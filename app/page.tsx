@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   AlertTriangle,
   CheckCircle,
-  AlertCircle,
   ExternalLink,
   Search,
   ChevronDown,
@@ -839,11 +838,12 @@ export default function Home() {
                   {walletTokens
                     .filter((token) => {
                       if (filterType === "spam") {
-                        return (
-                          token.is_spam || token.spamConfidence === "MAYBE"
-                        );
+                        return token.is_spam;
                       } else if (filterType === "safe") {
-                        return !token.is_spam && token.spamConfidence === "NO";
+                        return (
+                          (!token.is_spam && token.spamConfidence === "NO") ||
+                          token.spamConfidence === "MAYBE"
+                        );
                       }
                       return true;
                     })
@@ -854,7 +854,7 @@ export default function Home() {
                           token.is_spam
                             ? "bg-black/50 border-[#ff0000]/30 shadow-[0_0_10px_rgba(255,0,0,0.1)]"
                             : token.spamConfidence === "MAYBE"
-                            ? "bg-black/50 border-[#ffff00]/30 shadow-[0_0_10px_rgba(255,255,0,0.1)]"
+                            ? "bg-black/50 border-[#00ff00]/30 shadow-[0_0_10px_rgba(0,255,0,0.1)]"
                             : "bg-black/50 border-[#00ff00]/30 shadow-[0_0_10px_rgba(0,255,0,0.1)]"
                         }`}
                       >
@@ -883,7 +883,7 @@ export default function Home() {
                               token.is_spam
                                 ? "bg-[#ff0000]"
                                 : token.spamConfidence === "MAYBE"
-                                ? "bg-[#ffff00]"
+                                ? "bg-[#00ff00]"
                                 : "bg-[#00ff00]"
                             }`}
                           ></div>
@@ -910,9 +910,8 @@ export default function Home() {
 
                             {!token.is_spam &&
                               token.spamConfidence === "MAYBE" && (
-                                <span className="px-1.5 py-0.5 text-xs bg-[#ffff00]/20 text-[#ffff00] rounded-full flex items-center gap-1 border border-[#ffff00]/30">
-                                  <AlertCircle className="h-2.5 w-2.5" />{" "}
-                                  CAUTION
+                                <span className="px-1.5 py-0.5 text-xs bg-[#00ff00]/20 text-[#00ff00] rounded-full flex items-center gap-1 border border-[#00ff00]/30">
+                                  <CheckCircle className="h-2.5 w-2.5" /> SAFE
                                 </span>
                               )}
 
@@ -993,13 +992,6 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3
-                  className={`${pixelMonoFont.className} text-base sm:text-lg text-[#ff0000]`}
-                >
-                  Recent Spam Token Alerts
-                </h3>
-              </div>
               <RecentSpamTokens chainId={selectedChain} />
             </div>
           )}
@@ -1330,7 +1322,7 @@ export default function Home() {
                       token.is_spam
                         ? "bg-black/50 border-[#ff0000]/30 shadow-[0_0_10px_rgba(255,0,0,0.1)]"
                         : token.spamConfidence === "MAYBE"
-                        ? "bg-black/50 border-[#ffff00]/30 shadow-[0_0_10px_rgba(255,255,0,0.1)]"
+                        ? "bg-black/50 border-[#00ff00]/30 shadow-[0_0_10px_rgba(0,255,0,0.1)]"
                         : "bg-black/50 border-[#00ff00]/30 shadow-[0_0_10px_rgba(0,255,0,0.1)]"
                     }`}
                     style={{ animationDelay: `${index * 50}ms` }}
@@ -1361,7 +1353,7 @@ export default function Home() {
                             token.is_spam
                               ? "bg-[#ff0000]"
                               : token.spamConfidence === "MAYBE"
-                              ? "bg-[#ffff00]"
+                              ? "bg-[#00ff00]"
                               : "bg-[#00ff00]"
                           }`}
                         ></div>
@@ -1389,9 +1381,9 @@ export default function Home() {
 
                           {!token.is_spam &&
                             token.spamConfidence === "MAYBE" && (
-                              <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-[#ffff00]/20 text-[#ffff00] rounded-full flex items-center gap-1 border border-[#ffff00]/30">
-                                <AlertCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3" />{" "}
-                                CAUTION
+                              <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-[#00ff00]/20 text-[#00ff00] rounded-full flex items-center gap-1 border border-[#00ff00]/30">
+                                <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3" />{" "}
+                                SAFE
                               </span>
                             )}
 
@@ -1438,7 +1430,7 @@ export default function Home() {
                           token.is_spam
                             ? "bg-black/90 text-[#ff0000] border-[#ff0000]/50"
                             : token.spamConfidence === "MAYBE"
-                            ? "bg-black/90 text-[#ffff00] border-[#ffff00]/50"
+                            ? "bg-black/90 text-[#00ff00] border-[#00ff00]/50"
                             : "bg-black/90 text-[#00ff00] border-[#00ff00]/50"
                         }`}
                       >
