@@ -63,22 +63,31 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
           : "/api/spam-tokens";
       }
 
+      console.log(`Fetching from API URL: ${apiUrl}`);
       const response = await fetch(apiUrl);
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error(
+          `API error: ${response.status} ${response.statusText}`,
+          errorText
+        );
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
 
       if (data.error) {
+        console.error("API returned error:", data.error);
         throw new Error(data.error);
       }
 
+      console.log(`Received ${data.tokens?.length || 0} tokens from API`);
       setRecentSpamTokens(data.tokens);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Error fetching recent spam tokens:", err);
-      setError("Failed to load recent spam tokens");
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Failed to load recent spam tokens: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -94,17 +103,25 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
 
     try {
       const apiUrl = `/api/spam-tokens?token=${searchTerm.trim()}`;
+      console.log(`Searching token: ${apiUrl}`);
       const response = await fetch(apiUrl);
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error(
+          `API error: ${response.status} ${response.statusText}`,
+          errorText
+        );
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+      console.log("Search result:", data);
       setSearchResult(data);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Error searching for token:", err);
-      setError("Failed to search for token");
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Failed to search for token: ${errorMessage}`);
     } finally {
       setIsSearching(false);
     }

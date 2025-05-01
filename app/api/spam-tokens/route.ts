@@ -83,15 +83,42 @@ function getRandomTimestamp() {
   );
 }
 
-async function fetchWithCache(url: string): Promise<string> {
-  if (yamlCache[url]) return yamlCache[url];
-  const absUrl = "https://chainwatchdog.vercel.app" + url;
+async function fetchWithCache(path: string): Promise<string> {
+  if (yamlCache[path]) return yamlCache[path];
 
-  const response = await fetch(absUrl);
-  if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
-  const text = await response.text();
-  yamlCache[url] = text;
-  return text;
+  try {
+    // Use relative URL for deployment compatibility
+    const url = path.startsWith("/") ? path : `/${path}`;
+
+    // Use absolute URL in production, relative in development
+    let fetchUrl;
+    if (process.env.VERCEL_URL) {
+      // We're on Vercel
+      fetchUrl = `https://${process.env.VERCEL_URL}${url}`;
+    } else if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+      // Another way to get Vercel URL
+      fetchUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}${url}`;
+    } else {
+      // Local development
+      fetchUrl = url;
+    }
+
+    console.log(`Fetching from: ${fetchUrl}`);
+    const response = await fetch(fetchUrl);
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch ${fetchUrl}: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const text = await response.text();
+    yamlCache[path] = text;
+    return text;
+  } catch (error) {
+    console.error(`Error fetching ${path}:`, error);
+    throw error;
+  }
 }
 
 async function parseSpamList(
@@ -202,8 +229,8 @@ async function updateAllCaches() {
   }
 }
 
-// Make sure this is not executed at the edge (it must run on Node.js to read files)
-export const runtime = "nodejs";
+// Make sure this is executed at the edge (since we're just using fetch now)
+export const runtime = "edge";
 
 initializeCache().catch(console.error);
 
