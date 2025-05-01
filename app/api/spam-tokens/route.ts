@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
 import yaml from "js-yaml";
 
 const networkMapping: Record<
@@ -9,32 +8,32 @@ const networkMapping: Record<
   ETHEREUM_MAINNET: {
     id: "eth-mainnet",
     name: "Ethereum",
-    yamlPath: "src/spam-lists/eth_mainnet_token_spam_contracts_yes.yaml",
+    yamlPath: "/spam-lists/eth_mainnet_token_spam_contracts_yes.yaml",
   },
   BSC_MAINNET: {
     id: "bsc-mainnet",
     name: "BSC",
-    yamlPath: "src/spam-lists/bsc_mainnet_token_spam_contracts_yes_1.yaml",
+    yamlPath: "/spam-lists/bsc_mainnet_token_spam_contracts_yes_1.yaml",
   },
   POLYGON_MAINNET: {
     id: "matic-mainnet",
     name: "Polygon",
-    yamlPath: "src/spam-lists/pol_mainnet_token_spam_contracts_yes.yaml",
+    yamlPath: "/spam-lists/pol_mainnet_token_spam_contracts_yes.yaml",
   },
   OPTIMISM_MAINNET: {
     id: "optimism-mainnet",
     name: "Optimism",
-    yamlPath: "src/spam-lists/op_mainnet_token_spam_contracts_yes.yaml",
+    yamlPath: "/spam-lists/op_mainnet_token_spam_contracts_yes.yaml",
   },
   GNOSIS_MAINNET: {
     id: "gnosis-mainnet",
     name: "Gnosis",
-    yamlPath: "src/spam-lists/gnosis_mainnet_token_spam_contracts_yes.yaml",
+    yamlPath: "/spam-lists/gnosis_mainnet_token_spam_contracts_yes.yaml",
   },
   BASE_MAINNET: {
     id: "base-mainnet",
     name: "Base",
-    yamlPath: "src/spam-lists/base_mainnet_token_spam_contracts_yes.yaml",
+    yamlPath: "/spam-lists/base_mainnet_token_spam_contracts_yes.yaml",
   },
 };
 
@@ -84,18 +83,15 @@ function getRandomTimestamp() {
   );
 }
 
-async function fetchWithCache(path: string): Promise<string> {
-  if (yamlCache[path]) {
-    return yamlCache[path];
-  }
-  try {
-    const text = await fs.readFile(path, "utf8");
-    yamlCache[path] = text;
-    return text;
-  } catch (error) {
-    console.error(`Error reading ${path}:`, error);
-    throw error;
-  }
+async function fetchWithCache(url: string): Promise<string> {
+  if (yamlCache[url]) return yamlCache[url];
+  const absUrl = "https://chainwatchdog.vercel.app/" + url;
+
+  const response = await fetch(absUrl);
+  if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
+  const text = await response.text();
+  yamlCache[url] = text;
+  return text;
 }
 
 async function parseSpamList(
