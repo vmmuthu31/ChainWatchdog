@@ -1,4 +1,20 @@
+"use client";
 import { Chain, GoldRushClient } from "@covalenthq/client-sdk";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let isERC20Spam: any = null;
+
+type ConfidenceLevel = "YES" | "MAYBE";
+
+if (typeof window === "undefined") {
+  import("@covalenthq/goldrush-enhanced-spam-lists")
+    .then((module) => {
+      isERC20Spam = module.isERC20Spam;
+    })
+    .catch((error) => {
+      console.error("Failed to import enhanced-spam-lists:", error);
+    });
+}
 
 export interface TokenBalance {
   contract_decimals: number;
@@ -701,10 +717,34 @@ export const getExplorerUrl = (
   return `${chain.explorer}/token/${tokenAddress}`;
 };
 
-const GoldRushServices = async (
+const checkTokenSpam = async (
+  tokenAddress: string,
+  chainId: string,
+  confidenceLevel: ConfidenceLevel
+): Promise<boolean> => {
+  try {
+    if (typeof isERC20Spam !== "function") {
+      return false;
+    }
+
+    return await isERC20Spam(tokenAddress, chainId, confidenceLevel, true);
+  } catch (error) {
+    console.error(`Enhanced spam check error for ${tokenAddress}:`, error);
+    return false;
+  }
+};
+
+const GoldRushServices = (
   walletAddress: string,
   chainId: string = "eth-mainnet"
 ): Promise<GoldRushResponse> => {
+  return fetchGoldRushData(walletAddress, chainId);
+};
+
+async function fetchGoldRushData(
+  walletAddress: string,
+  chainId: string
+): Promise<GoldRushResponse> {
   const client = new GoldRushClient(
     process.env.NEXT_PUBLIC_GOLDRUSH_API_KEY || ""
   );
@@ -719,18 +759,64 @@ const GoldRushServices = async (
     if (!response.error) {
       const enhancedResponse = response as unknown as GoldRushResponse;
 
-      enhancedResponse.data.items.forEach((token) => {
-        if (token.is_spam) {
-          token.spamConfidence = "YES";
-          token.spamScore = "High";
-        } else if (token.type === "dust" || parseFloat(token.balance) === 0) {
-          token.spamConfidence = "MAYBE";
-          token.spamScore = "Medium";
-        } else {
-          token.spamConfidence = "NO";
-          token.spamScore = "Low";
-        }
-      });
+      await Promise.all(
+        enhancedResponse.data.items.map(async (token) => {
+          try {
+            if (token.is_spam) {
+              token.spamConfidence = "YES";
+              token.spamScore = "High";
+              return;
+            }
+
+            if (typeof isERC20Spam === "function") {
+              const isDefiniteSpam = await checkTokenSpam(
+                token.contract_address,
+                chainId,
+                "YES"
+              );
+
+              if (isDefiniteSpam) {
+                token.is_spam = true;
+                token.spamConfidence = "YES";
+                token.spamScore = "High";
+                return;
+              }
+
+              const isPotentialSpam = await checkTokenSpam(
+                token.contract_address,
+                chainId,
+                "MAYBE"
+              );
+
+              if (isPotentialSpam) {
+                token.spamConfidence = "MAYBE";
+                token.spamScore = "Medium";
+                return;
+              }
+            }
+
+            if (token.type === "dust" || parseFloat(token.balance) === 0) {
+              token.spamConfidence = "MAYBE";
+              token.spamScore = "Medium";
+            } else {
+              token.spamConfidence = "NO";
+              token.spamScore = "Low";
+            }
+          } catch (error) {
+            console.error(
+              `Error checking token ${token.contract_address}:`,
+              error
+            );
+            if (token.type === "dust" || parseFloat(token.balance) === 0) {
+              token.spamConfidence = "MAYBE";
+              token.spamScore = "Medium";
+            } else {
+              token.spamConfidence = "NO";
+              token.spamScore = "Low";
+            }
+          }
+        })
+      );
 
       return enhancedResponse;
     } else {
@@ -741,6 +827,6 @@ const GoldRushServices = async (
   } catch (error) {
     throw error;
   }
-};
+}
 
 export default GoldRushServices;
