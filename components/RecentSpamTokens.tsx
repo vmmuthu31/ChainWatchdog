@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { AlertTriangle, ExternalLink, Clock, Search } from "lucide-react";
 import { Press_Start_2P, VT323 } from "next/font/google";
 import { getExplorerUrl } from "@/lib/services/goldrush";
+import yaml from "js-yaml";
 
 const pixelFont = Press_Start_2P({
   weight: "400",
@@ -14,6 +15,52 @@ const pixelMonoFont = VT323({
   weight: "400",
   subsets: ["latin"],
 });
+
+// Network configuration
+const networkMapping: Record<
+  string,
+  { id: string; name: string; yamlPath: string }
+> = {
+  ETHEREUM_MAINNET: {
+    id: "eth-mainnet",
+    name: "Ethereum",
+    yamlPath: "/spam-lists/eth_mainnet_token_spam_contracts_yes.yaml",
+  },
+  BSC_MAINNET: {
+    id: "bsc-mainnet",
+    name: "BSC",
+    yamlPath: "/spam-lists/bsc_mainnet_token_spam_contracts_yes_1.yaml",
+  },
+  POLYGON_MAINNET: {
+    id: "matic-mainnet",
+    name: "Polygon",
+    yamlPath: "/spam-lists/pol_mainnet_token_spam_contracts_yes.yaml",
+  },
+  OPTIMISM_MAINNET: {
+    id: "optimism-mainnet",
+    name: "Optimism",
+    yamlPath: "/spam-lists/op_mainnet_token_spam_contracts_yes.yaml",
+  },
+  GNOSIS_MAINNET: {
+    id: "gnosis-mainnet",
+    name: "Gnosis",
+    yamlPath: "/spam-lists/gnosis_mainnet_token_spam_contracts_yes.yaml",
+  },
+  BASE_MAINNET: {
+    id: "base-mainnet",
+    name: "Base",
+    yamlPath: "/spam-lists/base_mainnet_token_spam_contracts_yes.yaml",
+  },
+};
+
+const chainToNetwork: Record<string, { networkKey: string }> = {
+  "eth-mainnet": { networkKey: "ETHEREUM_MAINNET" },
+  "bsc-mainnet": { networkKey: "BSC_MAINNET" },
+  "matic-mainnet": { networkKey: "POLYGON_MAINNET" },
+  "optimism-mainnet": { networkKey: "OPTIMISM_MAINNET" },
+  "gnosis-mainnet": { networkKey: "GNOSIS_MAINNET" },
+  "base-mainnet": { networkKey: "BASE_MAINNET" },
+};
 
 type SpamToken = {
   address: string;
@@ -35,6 +82,9 @@ interface RecentSpamTokensProps {
   chainId?: string;
 }
 
+// Client-side cache for YAML content
+const yamlCache: Record<string, { SpamContracts?: string[] }> = {};
+
 export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
   const [recentSpamTokens, setRecentSpamTokens] = useState<SpamToken[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,46 +94,155 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
 
-  useEffect(() => {
-    fetchRecentSpamTokens();
-  }, [chainId, showRecentFromAll]);
+  // Function to get a random timestamp in the past
+  const getRandomTimestamp = useCallback(() => {
+    const now = Date.now();
+    const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
+    const oneDayAgo = now - 24 * 60 * 60 * 1000;
+    return (
+      thirtyDaysAgo + Math.floor(Math.random() * (oneDayAgo - thirtyDaysAgo))
+    );
+  }, []);
 
-  const fetchRecentSpamTokens = async () => {
+  // Function to fetch a YAML file with caching
+  const fetchYamlWithCache = useCallback(async (path: string) => {
+    if (yamlCache[path]) {
+      return yamlCache[path];
+    }
+
+    try {
+      console.log(`Fetching YAML file: ${path}`);
+      const response = await fetch(path);
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch ${path}: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const text = await response.text();
+      const parsed = yaml.load(text) as { SpamContracts?: string[] };
+      yamlCache[path] = parsed;
+      return parsed;
+    } catch (error) {
+      console.error(`Error fetching ${path}:`, error);
+      throw error;
+    }
+  }, []);
+
+  // Function to parse spam list entries
+  const parseSpamList = useCallback(
+    async (networkKey: string, yamlPath: string, limit = 100) => {
+      try {
+        const parsed = await fetchYamlWithCache(yamlPath);
+        const tokenEntries: SpamToken[] = [];
+
+        if (parsed && Array.isArray(parsed.SpamContracts)) {
+          const entries = parsed.SpamContracts.slice(0, limit);
+
+          entries.forEach((entry: string) => {
+            const parts = entry.split("/");
+            if (parts.length >= 2) {
+              // The actual Ethereum address is the second part (index 1)
+              const address = parts[1];
+              // Score is the third part if available
+              const scoreStr = parts.length > 2 ? parts[2] : "0";
+              const score = parseInt(scoreStr, 10) || 0;
+
+              // Skip entries with invalid addresses
+              if (!address || !address.startsWith("0x")) {
+                return;
+              }
+
+              const networkInfo = networkMapping[networkKey];
+              tokenEntries.push({
+                address: address.toLowerCase(),
+                networkId: networkInfo.id,
+                network: networkInfo.name,
+                name: `Spam Token (${address.substring(0, 6)}...)`,
+                symbol: "SPAM",
+                timestamp: getRandomTimestamp(),
+                score: score,
+              });
+            }
+          });
+        }
+
+        return tokenEntries.sort(
+          (a, b) => (b.timestamp || 0) - (a.timestamp || 0)
+        );
+      } catch (error) {
+        console.error(`Error parsing spam list from ${yamlPath}:`, error);
+        return [];
+      }
+    },
+    [getRandomTimestamp, fetchYamlWithCache]
+  );
+
+  // Function to fetch recent spam tokens
+  const fetchRecentSpamTokens = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      let apiUrl = "";
+      let tokens: SpamToken[] = [];
 
       if (showRecentFromAll) {
-        apiUrl = `/api/spam-tokens?recent=true`;
+        // Fetch tokens from all networks
+        const defaultNetworks = [
+          "ETHEREUM_MAINNET",
+          "BSC_MAINNET",
+          "POLYGON_MAINNET",
+        ];
+
+        const allTokensPromises = defaultNetworks.map(async (networkKey) => {
+          const network = networkMapping[networkKey];
+          const spamTokens = await parseSpamList(
+            networkKey,
+            network.yamlPath,
+            20
+          );
+          return spamTokens.slice(0, 5);
+        });
+
+        const allTokensArrays = await Promise.all(allTokensPromises);
+        tokens = allTokensArrays
+          .flat()
+          .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+          .slice(0, 5);
+      } else if (chainId && chainToNetwork[chainId]) {
+        // Fetch tokens for specific chain
+        const { networkKey } = chainToNetwork[chainId];
+        const network = networkMapping[networkKey];
+        tokens = await parseSpamList(networkKey, network.yamlPath, 10);
+        tokens = tokens.slice(0, 5);
       } else {
-        apiUrl = chainId
-          ? `/api/spam-tokens?chainId=${chainId}`
-          : "/api/spam-tokens";
+        // Fetch from default networks
+        const defaultNetworks = [
+          "ETHEREUM_MAINNET",
+          "BSC_MAINNET",
+          "POLYGON_MAINNET",
+        ];
+
+        const allTokensPromises = defaultNetworks.map(async (networkKey) => {
+          const network = networkMapping[networkKey];
+          const spamTokens = await parseSpamList(
+            networkKey,
+            network.yamlPath,
+            10
+          );
+          return spamTokens.slice(0, 2);
+        });
+
+        const allTokensArrays = await Promise.all(allTokensPromises);
+        tokens = allTokensArrays
+          .flat()
+          .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+          .slice(0, 5);
       }
 
-      console.log(`Fetching from API URL: ${apiUrl}`);
-      const response = await fetch(apiUrl);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(
-          `API error: ${response.status} ${response.statusText}`,
-          errorText
-        );
-        throw new Error(`API error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      if (data.error) {
-        console.error("API returned error:", data.error);
-        throw new Error(data.error);
-      }
-
-      console.log(`Received ${data.tokens?.length || 0} tokens from API`);
-      setRecentSpamTokens(data.tokens);
+      console.log(`Received ${tokens.length} tokens`);
+      setRecentSpamTokens(tokens);
     } catch (err: unknown) {
       console.error("Error fetching recent spam tokens:", err);
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -91,8 +250,9 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [chainId, showRecentFromAll, parseSpamList]);
 
+  // Function to handle token search
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -102,22 +262,29 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     setSearchResult(null);
 
     try {
-      const apiUrl = `/api/spam-tokens?token=${searchTerm.trim()}`;
-      console.log(`Searching token: ${apiUrl}`);
-      const response = await fetch(apiUrl);
+      const searchAddress = searchTerm.trim().toLowerCase();
+      console.log(`Searching for token: ${searchAddress}`);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(
-          `API error: ${response.status} ${response.statusText}`,
-          errorText
-        );
-        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      for (const [, network] of Object.entries(networkMapping)) {
+        const parsed = await fetchYamlWithCache(network.yamlPath);
+
+        if (
+          parsed?.SpamContracts?.some((entry: string) => {
+            const parts = entry.toLowerCase().split("/");
+            return parts.length >= 2 && parts[1] === searchAddress;
+          })
+        ) {
+          setSearchResult({
+            found: true,
+            network: network.name,
+            networkId: network.id,
+          });
+          return;
+        }
       }
 
-      const data = await response.json();
-      console.log("Search result:", data);
-      setSearchResult(data);
+      // If we get here, the token wasn't found
+      setSearchResult({ found: false });
     } catch (err: unknown) {
       console.error("Error searching for token:", err);
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -126,6 +293,10 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
       setIsSearching(false);
     }
   };
+
+  useEffect(() => {
+    fetchRecentSpamTokens();
+  }, [chainId, showRecentFromAll, fetchRecentSpamTokens]);
 
   const toggleModeLabel = showRecentFromAll
     ? "Show chain specific tokens"
