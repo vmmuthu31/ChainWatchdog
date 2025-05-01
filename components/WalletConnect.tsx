@@ -48,7 +48,7 @@ function WalletConnect() {
                 return (
                   <Button
                     onClick={openConnectModal}
-                    className={`${pixelFont.className} bg-transparent border-2 border-[#00ff00] hover:bg-[#00ff00]/10 text-[#00ff00] hover:text-[#00ffff] font-semibold px-6 py-2.5 rounded-xl shadow-[0_0_10px_rgba(0,255,0,0.3)] hover:shadow-[0_0_15px_rgba(0,255,0,0.5)] transition-all duration-200`}
+                    className={`${pixelFont.className} text-xs sm:text-sm bg-transparent border-2 border-[#00ff00] hover:bg-[#00ff00]/10 text-[#00ff00] hover:text-[#00ffff] font-semibold px-2 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-xl shadow-[0_0_10px_rgba(0,255,0,0.3)] hover:shadow-[0_0_15px_rgba(0,255,0,0.5)] transition-all duration-200`}
                   >
                     CONNECT
                   </Button>
@@ -59,24 +59,24 @@ function WalletConnect() {
                 return (
                   <Button
                     onClick={openChainModal}
-                    className={`${pixelFont.className} bg-[#ff0000]/20 text-[#ff0000] border border-[#ff0000]/50 hover:bg-[#ff0000]/30 font-medium px-4 py-2 rounded-xl`}
+                    className={`${pixelFont.className} text-xs sm:text-sm bg-[#ff0000]/20 text-[#ff0000] border border-[#ff0000]/50 hover:bg-[#ff0000]/30 font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl`}
                     type="button"
                   >
-                    WRONG NETWORK
+                    WRONG NET
                   </Button>
                 );
               }
 
               return (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4">
                   <button
                     onClick={openChainModal}
-                    className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-2 rounded-xl bg-black/50 hover:bg-black/80 border border-[#00ff00]/50 text-[#00ffff] transition-colors duration-200`}
+                    className={`${pixelMonoFont.className} flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 rounded-xl bg-black/50 hover:bg-black/80 border border-[#00ff00]/50 text-[#00ffff] transition-colors duration-200`}
                     type="button"
                   >
                     {chain.hasIcon && (
                       <div
-                        className="relative w-5 h-5 rounded-full overflow-hidden border border-[#00ff00]/30"
+                        className="relative w-4 h-4 sm:w-5 sm:h-5 rounded-full overflow-hidden border border-[#00ff00]/30"
                         style={{
                           background: chain.iconBackground,
                         }}
@@ -91,15 +91,17 @@ function WalletConnect() {
                         )}
                       </div>
                     )}
-                    <span className="text-sm font-medium">{chain.name}</span>
+                    <span className="text-xs sm:text-sm font-medium hidden xs:inline">
+                      {chain.name}
+                    </span>
                   </button>
 
                   <button
                     onClick={openAccountModal}
-                    className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00ff00]/10 hover:bg-[#00ff00]/20 border border-[#00ff00]/30 text-[#00ff00] transition-colors duration-200`}
+                    className={`${pixelMonoFont.className} flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 rounded-xl bg-[#00ff00]/10 hover:bg-[#00ff00]/20 border border-[#00ff00]/30 text-[#00ff00] transition-colors duration-200`}
                     type="button"
                   >
-                    <span className="text-sm font-medium">
+                    <span className="text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-[120px] md:max-w-none">
                       {account.displayName}
                       {account.displayBalance
                         ? ` (${account.displayBalance})`

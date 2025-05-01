@@ -239,22 +239,23 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-black text-white">
-      <header className="w-full border-b border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-4 sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative">
+      <header className="w-full border-b border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-2 sm:p-3 md:p-4 sticky top-0 z-50">
+        <div className="container mx-auto px-2 flex items-center justify-between">
+          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
+            <div className="relative hidden xs:block">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-[#00ff00] to-[#00ffff] rounded-full blur opacity-70"></div>
               <div className="relative">
                 <Image
                   src="/logo.png"
                   alt="ChainWatchDog Logo"
-                  width={20}
-                  height={20}
+                  width={16}
+                  height={16}
+                  className="sm:w-[20px] sm:h-[20px]"
                 />
               </div>
             </div>
             <h1
-              className={`${pixelFont.className} text-xl font-bold bg-gradient-to-r from-[#00ff00] to-[#00ffff] bg-clip-text text-transparent glow-green-sm`}
+              className={`${pixelFont.className} text-xs sm:text-sm md:text-xl font-bold bg-gradient-to-r from-[#00ff00] to-[#00ffff] bg-clip-text text-transparent glow-green-sm`}
             >
               ChainWatchDog
             </h1>
@@ -263,16 +264,16 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="container mx-auto flex flex-1 flex-col items-center justify-center gap-10 p-4 md:p-8">
+      <main className="container mx-auto flex flex-1 flex-col items-center justify-center gap-6 sm:gap-10 p-3 sm:p-4 md:p-8">
         <div className="text-center space-y-6 max-w-2xl relative">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#00ff00]/20 via-transparent to-transparent blur-3xl"></div>
           <h2
-            className={`${pixelFont.className} text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-[#00ff00] via-[#00ffff] to-[#ff00ff] bg-clip-text text-transparent glow-green-md animate-pulse-slow`}
+            className={`${pixelFont.className} text-2xl sm:text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-[#00ff00] via-[#00ffff] to-[#ff00ff] bg-clip-text text-transparent glow-green-md animate-pulse-slow`}
           >
             SPAM SHIELD DETECTOR
           </h2>
           <p
-            className={`${pixelMonoFont.className} text-xl text-[#00ff00] leading-relaxed max-w-xl mx-auto animate-fade-in-up animation-delay-100`}
+            className={`${pixelMonoFont.className} text-base sm:text-xl text-[#00ff00] leading-relaxed max-w-xl mx-auto animate-fade-in-up animation-delay-100`}
           >
             Instantly analyze wallets for spam tokens and security threats
             across{" "}
@@ -283,7 +284,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="w-full max-w-xl backdrop-blur-lg bg-black/50 p-8 rounded-2xl border border-[#00ff00]/30 shadow-xl relative z-[10] transform transition-all duration-300 hover:shadow-[0_0_50px_-12px_rgba(0,255,0,0.5)]">
+        <div className="w-full max-w-xl backdrop-blur-lg bg-black/50 p-4 sm:p-6 md:p-8 rounded-2xl border border-[#00ff00]/30 shadow-xl relative z-[10] transform transition-all duration-300 hover:shadow-[0_0_50px_-12px_rgba(0,255,0,0.5)]">
           {/* Network selector */}
           <div className="mb-6">
             <label
@@ -754,22 +755,22 @@ export default function Home() {
         {tokenData && !error && !isLoading && (
           <div className="w-full max-w-4xl space-y-8 relative z-[5] animate-fade-in">
             {/* Wallet Summary Card */}
-            <div className="p-6 backdrop-blur-lg bg-black/50 rounded-2xl border border-[#00ff00]/30 shadow-[0_0_15px_rgba(0,255,0,0.2)] overflow-hidden relative">
+            <div className="p-4 sm:p-6 backdrop-blur-lg bg-black/50 rounded-2xl border border-[#00ff00]/30 shadow-[0_0_15px_rgba(0,255,0,0.2)] overflow-hidden relative">
               <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#00ff00]/10 via-transparent to-transparent"></div>
 
-              <div className="flex items-center gap-2 mb-6">
-                <div className="h-9 w-9 rounded-lg bg-[#00ff00]/10 flex items-center justify-center">
-                  <ShieldCheck className="h-5 w-5 text-[#00ff00]" />
+              <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                <div className="h-7 w-7 sm:h-9 sm:w-9 rounded-lg bg-[#00ff00]/10 flex items-center justify-center">
+                  <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-[#00ff00]" />
                 </div>
                 <h3
-                  className={`${pixelFont.className} text-xl font-bold text-[#00ffff]`}
+                  className={`${pixelFont.className} text-base sm:text-xl font-bold text-[#00ffff]`}
                 >
                   WALLET SECURITY
                 </h3>
               </div>
 
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="space-y-4 text-[#00ffff] flex-1">
+              <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
+                <div className="space-y-3 sm:space-y-4 text-[#00ffff] flex-1">
                   <div className="space-y-1">
                     <span
                       className={`${pixelMonoFont.className} text-xs text-[#00ff00]`}
@@ -778,7 +779,7 @@ export default function Home() {
                     </span>
                     <div className="flex items-center gap-2">
                       <span
-                        className={`${pixelMonoFont.className} text-sm font-mono bg-black/50 py-1 px-2 rounded-lg truncate border border-[#00ff00]/20`}
+                        className={`${pixelMonoFont.className} text-xs sm:text-sm font-mono bg-black/50 py-1 px-2 rounded-lg truncate border border-[#00ff00]/20`}
                       >
                         {tokenData.data.address}
                       </span>
@@ -786,9 +787,9 @@ export default function Home() {
                         href={`${currentChain.explorer}/address/${tokenData.data.address}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-black/50 text-[#00ff00] hover:bg-black/70 hover:text-[#00ffff] transition-colors border border-[#00ff00]/30"
+                        className="inline-flex items-center justify-center h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-black/50 text-[#00ff00] hover:bg-black/70 hover:text-[#00ffff] transition-colors border border-[#00ff00]/30"
                       >
-                        <ExternalLink className="h-3 w-3" />
+                        <ExternalLink className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       </a>
                     </div>
                   </div>
@@ -800,7 +801,7 @@ export default function Home() {
                     </span>
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1.5 bg-black/50 py-1 px-2 rounded-lg border border-[#00ff00]/20">
-                        <div className="w-4 h-4 rounded-full bg-black/80 flex items-center justify-center overflow-hidden border border-[#00ff00]/30">
+                        <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-black/80 flex items-center justify-center overflow-hidden border border-[#00ff00]/30">
                           <Image
                             src={
                               currentChain.logoUrl ||
@@ -813,13 +814,13 @@ export default function Home() {
                           />
                         </div>
                         <span
-                          className={`${pixelMonoFont.className} text-sm font-medium`}
+                          className={`${pixelMonoFont.className} text-xs sm:text-sm font-medium`}
                         >
                           {currentChain.name}
                         </span>
                         {currentChain.type === "Testnet" && (
                           <span
-                            className={`${pixelMonoFont.className} text-xs px-1.5 py-0.5 bg-[#ff00ff]/20 text-[#ff00ff] rounded-full`}
+                            className={`${pixelMonoFont.className} text-[10px] sm:text-xs px-1 sm:px-1.5 py-0.5 bg-[#ff00ff]/20 text-[#ff00ff] rounded-full`}
                           >
                             Testnet
                           </span>
@@ -834,46 +835,46 @@ export default function Home() {
                       LAST SCANNED
                     </span>
                     <div
-                      className={`${pixelMonoFont.className} text-sm bg-black/50 py-1 px-2 rounded-lg border border-[#00ff00]/20`}
+                      className={`${pixelMonoFont.className} text-xs sm:text-sm bg-black/50 py-1 px-2 rounded-lg border border-[#00ff00]/20`}
                     >
                       {new Date(tokenData.data.updated_at).toLocaleString()}
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 flex-1">
-                  <div className="p-4 bg-black/70 rounded-xl border border-[#00ff00]/30 text-center transform transition-all duration-300 hover:scale-105 shadow-[0_0_10px_rgba(0,255,0,0.1)]">
+                <div className="grid grid-cols-3 gap-2 sm:gap-4 flex-1">
+                  <div className="p-2 sm:p-4 bg-black/70 rounded-xl border border-[#00ff00]/30 text-center transform transition-all duration-300 hover:scale-105 shadow-[0_0_10px_rgba(0,255,0,0.1)]">
                     <div
-                      className={`${pixelFont.className} text-3xl font-bold text-[#00ffff] mb-1 glow-cyan-sm`}
+                      className={`${pixelFont.className} text-xl sm:text-3xl font-bold text-[#00ffff] mb-1 glow-cyan-sm`}
                     >
                       {spamStats.total}
                     </div>
                     <div
-                      className={`${pixelMonoFont.className} text-xs text-[#00ff00]`}
+                      className={`${pixelMonoFont.className} text-[10px] sm:text-xs text-[#00ff00]`}
                     >
                       TOTAL TOKENS
                     </div>
                   </div>
-                  <div className="p-4 bg-black/70 rounded-xl border border-[#ff0000]/30 text-center transform transition-all duration-300 hover:scale-105 shadow-[0_0_10px_rgba(255,0,0,0.1)]">
+                  <div className="p-2 sm:p-4 bg-black/70 rounded-xl border border-[#ff0000]/30 text-center transform transition-all duration-300 hover:scale-105 shadow-[0_0_10px_rgba(255,0,0,0.1)]">
                     <div
-                      className={`${pixelFont.className} text-3xl font-bold text-[#ff5555] mb-1 glow-red-sm`}
+                      className={`${pixelFont.className} text-xl sm:text-3xl font-bold text-[#ff5555] mb-1 glow-red-sm`}
                     >
                       {spamStats.spam}
                     </div>
                     <div
-                      className={`${pixelMonoFont.className} text-xs text-[#ff0000]`}
+                      className={`${pixelMonoFont.className} text-[10px] sm:text-xs text-[#ff0000]`}
                     >
                       SPAM TOKENS
                     </div>
                   </div>
-                  <div className="p-4 bg-black/70 rounded-xl border border-[#00ff00]/30 text-center transform transition-all duration-300 hover:scale-105 shadow-[0_0_10px_rgba(0,255,0,0.1)]">
+                  <div className="p-2 sm:p-4 bg-black/70 rounded-xl border border-[#00ff00]/30 text-center transform transition-all duration-300 hover:scale-105 shadow-[0_0_10px_rgba(0,255,0,0.1)]">
                     <div
-                      className={`${pixelFont.className} text-3xl font-bold text-[#00ff00] mb-1 glow-green-sm`}
+                      className={`${pixelFont.className} text-xl sm:text-3xl font-bold text-[#00ff00] mb-1 glow-green-sm`}
                     >
                       {spamStats.safe}
                     </div>
                     <div
-                      className={`${pixelMonoFont.className} text-xs text-[#00ff00]`}
+                      className={`${pixelMonoFont.className} text-[10px] sm:text-xs text-[#00ff00]`}
                     >
                       SAFE TOKENS
                     </div>
@@ -924,10 +925,10 @@ export default function Home() {
             </div>
 
             {/* Tokens List */}
-            <div className="space-y-6">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-black/50 p-4 rounded-xl border border-[#00ff00]/30 shadow-[0_0_15px_rgba(0,255,0,0.1)]">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-lg bg-[#00ff00]/10 flex items-center justify-center">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 bg-black/50 p-3 sm:p-4 rounded-xl border border-[#00ff00]/30 shadow-[0_0_15px_rgba(0,255,0,0.1)]">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-[#00ff00]/10 flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -936,7 +937,7 @@ export default function Home() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="h-4 w-4 text-[#00ff00]"
+                      className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#00ff00]"
                     >
                       <circle cx="8" cy="21" r="1" />
                       <circle cx="19" cy="21" r="1" />
@@ -944,35 +945,35 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3
-                    className={`${pixelFont.className} text-xl font-bold text-[#00ffff]`}
+                    className={`${pixelFont.className} text-base sm:text-xl font-bold text-[#00ffff]`}
                   >
                     TOKEN HOLDINGS
                   </h3>
                 </div>
 
-                <div className="flex items-center gap-3 w-full md:w-auto">
-                  <div className="relative flex-1 md:w-60">
+                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                  <div className="relative flex-1 sm:w-60">
                     <input
                       type="text"
                       placeholder="Search tokens..."
-                      className="w-full pl-10 pr-4 py-2 bg-black/80 border border-[#00ff00]/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#00ff00] text-[#00ffff] text-sm"
+                      className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1.5 sm:py-2 bg-black/80 border border-[#00ff00]/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#00ff00] text-[#00ffff] text-xs sm:text-sm"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#00ff00]" />
+                    <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#00ff00]" />
                     {searchQuery && (
                       <button
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#00ff00] hover:text-[#00ffff]"
+                        className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#00ff00] hover:text-[#00ffff]"
                         onClick={() => setSearchQuery("")}
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       </button>
                     )}
                   </div>
 
                   <div className="flex p-1 bg-black/80 border border-[#00ff00]/50 rounded-lg overflow-hidden">
                     <button
-                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
                         filterType === "all"
                           ? "bg-[#00ff00] text-black"
                           : "text-[#00ff00] hover:bg-black/90"
@@ -982,7 +983,7 @@ export default function Home() {
                       All
                     </button>
                     <button
-                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
                         filterType === "spam"
                           ? "bg-[#ff0000] text-black"
                           : "text-[#00ff00] hover:bg-black/90"
@@ -992,7 +993,7 @@ export default function Home() {
                       Spam
                     </button>
                     <button
-                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
                         filterType === "safe"
                           ? "bg-[#00ff00] text-black"
                           : "text-[#00ff00] hover:bg-black/90"
@@ -1040,7 +1041,7 @@ export default function Home() {
                 {filteredTokens.map((token, index) => (
                   <div
                     key={token.contract_address}
-                    className={`p-5 backdrop-blur-lg rounded-xl border flex flex-col md:flex-row md:items-center gap-4 transition-all duration-300 hover:shadow-lg animate-fade-in ${
+                    className={`p-4 sm:p-5 backdrop-blur-lg rounded-xl border flex flex-col md:flex-row md:items-center gap-3 sm:gap-4 transition-all duration-300 hover:shadow-lg animate-fade-in ${
                       token.is_spam
                         ? "bg-black/50 border-[#ff0000]/30 shadow-[0_0_10px_rgba(255,0,0,0.1)]"
                         : token.spamConfidence === "MAYBE"
@@ -1049,8 +1050,8 @@ export default function Home() {
                     }`}
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 relative rounded-full overflow-hidden bg-black/80 flex-shrink-0 border border-[#00ff00]/30">
+                    <div className="flex items-center gap-3 sm:gap-4 w-full">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 relative rounded-full overflow-hidden bg-black/80 flex-shrink-0 border border-[#00ff00]/30">
                         {token.logo_url ? (
                           <Image
                             src={token.logo_url}
@@ -1062,7 +1063,7 @@ export default function Home() {
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-black to-gray-900 border border-[#00ff00]/10">
                             <span
-                              className={`${pixelMonoFont.className} text-lg font-semibold text-[#00ff00]`}
+                              className={`${pixelMonoFont.className} text-base sm:text-lg font-semibold text-[#00ff00]`}
                             >
                               {token.contract_ticker_symbol.charAt(0)}
                             </span>
@@ -1071,7 +1072,7 @@ export default function Home() {
 
                         {/* Security indicator dot */}
                         <div
-                          className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-black ${
+                          className={`absolute bottom-0 right-0 w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-black ${
                             token.is_spam
                               ? "bg-[#ff0000]"
                               : token.spamConfidence === "MAYBE"
@@ -1084,37 +1085,40 @@ export default function Home() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <h4
-                            className={`${pixelMonoFont.className} font-medium truncate text-[#00ffff]`}
+                            className={`${pixelMonoFont.className} text-sm sm:text-base font-medium truncate text-[#00ffff]`}
                           >
                             {token.contract_name}
                           </h4>
                           <span
-                            className={`${pixelMonoFont.className} text-sm px-2 py-0.5 bg-black/80 rounded-full text-[#00ff00] border border-[#00ff00]/30`}
+                            className={`${pixelMonoFont.className} text-xs sm:text-sm px-1.5 sm:px-2 py-0.5 bg-black/80 rounded-full text-[#00ff00] border border-[#00ff00]/30`}
                           >
                             {token.contract_ticker_symbol}
                           </span>
 
                           {token.is_spam && (
-                            <span className="px-2 py-0.5 text-xs bg-[#ff0000]/20 text-[#ff0000] rounded-full flex items-center gap-1 border border-[#ff0000]/30">
-                              <AlertTriangle className="h-3 w-3" /> SPAM TOKEN
+                            <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-[#ff0000]/20 text-[#ff0000] rounded-full flex items-center gap-1 border border-[#ff0000]/30">
+                              <AlertTriangle className="h-2.5 w-2.5 sm:h-3 sm:w-3" />{" "}
+                              SPAM
                             </span>
                           )}
 
                           {!token.is_spam &&
                             token.spamConfidence === "MAYBE" && (
-                              <span className="px-2 py-0.5 text-xs bg-[#ffff00]/20 text-[#ffff00] rounded-full flex items-center gap-1 border border-[#ffff00]/30">
-                                <AlertCircle className="h-3 w-3" /> CAUTION
+                              <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-[#ffff00]/20 text-[#ffff00] rounded-full flex items-center gap-1 border border-[#ffff00]/30">
+                                <AlertCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3" />{" "}
+                                CAUTION
                               </span>
                             )}
 
                           {!token.is_spam && token.spamConfidence === "NO" && (
-                            <span className="px-2 py-0.5 text-xs bg-[#00ff00]/20 text-[#00ff00] rounded-full flex items-center gap-1 border border-[#00ff00]/30">
-                              <CheckCircle className="h-3 w-3" /> SAFE
+                            <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-[#00ff00]/20 text-[#00ff00] rounded-full flex items-center gap-1 border border-[#00ff00]/30">
+                              <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3" />{" "}
+                              SAFE
                             </span>
                           )}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-1 text-sm">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs sm:text-sm">
                           <div
                             className={`${pixelMonoFont.className} text-[#00ff00]`}
                           >
@@ -1136,16 +1140,16 @@ export default function Home() {
                         </div>
 
                         <div
-                          className={`${pixelMonoFont.className} mt-2 text-xs font-mono text-[#00ffaa] truncate`}
+                          className={`${pixelMonoFont.className} mt-1 sm:mt-2 text-xs font-mono text-[#00ffaa] truncate`}
                         >
                           {token.contract_address}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex md:flex-col items-center md:items-end gap-3 md:gap-2 mt-3 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-[#00ff00]/20 md:ml-auto">
+                    <div className="flex md:flex-col items-center md:items-end gap-2 sm:gap-3 mt-3 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-[#00ff00]/20 md:ml-auto">
                       <div
-                        className={`text-center px-3 py-1 rounded-lg border ${
+                        className={`text-center px-2 sm:px-3 py-1 rounded-lg border ${
                           token.is_spam
                             ? "bg-black/90 text-[#ff0000] border-[#ff0000]/50"
                             : token.spamConfidence === "MAYBE"
@@ -1156,10 +1160,10 @@ export default function Home() {
                         <div
                           className={`${pixelMonoFont.className} text-xs font-medium`}
                         >
-                          RISK LEVEL
+                          RISK
                         </div>
                         <div
-                          className={`${pixelMonoFont.className} text-sm font-semibold`}
+                          className={`${pixelMonoFont.className} text-xs sm:text-sm font-semibold`}
                         >
                           {token.spamScore}
                         </div>
@@ -1172,9 +1176,10 @@ export default function Home() {
                         )}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`${pixelMonoFont.className} inline-flex items-center justify-center px-3 py-1.5 bg-black/80 hover:bg-black/90 border border-[#00ff00]/50 rounded-lg text-[#00ffff] hover:text-[#00ff00] transition-colors text-xs gap-1.5`}
+                        className={`${pixelMonoFont.className} inline-flex items-center justify-center px-2 sm:px-3 py-1 sm:py-1.5 bg-black/80 hover:bg-black/90 border border-[#00ff00]/50 rounded-lg text-[#00ffff] hover:text-[#00ff00] transition-colors text-xs gap-1 sm:gap-1.5`}
                       >
-                        <ExternalLink className="h-3 w-3" /> VIEW EXPLORER
+                        <ExternalLink className="h-2.5 w-2.5 sm:h-3 sm:w-3" />{" "}
+                        VIEW
                       </a>
                     </div>
                   </div>
