@@ -47,8 +47,9 @@ const chainToNetwork: Record<string, { networkKey: string }> = {
   "eth-mainnet": { networkKey: "ETHEREUM_MAINNET" },
   "bsc-mainnet": { networkKey: "BSC_MAINNET" },
   "matic-mainnet": { networkKey: "POLYGON_MAINNET" },
-  "arbitrum-mainnet": { networkKey: "ARBITRUM_MAINNET" },
   "optimism-mainnet": { networkKey: "OPTIMISM_MAINNET" },
+  "gnosis-mainnet": { networkKey: "GNOSIS_MAINNET" },
+  "base-mainnet": { networkKey: "BASE_MAINNET" },
 };
 
 interface SpamListEntry {
@@ -95,6 +96,10 @@ async function fetchWithCache(url: string): Promise<string> {
     const response = await fetch(url, {
       next: { revalidate: 3600 },
       cache: "force-cache",
+      headers: {
+        Accept: "application/vnd.github.v3.raw",
+        "User-Agent": "ChainWatchdog",
+      },
     });
 
     if (!response.ok) {
@@ -106,6 +111,42 @@ async function fetchWithCache(url: string): Promise<string> {
     return text;
   } catch (error) {
     console.error(`Error fetching ${url}:`, error);
+
+    // If in production and likely a CORS issue, try a proxy approach
+    if (
+      process.env.NODE_ENV === "production" &&
+      url.includes("githubusercontent.com")
+    ) {
+      try {
+        // Convert GitHub raw URL to API URL that might have different CORS policy
+        const githubApiUrl = url
+          .replace("raw.githubusercontent.com", "api.github.com/repos")
+          .replace(/\/main\/(.+)$/, "/contents/$1");
+
+        console.log(`Trying GitHub API fallback: ${githubApiUrl}`);
+
+        const apiResponse = await fetch(githubApiUrl, {
+          headers: {
+            Accept: "application/vnd.github.v3.raw",
+            "User-Agent": "ChainWatchdog",
+          },
+        });
+
+        if (!apiResponse.ok) {
+          throw new Error(
+            `GitHub API fallback failed: ${apiResponse.statusText}`
+          );
+        }
+
+        const content = await apiResponse.text();
+        yamlCache[url] = content;
+        return content;
+      } catch (proxyError) {
+        console.error(`GitHub API fallback failed for ${url}:`, proxyError);
+        throw error; // Throw the original error if proxy fails
+      }
+    }
+
     throw error;
   }
 }
@@ -252,10 +293,19 @@ export async function GET(request: Request) {
 
     if (recentOnly) {
       if (recentTokensCache.length > 0) {
-        return NextResponse.json({
-          tokens: recentTokensCache.slice(0, 5),
-          source: "cache",
-        });
+        return NextResponse.json(
+          {
+            tokens: recentTokensCache.slice(0, 5),
+            source: "cache",
+          },
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET, OPTIONS",
+              "Access-Control-Allow-Headers": "Content-Type",
+            },
+          }
+        );
       }
 
       let allRecentTokens: SpamToken[] = [];
@@ -267,28 +317,55 @@ export async function GET(request: Request) {
         .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
         .slice(0, 5);
 
-      return NextResponse.json({
-        tokens: sortedRecentTokens,
-        source: "generated",
-      });
+      return NextResponse.json(
+        {
+          tokens: sortedRecentTokens,
+          source: "generated",
+        },
+        {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          },
+        }
+      );
     }
 
     if (chainId && chainToNetwork[chainId]) {
       const networkKey = chainToNetwork[chainId].networkKey;
 
       if (tokenCache[networkKey] && tokenCache[networkKey].length > 0) {
-        return NextResponse.json({
-          tokens: tokenCache[networkKey].slice(0, 5),
-          source: "cache",
-        });
+        return NextResponse.json(
+          {
+            tokens: tokenCache[networkKey].slice(0, 5),
+            source: "cache",
+          },
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET, OPTIONS",
+              "Access-Control-Allow-Headers": "Content-Type",
+            },
+          }
+        );
       }
 
       const network = networkMapping[networkKey];
       if (!network) {
-        return NextResponse.json({
-          tokens: [],
-          error: "Network not supported",
-        });
+        return NextResponse.json(
+          {
+            tokens: [],
+            error: "Network not supported",
+          },
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET, OPTIONS",
+              "Access-Control-Allow-Headers": "Content-Type",
+            },
+          }
+        );
       }
 
       try {
@@ -310,16 +387,34 @@ export async function GET(request: Request) {
 
         tokenCache[networkKey] = tokens;
 
-        return NextResponse.json({
-          tokens: tokens.slice(0, 5),
-          source: "fresh",
-        });
+        return NextResponse.json(
+          {
+            tokens: tokens.slice(0, 5),
+            source: "fresh",
+          },
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET, OPTIONS",
+              "Access-Control-Allow-Headers": "Content-Type",
+            },
+          }
+        );
       } catch (err) {
         console.error(`Error processing network ${network.name}:`, err);
-        return NextResponse.json({
-          tokens: [],
-          error: "Failed to fetch network data",
-        });
+        return NextResponse.json(
+          {
+            tokens: [],
+            error: "Failed to fetch network data",
+          },
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET, OPTIONS",
+              "Access-Control-Allow-Headers": "Content-Type",
+            },
+          }
+        );
       }
     }
 
@@ -341,10 +436,19 @@ export async function GET(request: Request) {
         .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
         .slice(0, 5);
 
-      return NextResponse.json({
-        tokens: sortedTokens,
-        source: "cache",
-      });
+      return NextResponse.json(
+        {
+          tokens: sortedTokens,
+          source: "cache",
+        },
+        {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          },
+        }
+      );
     }
 
     const fetchPromises = defaultNetworks.map(async (networkKey) => {
@@ -390,15 +494,43 @@ export async function GET(request: Request) {
       .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
       .slice(0, 5);
 
-    return NextResponse.json({
-      tokens: sortedTokens,
-      source: "mixed",
-    });
+    return NextResponse.json(
+      {
+        tokens: sortedTokens,
+        source: "mixed",
+      },
+      {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error fetching spam tokens:", error);
     return NextResponse.json(
       { error: "Failed to fetch spam tokens", tokens: [] },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      }
     );
   }
+}
+
+// Add OPTIONS handler for preflight requests
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
 }
