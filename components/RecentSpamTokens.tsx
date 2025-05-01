@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, ExternalLink, Clock } from "lucide-react";
+import { AlertTriangle, ExternalLink, Clock, Search } from "lucide-react";
 import { Press_Start_2P, VT323 } from "next/font/google";
 import { getExplorerUrl } from "@/lib/services/goldrush";
 
@@ -25,6 +25,12 @@ type SpamToken = {
   score?: number;
 };
 
+type SearchResult = {
+  found: boolean;
+  network?: string;
+  networkId?: string;
+};
+
 interface RecentSpamTokensProps {
   chainId?: string;
 }
@@ -34,6 +40,9 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showRecentFromAll, setShowRecentFromAll] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
 
   useEffect(() => {
     fetchRecentSpamTokens();
@@ -75,9 +84,101 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     }
   };
 
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!searchTerm.trim()) return;
+
+    setIsSearching(true);
+    setSearchResult(null);
+
+    try {
+      const apiUrl = `/api/spam-tokens?token=${searchTerm.trim()}`;
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setSearchResult(data);
+    } catch (err) {
+      console.error("Error searching for token:", err);
+      setError("Failed to search for token");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const toggleModeLabel = showRecentFromAll
     ? "Show chain specific tokens"
     : "Show most recent from all chains";
+
+  // Search UI
+  const renderSearchSection = () => (
+    <div className="mb-4 pt-2">
+      <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search token address"
+            className="w-full px-3 py-2 bg-black/70 border border-[#ff0000]/30 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#ff0000] placeholder:text-gray-500"
+          />
+          {isSearching && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <div className="w-4 h-4 rounded-full border-t-2 border-b-2 border-[#ff0000] animate-spin"></div>
+            </div>
+          )}
+        </div>
+        <button
+          type="submit"
+          disabled={isSearching}
+          className="px-3 py-2 bg-[#ff0000]/10 hover:bg-[#ff0000]/20 text-[#ff8888] rounded-lg border border-[#ff0000]/30 flex items-center gap-1 transition-colors disabled:opacity-50"
+        >
+          <Search className="h-4 w-4" />
+          <span>Search</span>
+        </button>
+      </form>
+
+      {searchResult && (
+        <div className="mt-3 p-3 bg-black/70 border border-[#ff0000]/30 rounded-lg animate-fade-in">
+          {searchResult.found ? (
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`${pixelMonoFont.className} text-[#ff0000] font-bold`}
+                >
+                  SPAM ALERT!
+                </span>
+                <span className={`${pixelMonoFont.className} text-[#ff8888]`}>
+                  Token found in {searchResult.network} spam list
+                </span>
+              </div>
+              <a
+                href={
+                  searchResult.networkId &&
+                  getExplorerUrl(searchResult.networkId, searchTerm)
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 text-xs text-[#ff8888] hover:text-[#ff5555] flex items-center gap-1 transition-colors w-fit"
+              >
+                <ExternalLink className="h-3 w-3" />
+                View on explorer
+              </a>
+            </div>
+          ) : (
+            <p className={`${pixelMonoFont.className} text-green-400`}>
+              This token was not found in our spam lists. However, always do
+              your own research.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   if (isLoading) {
     return (
@@ -93,6 +194,7 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
             RECENT SPAM ALERTS
           </h3>
         </div>
+        {renderSearchSection()}
         <div className="flex justify-center py-8">
           <div className="w-8 h-8 rounded-full border-t-2 border-b-2 border-[#ff0000] animate-spin"></div>
         </div>
@@ -114,6 +216,7 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
             RECENT SPAM ALERTS
           </h3>
         </div>
+        {renderSearchSection()}
         <div className="text-center py-4">
           <p className={`${pixelMonoFont.className} text-[#ff8888]`}>
             {error || "No recent spam tokens found"}
@@ -154,6 +257,8 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
           {showRecentFromAll ? "Show by chain" : "Show most recent"}
         </button>
       </div>
+
+      {renderSearchSection()}
 
       <p className={`${pixelMonoFont.className} text-sm text-[#ff8888] mb-3`}>
         {showRecentFromAll
