@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ChainWatchDog
+
+ChainWatchDog is a blockchain security tool designed to detect spam tokens and security threats across multiple blockchain networks. It helps users identify potentially malicious tokens in their wallets before they can cause harm.
+
+![ChainWatchDog](https://placeholder-for-your-screenshot.com/screenshot.png)
+
+## Features
+
+- ✅ Detect spam tokens across 70+ supported blockchains
+- ✅ Real-time wallet scanning and analysis
+- ✅ Track and display recent spam token activity
+- ✅ Multi-chain support (Ethereum, BSC, Polygon, Optimism, Gnosis, Base, etc.)
+- ✅ Integration with blockchain explorers
+- ✅ Modern cyberpunk/retro pixel UI aesthetic
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS, Shadcn UI components
+- **Blockchain**: Wagmi, RainbowKit for wallet connection
+- **APIs**: Covalent API integration
+- **Data**: Goldrush enhanced spam lists for token detection
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js 18+ or Bun
+- Git
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   git clone https://github.com/yourusername/chainwatchdog.git
+   cd chainwatchdog
+   ```
 
-## Learn More
+2. Install dependencies:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   # or
+   bun install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Set up environment variables:
+   Create a `.env` file in the root directory and add your API keys:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```
+   COVALENT_API_KEY=your_covalent_api_key
+   ```
 
-## Deploy on Vercel
+4. Run the development server:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```bash
+   npm run dev
+   # or
+   bun dev
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+
+## Project Structure
+
+- `/app` - Next.js app directory containing pages and API routes
+- `/components` - Reusable React components
+- `/lib` - Utility functions and services
+- `/public` - Static assets and spam token lists
+
+## API Endpoints
+
+- `GET /api/spam-tokens` - Retrieve spam tokens based on network or wallet address
+
+## Deployment
+
+The application can be easily deployed on Vercel:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fchainwatchdog)
+
+## License
+
+[MIT](LICENSE)
+
+## Acknowledgments
+
+- [Covalent](https://www.covalenthq.com/) for blockchain data API
+- [Goldrush](https://github.com/covalenthq/goldrush-enhanced-spam-lists) for spam token lists
