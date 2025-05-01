@@ -229,13 +229,9 @@ export default function Home() {
     let filtered = tokenData.data.items;
 
     if (filterType === "spam") {
-      filtered = filtered.filter(
-        (token) => token.is_spam || token.spamConfidence === "MAYBE"
-      );
+      filtered = filtered.filter((token) => token.is_spam);
     } else if (filterType === "safe") {
-      filtered = filtered.filter(
-        (token) => !token.is_spam && token.spamConfidence === "NO"
-      );
+      filtered = filtered.filter((token) => !token.is_spam);
     }
 
     if (searchQuery) {
@@ -256,12 +252,9 @@ export default function Home() {
 
     const total = tokenData.data.items.length;
     const spam = tokenData.data.items.filter((t) => t.is_spam).length;
-    const maybe = tokenData.data.items.filter(
-      (t) => !t.is_spam && t.spamConfidence === "MAYBE"
-    ).length;
-    const safe = total - spam - maybe;
+    const safe = total - spam;
 
-    return { total, spam, safe, maybe };
+    return { total, spam, safe, maybe: 0 };
   }, [tokenData]);
 
   return (
@@ -835,26 +828,57 @@ export default function Home() {
                 </div>
               ) : walletTokens.length > 0 ? (
                 <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-                  {walletTokens
-                    .filter((token) => {
-                      if (filterType === "spam") {
-                        return token.is_spam;
-                      } else if (filterType === "safe") {
-                        return (
-                          (!token.is_spam && token.spamConfidence === "NO") ||
-                          token.spamConfidence === "MAYBE"
-                        );
+                  {(() => {
+                    const filteredWalletTokens = walletTokens.filter(
+                      (token) => {
+                        if (filterType === "spam") {
+                          return token.is_spam;
+                        } else if (filterType === "safe") {
+                          return !token.is_spam;
+                        }
+                        return true;
                       }
-                      return true;
-                    })
-                    .map((token) => (
+                    );
+
+                    if (filteredWalletTokens.length === 0) {
+                      return (
+                        <div className="p-8 text-center">
+                          <div className="h-16 w-16 mx-auto mb-4 text-[#00ff00] opacity-60">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                              />
+                            </svg>
+                          </div>
+                          <h3
+                            className={`${pixelFont.className} text-base font-medium text-[#00ffff] mb-2`}
+                          >
+                            NO TOKENS FOUND
+                          </h3>
+                          <p
+                            className={`${pixelMonoFont.className} text-[#00ff00] max-w-sm mx-auto`}
+                          >
+                            No tokens match your current filter. Try selecting a
+                            different filter option.
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    return filteredWalletTokens.map((token) => (
                       <div
                         key={token.contract_address}
                         className={`p-3 backdrop-blur-lg rounded-xl border flex items-center gap-3 transition-all duration-300 hover:shadow-md ${
                           token.is_spam
                             ? "bg-black/50 border-[#ff0000]/30 shadow-[0_0_10px_rgba(255,0,0,0.1)]"
-                            : token.spamConfidence === "MAYBE"
-                            ? "bg-black/50 border-[#00ff00]/30 shadow-[0_0_10px_rgba(0,255,0,0.1)]"
                             : "bg-black/50 border-[#00ff00]/30 shadow-[0_0_10px_rgba(0,255,0,0.1)]"
                         }`}
                       >
@@ -880,11 +904,7 @@ export default function Home() {
                           {/* Security indicator dot */}
                           <div
                             className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-black ${
-                              token.is_spam
-                                ? "bg-[#ff0000]"
-                                : token.spamConfidence === "MAYBE"
-                                ? "bg-[#00ff00]"
-                                : "bg-[#00ff00]"
+                              token.is_spam ? "bg-[#ff0000]" : "bg-[#00ff00]"
                             }`}
                           ></div>
                         </div>
@@ -908,19 +928,11 @@ export default function Home() {
                               </span>
                             )}
 
-                            {!token.is_spam &&
-                              token.spamConfidence === "MAYBE" && (
-                                <span className="px-1.5 py-0.5 text-xs bg-[#00ff00]/20 text-[#00ff00] rounded-full flex items-center gap-1 border border-[#00ff00]/30">
-                                  <CheckCircle className="h-2.5 w-2.5" /> SAFE
-                                </span>
-                              )}
-
-                            {!token.is_spam &&
-                              token.spamConfidence === "NO" && (
-                                <span className="px-1.5 py-0.5 text-xs bg-[#00ff00]/20 text-[#00ff00] rounded-full flex items-center gap-1 border border-[#00ff00]/30">
-                                  <CheckCircle className="h-2.5 w-2.5" /> SAFE
-                                </span>
-                              )}
+                            {!token.is_spam && (
+                              <span className="px-1.5 py-0.5 text-xs bg-[#00ff00]/20 text-[#00ff00] rounded-full flex items-center gap-1 border border-[#00ff00]/30">
+                                <CheckCircle className="h-2.5 w-2.5" /> SAFE
+                              </span>
+                            )}
                           </div>
 
                           <div className="grid grid-cols-2 gap-1 text-xs mt-1">
@@ -957,7 +969,8 @@ export default function Home() {
                           <ExternalLink className="h-3 w-3" />
                         </a>
                       </div>
-                    ))}
+                    ));
+                  })()}
                 </div>
               ) : (
                 <div className="p-8 text-center">
@@ -1029,7 +1042,7 @@ export default function Home() {
           </div>
         )}
 
-        {tokenData && !error && !isLoading && (
+        {tokenData && activeTab === "search" && !error && !isLoading && (
           <div className="w-full max-w-4xl space-y-8 relative z-[5] animate-fade-in">
             {/* Wallet Summary Card */}
             <div className="p-4 sm:p-6 backdrop-blur-lg bg-black/50 rounded-2xl border border-[#00ff00]/30 shadow-[0_0_15px_rgba(0,255,0,0.2)] overflow-hidden relative">
@@ -1321,8 +1334,6 @@ export default function Home() {
                     className={`p-4 sm:p-5 backdrop-blur-lg rounded-xl border flex flex-col md:flex-row md:items-center gap-3 sm:gap-4 transition-all duration-300 hover:shadow-lg animate-fade-in ${
                       token.is_spam
                         ? "bg-black/50 border-[#ff0000]/30 shadow-[0_0_10px_rgba(255,0,0,0.1)]"
-                        : token.spamConfidence === "MAYBE"
-                        ? "bg-black/50 border-[#00ff00]/30 shadow-[0_0_10px_rgba(0,255,0,0.1)]"
                         : "bg-black/50 border-[#00ff00]/30 shadow-[0_0_10px_rgba(0,255,0,0.1)]"
                     }`}
                     style={{ animationDelay: `${index * 50}ms` }}
@@ -1350,11 +1361,7 @@ export default function Home() {
                         {/* Security indicator dot */}
                         <div
                           className={`absolute bottom-0 right-0 w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-black ${
-                            token.is_spam
-                              ? "bg-[#ff0000]"
-                              : token.spamConfidence === "MAYBE"
-                              ? "bg-[#00ff00]"
-                              : "bg-[#00ff00]"
+                            token.is_spam ? "bg-[#ff0000]" : "bg-[#00ff00]"
                           }`}
                         ></div>
                       </div>
@@ -1379,15 +1386,7 @@ export default function Home() {
                             </span>
                           )}
 
-                          {!token.is_spam &&
-                            token.spamConfidence === "MAYBE" && (
-                              <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-[#00ff00]/20 text-[#00ff00] rounded-full flex items-center gap-1 border border-[#00ff00]/30">
-                                <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3" />{" "}
-                                SAFE
-                              </span>
-                            )}
-
-                          {!token.is_spam && token.spamConfidence === "NO" && (
+                          {!token.is_spam && (
                             <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-[#00ff00]/20 text-[#00ff00] rounded-full flex items-center gap-1 border border-[#00ff00]/30">
                               <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3" />{" "}
                               SAFE
@@ -1429,8 +1428,6 @@ export default function Home() {
                         className={`text-center px-2 sm:px-3 py-1 rounded-lg border ${
                           token.is_spam
                             ? "bg-black/90 text-[#ff0000] border-[#ff0000]/50"
-                            : token.spamConfidence === "MAYBE"
-                            ? "bg-black/90 text-[#00ff00] border-[#00ff00]/50"
                             : "bg-black/90 text-[#00ff00] border-[#00ff00]/50"
                         }`}
                       >
