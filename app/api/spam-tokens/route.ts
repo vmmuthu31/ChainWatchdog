@@ -23,17 +23,23 @@ const networkMapping: Record<
     yamlUrl:
       "https://raw.githubusercontent.com/covalenthq/goldrush-enhanced-spam-lists/main/src/lists/erc20/pol_mainnet_token_spam_contracts_yes.yaml",
   },
-  ARBITRUM_MAINNET: {
-    id: "arbitrum-mainnet",
-    name: "Arbitrum",
-    yamlUrl:
-      "https://raw.githubusercontent.com/covalenthq/goldrush-enhanced-spam-lists/main/src/lists/erc20/arbitrum_mainnet_token_spam_contracts_yes.yaml",
-  },
   OPTIMISM_MAINNET: {
     id: "optimism-mainnet",
     name: "Optimism",
     yamlUrl:
       "https://raw.githubusercontent.com/covalenthq/goldrush-enhanced-spam-lists/main/src/lists/erc20/op_mainnet_token_spam_contracts_yes.yaml",
+  },
+  GNOSIS_MAINNET: {
+    id: "gnosis-mainnet",
+    name: "Gnosis",
+    yamlUrl:
+      "https://raw.githubusercontent.com/covalenthq/goldrush-enhanced-spam-lists/main/src/lists/erc20/gnosis_mainnet_token_spam_contracts_yes.yaml",
+  },
+  BASE_MAINNET: {
+    id: "base-mainnet",
+    name: "Base",
+    yamlUrl:
+      "https://raw.githubusercontent.com/covalenthq/goldrush-enhanced-spam-lists/main/src/lists/erc20/base_mainnet_token_spam_contracts_yes.yaml",
   },
 };
 
@@ -64,28 +70,53 @@ type SpamToken = {
   score?: number;
 };
 
-const recentTokensCache: Record<string, SpamToken[]> = {};
-const CACHE_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+const tokenCache: Record<string, SpamToken[]> = {};
+const recentTokensCache: SpamToken[] = [];
+const yamlCache: Record<string, string> = {};
+
+const CACHE_EXPIRY_MS = 60 * 60 * 1000;
 let lastCacheUpdate = 0;
+let isCacheUpdating = false;
+let cacheInitPromise: Promise<void> | null = null;
 
 function getRandomTimestamp() {
   const now = Date.now();
   const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
-  return thirtyDaysAgo + Math.floor(Math.random() * (now - thirtyDaysAgo));
+  const oneDayAgo = now - 24 * 60 * 60 * 1000;
+  return oneDayAgo - Math.floor(Math.random() * (oneDayAgo - thirtyDaysAgo));
 }
 
-async function fetchSpamList(
+async function fetchWithCache(url: string): Promise<string> {
+  if (yamlCache[url]) {
+    return yamlCache[url];
+  }
+
+  try {
+    const response = await fetch(url, {
+      next: { revalidate: 3600 },
+      cache: "force-cache",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.statusText}`);
+    }
+
+    const text = await response.text();
+    yamlCache[url] = text;
+    return text;
+  } catch (error) {
+    console.error(`Error fetching ${url}:`, error);
+    throw error;
+  }
+}
+
+async function parseSpamList(
   networkKey: string,
   yamlUrl: string,
   limit = 100
 ): Promise<SpamListEntry[]> {
   try {
-    const response = await fetch(yamlUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch spam list: ${response.statusText}`);
-    }
-
-    const yamlText = await response.text();
+    const yamlText = await fetchWithCache(yamlUrl);
     const parsed = yaml.load(yamlText) as { SpamContracts?: string[] };
 
     const tokenEntries: SpamListEntry[] = [];
@@ -98,7 +129,6 @@ async function fetchSpamList(
         if (parts.length === 3) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const [chainId, address, scoreStr] = parts;
-
           const score = parseInt(scoreStr, 10);
 
           tokenEntries.push({
@@ -115,103 +145,55 @@ async function fetchSpamList(
 
     return tokenEntries.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
   } catch (error) {
-    console.error(`Error fetching spam list from ${yamlUrl}:`, error);
+    console.error(`Error parsing spam list from ${yamlUrl}:`, error);
     return [];
   }
 }
 
-async function updateRecentTokensCache() {
-  const now = Date.now();
+async function initializeCache() {
+  if (cacheInitPromise) {
+    return cacheInitPromise;
+  }
 
+  cacheInitPromise = updateAllCaches();
+  return cacheInitPromise;
+}
+
+async function updateAllCaches() {
+  if (isCacheUpdating) return;
+
+  const now = Date.now();
   if (
     now - lastCacheUpdate < CACHE_EXPIRY_MS &&
-    Object.keys(recentTokensCache).length > 0
+    Object.keys(tokenCache).length > 0
   ) {
     return;
   }
 
-  const networkEntries = Object.entries(networkMapping);
-
-  Object.keys(recentTokensCache).forEach((key) => {
-    delete recentTokensCache[key];
-  });
-
-  await Promise.all(
-    networkEntries.map(async ([networkKey, network]) => {
-      try {
-        const tokenEntries = await fetchSpamList(
-          networkKey,
-          network.yamlUrl,
-          50
-        );
-
-        const tokens: SpamToken[] = tokenEntries.map((entry) => ({
-          address: entry.address || "",
-          networkId: network.id,
-          network: network.name,
-          name: entry.name,
-          symbol: entry.symbol,
-          timestamp: entry.timestamp,
-          score: entry.score,
-        }));
-
-        recentTokensCache[networkKey] = tokens;
-      } catch (err) {
-        console.error(`Error updating cache for ${network.name}:`, err);
-      }
-    })
-  );
-
-  lastCacheUpdate = now;
-}
-
-export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const chainId = searchParams.get("chainId");
-    const recentOnly = searchParams.get("recent") === "true";
-
-    if (recentOnly) {
-      await updateRecentTokensCache();
-
-      let allRecentTokens: SpamToken[] = [];
-
-      Object.values(recentTokensCache).forEach((tokens) => {
-        allRecentTokens = allRecentTokens.concat(tokens);
-      });
-
-      const sortedRecentTokens = allRecentTokens
-        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
-        .slice(0, 5);
-
-      return NextResponse.json({ tokens: sortedRecentTokens });
-    }
-
-    let networksToFetch: string[] = [
-      "ETHEREUM_MAINNET",
-      "BSC_MAINNET",
-      "POLYGON_MAINNET",
-    ];
-
-    if (chainId && chainToNetwork[chainId]) {
-      networksToFetch = [chainToNetwork[chainId].networkKey];
-    }
-
-    const allSpamTokens: SpamToken[] = [];
+    isCacheUpdating = true;
+    const networkEntries = Object.entries(networkMapping);
 
     await Promise.all(
-      networksToFetch.map(async (networkKey) => {
-        const network = networkMapping[networkKey];
-        if (!network) return;
-
+      networkEntries.map(async ([, network]) => {
         try {
-          const tokenEntries = await fetchSpamList(
+          await fetchWithCache(network.yamlUrl);
+        } catch (err) {
+          console.error(`Error pre-fetching YAML for ${network.name}:`, err);
+        }
+      })
+    );
+
+    await Promise.all(
+      networkEntries.map(async ([networkKey, network]) => {
+        try {
+          const tokenEntries = await parseSpamList(
             networkKey,
             network.yamlUrl,
-            30
+            50
           );
 
-          const tokensFromNetwork = tokenEntries.map((entry) => ({
+          const tokens: SpamToken[] = tokenEntries.map((entry) => ({
             address: entry.address || "",
             networkId: network.id,
             network: network.name,
@@ -221,22 +203,201 @@ export async function GET(request: Request) {
             score: entry.score,
           }));
 
-          allSpamTokens.push(...tokensFromNetwork.slice(0, 10));
+          tokenCache[networkKey] = tokens;
         } catch (err) {
-          console.error(`Error processing spam list for ${network.name}:`, err);
+          console.error(`Error updating cache for ${network.name}:`, err);
         }
       })
     );
+
+    let allTokens: SpamToken[] = [];
+    Object.values(tokenCache).forEach((tokens) => {
+      allTokens = allTokens.concat(tokens);
+    });
+
+    recentTokensCache.length = 0;
+    recentTokensCache.push(
+      ...allTokens
+        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+        .slice(0, 20)
+    );
+
+    lastCacheUpdate = now;
+  } catch (error) {
+    console.error("Error updating cache:", error);
+  } finally {
+    isCacheUpdating = false;
+  }
+}
+
+initializeCache().catch(console.error);
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const chainId = searchParams.get("chainId");
+    const recentOnly = searchParams.get("recent") === "true";
+
+    if (Object.keys(tokenCache).length === 0) {
+      try {
+        await initializeCache();
+      } catch (error) {
+        console.error("Error initializing cache:", error);
+      }
+    }
+
+    if (Date.now() - lastCacheUpdate > CACHE_EXPIRY_MS) {
+      updateAllCaches().catch(console.error);
+    }
+
+    if (recentOnly) {
+      if (recentTokensCache.length > 0) {
+        return NextResponse.json({
+          tokens: recentTokensCache.slice(0, 5),
+          source: "cache",
+        });
+      }
+
+      let allRecentTokens: SpamToken[] = [];
+      Object.values(tokenCache).forEach((tokens) => {
+        allRecentTokens = allRecentTokens.concat(tokens);
+      });
+
+      const sortedRecentTokens = allRecentTokens
+        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+        .slice(0, 5);
+
+      return NextResponse.json({
+        tokens: sortedRecentTokens,
+        source: "generated",
+      });
+    }
+
+    if (chainId && chainToNetwork[chainId]) {
+      const networkKey = chainToNetwork[chainId].networkKey;
+
+      if (tokenCache[networkKey] && tokenCache[networkKey].length > 0) {
+        return NextResponse.json({
+          tokens: tokenCache[networkKey].slice(0, 5),
+          source: "cache",
+        });
+      }
+
+      const network = networkMapping[networkKey];
+      if (!network) {
+        return NextResponse.json({
+          tokens: [],
+          error: "Network not supported",
+        });
+      }
+
+      try {
+        const tokenEntries = await parseSpamList(
+          networkKey,
+          network.yamlUrl,
+          30
+        );
+
+        const tokens = tokenEntries.map((entry) => ({
+          address: entry.address || "",
+          networkId: network.id,
+          network: network.name,
+          name: entry.name,
+          symbol: entry.symbol,
+          timestamp: entry.timestamp,
+          score: entry.score,
+        }));
+
+        tokenCache[networkKey] = tokens;
+
+        return NextResponse.json({
+          tokens: tokens.slice(0, 5),
+          source: "fresh",
+        });
+      } catch (err) {
+        console.error(`Error processing network ${network.name}:`, err);
+        return NextResponse.json({
+          tokens: [],
+          error: "Failed to fetch network data",
+        });
+      }
+    }
+
+    const defaultNetworks = [
+      "ETHEREUM_MAINNET",
+      "BSC_MAINNET",
+      "POLYGON_MAINNET",
+    ];
+    const allSpamTokens: SpamToken[] = [];
+
+    for (const networkKey of defaultNetworks) {
+      if (tokenCache[networkKey] && tokenCache[networkKey].length > 0) {
+        allSpamTokens.push(...tokenCache[networkKey].slice(0, 2));
+      }
+    }
+
+    if (allSpamTokens.length >= 5) {
+      const sortedTokens = allSpamTokens
+        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+        .slice(0, 5);
+
+      return NextResponse.json({
+        tokens: sortedTokens,
+        source: "cache",
+      });
+    }
+
+    const fetchPromises = defaultNetworks.map(async (networkKey) => {
+      const network = networkMapping[networkKey];
+      if (!network) return;
+
+      try {
+        if (!tokenCache[networkKey] || tokenCache[networkKey].length === 0) {
+          const tokenEntries = await parseSpamList(
+            networkKey,
+            network.yamlUrl,
+            10
+          );
+
+          const tokens = tokenEntries.map((entry) => ({
+            address: entry.address || "",
+            networkId: network.id,
+            network: network.name,
+            name: entry.name,
+            symbol: entry.symbol,
+            timestamp: entry.timestamp,
+            score: entry.score,
+          }));
+
+          tokenCache[networkKey] = tokens;
+          return tokens.slice(0, 2);
+        } else {
+          return tokenCache[networkKey].slice(0, 2);
+        }
+      } catch (err) {
+        console.error(`Error processing spam list for ${network.name}:`, err);
+        return [];
+      }
+    });
+
+    const tokenArrays = await Promise.all(fetchPromises);
+    const freshTokens: SpamToken[] = tokenArrays
+      .flat()
+      .filter(Boolean) as SpamToken[];
+    allSpamTokens.push(...freshTokens);
 
     const sortedTokens = allSpamTokens
       .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
       .slice(0, 5);
 
-    return NextResponse.json({ tokens: sortedTokens });
+    return NextResponse.json({
+      tokens: sortedTokens,
+      source: "mixed",
+    });
   } catch (error) {
     console.error("Error fetching spam tokens:", error);
     return NextResponse.json(
-      { error: "Failed to fetch spam tokens" },
+      { error: "Failed to fetch spam tokens", tokens: [] },
       { status: 500 }
     );
   }
