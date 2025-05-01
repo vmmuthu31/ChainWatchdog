@@ -85,7 +85,7 @@ function getRandomTimestamp() {
 
 async function fetchWithCache(url: string): Promise<string> {
   if (yamlCache[url]) return yamlCache[url];
-  const absUrl = "https://chainwatchdog.vercel.app/" + url;
+  const absUrl = "https://chainwatchdog.vercel.app" + url;
 
   const response = await fetch(absUrl);
   if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
