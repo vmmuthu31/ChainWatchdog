@@ -1,6 +1,18 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { Press_Start_2P, VT323 } from "next/font/google";
+
+const pixelFont = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+});
+
+const pixelMonoFont = VT323({
+  weight: "400",
+  subsets: ["latin"],
+});
+
 function WalletConnect() {
   return (
     <ConnectButton.Custom>
@@ -36,9 +48,9 @@ function WalletConnect() {
                 return (
                   <Button
                     onClick={openConnectModal}
-                    className="bg-gradient-to-r from-[#FA4C15] to-orange-500 hover:opacity-90 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg hover:shadow-orange-500/25 transition-all duration-200"
+                    className={`${pixelFont.className} bg-transparent border-2 border-[#00ff00] hover:bg-[#00ff00]/10 text-[#00ff00] hover:text-[#00ffff] font-semibold px-6 py-2.5 rounded-xl shadow-[0_0_10px_rgba(0,255,0,0.3)] hover:shadow-[0_0_15px_rgba(0,255,0,0.5)] transition-all duration-200`}
                   >
-                    Connect Wallet
+                    CONNECT
                   </Button>
                 );
               }
@@ -47,10 +59,10 @@ function WalletConnect() {
                 return (
                   <Button
                     onClick={openChainModal}
-                    className="bg-red-500/20 text-red-500 border border-red-500/50 hover:bg-red-500/30 font-medium px-4 py-2 rounded-xl"
+                    className={`${pixelFont.className} bg-[#ff0000]/20 text-[#ff0000] border border-[#ff0000]/50 hover:bg-[#ff0000]/30 font-medium px-4 py-2 rounded-xl`}
                     type="button"
                   >
-                    Wrong Network
+                    WRONG NETWORK
                   </Button>
                 );
               }
@@ -59,12 +71,12 @@ function WalletConnect() {
                 <div className="flex items-center gap-4">
                   <button
                     onClick={openChainModal}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-gray-800 transition-colors duration-200"
+                    className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-2 rounded-xl bg-black/50 hover:bg-black/80 border border-[#00ff00]/50 text-[#00ffff] transition-colors duration-200`}
                     type="button"
                   >
                     {chain.hasIcon && (
                       <div
-                        className="relative w-5 h-5 rounded-full overflow-hidden"
+                        className="relative w-5 h-5 rounded-full overflow-hidden border border-[#00ff00]/30"
                         style={{
                           background: chain.iconBackground,
                         }}
@@ -84,7 +96,7 @@ function WalletConnect() {
 
                   <button
                     onClick={openAccountModal}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FA4C15]/10 hover:bg-[#FA4C15]/20 border border-[#FA4C15]/20 text-[#FA4C15] transition-colors duration-200"
+                    className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00ff00]/10 hover:bg-[#00ff00]/20 border border-[#00ff00]/30 text-[#00ff00] transition-colors duration-200`}
                     type="button"
                   >
                     <span className="text-sm font-medium">

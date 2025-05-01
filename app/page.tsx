@@ -1,5 +1,6 @@
 "use client";
 
+import { Press_Start_2P, VT323 } from "next/font/google";
 import { TokenInputForm } from "@/components/token-input-form";
 import GoldRushServices, {
   type GoldRushResponse,
@@ -20,6 +21,16 @@ import { toast } from "sonner";
 import WalletConnect from "@/components/WalletConnect";
 import Image from "next/image";
 import { useMemo, useState, useRef, useEffect } from "react";
+
+const pixelFont = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+});
+
+const pixelMonoFont = VT323({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 export default function Home() {
   const [tokenData, setTokenData] = useState<GoldRushResponse | null>(null);
@@ -227,22 +238,24 @@ export default function Home() {
   }, [tokenData]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gradient-to-b from-[#0f172a] via-[#0f1729] to-black text-white">
-      <header className="w-full border-b border-gray-800/50 backdrop-blur-md bg-black/20 p-4 sticky top-0 z-50">
+    <div className="flex min-h-screen flex-col items-center bg-black text-white">
+      <header className="w-full border-b border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-4 sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="relative">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#FA4C15] to-[#FF8A3D] rounded-full blur opacity-70"></div>
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#00ff00] to-[#00ffff] rounded-full blur opacity-70"></div>
               <div className="relative">
                 <Image
                   src="/logo.png"
-                  alt="Bitcoin Mining Logo"
+                  alt="ChainWatchDog Logo"
                   width={20}
                   height={20}
                 />
               </div>
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#FA4C15] to-orange-400 bg-clip-text text-transparent">
+            <h1
+              className={`${pixelFont.className} text-xl font-bold bg-gradient-to-r from-[#00ff00] to-[#00ffff] bg-clip-text text-transparent glow-green-sm`}
+            >
               ChainWatchDog
             </h1>
           </div>
@@ -252,34 +265,40 @@ export default function Home() {
 
       <main className="container mx-auto flex flex-1 flex-col items-center justify-center gap-10 p-4 md:p-8">
         <div className="text-center space-y-6 max-w-2xl relative">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FA4C15]/20 via-transparent to-transparent blur-3xl"></div>
-          <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-[#FA4C15] via-orange-500 to-yellow-500 bg-clip-text text-transparent animate-fade-in-up">
-            Spam Shield Detector
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#00ff00]/20 via-transparent to-transparent blur-3xl"></div>
+          <h2
+            className={`${pixelFont.className} text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-[#00ff00] via-[#00ffff] to-[#ff00ff] bg-clip-text text-transparent glow-green-md animate-pulse-slow`}
+          >
+            SPAM SHIELD DETECTOR
           </h2>
-          <p className="text-lg text-gray-300 leading-relaxed max-w-xl mx-auto animate-fade-in-up animation-delay-100">
+          <p
+            className={`${pixelMonoFont.className} text-xl text-[#00ff00] leading-relaxed max-w-xl mx-auto animate-fade-in-up animation-delay-100`}
+          >
             Instantly analyze wallets for spam tokens and security threats
             across{" "}
-            <span className="text-[#FA4C15] font-semibold">
+            <span className="text-[#ff00ff] font-semibold">
               {supportedChains.length}+ blockchains
             </span>
             .
           </p>
         </div>
 
-        <div className="w-full max-w-xl backdrop-blur-lg bg-white/5 p-8 rounded-2xl border border-gray-800/50 shadow-xl relative z-[10] transform transition-all duration-300 hover:shadow-[0_0_50px_-12px_rgba(250,76,21,0.15)]">
+        <div className="w-full max-w-xl backdrop-blur-lg bg-black/50 p-8 rounded-2xl border border-[#00ff00]/30 shadow-xl relative z-[10] transform transition-all duration-300 hover:shadow-[0_0_50px_-12px_rgba(0,255,0,0.5)]">
           {/* Network selector */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-400 mb-2">
+            <label
+              className={`${pixelMonoFont.className} block text-sm font-medium text-[#00ff00] mb-2`}
+            >
               Select Blockchain Network
             </label>
             <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
-                className="w-full flex items-center justify-between p-3 bg-white/5 border border-gray-800 rounded-xl hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-[#FA4C15]/50"
+                className="w-full flex items-center justify-between p-3 bg-black/80 border border-[#00ff00]/50 rounded-xl hover:bg-black/90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#00ff00]/50"
                 onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
               >
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
+                  <div className="w-6 h-6 rounded-full bg-black/80 flex items-center justify-center overflow-hidden border border-[#00ff00]/30">
                     {currentChain.logoUrl ? (
                       <Image
                         src={currentChain.logoUrl}
@@ -289,40 +308,48 @@ export default function Home() {
                         className="object-contain"
                       />
                     ) : (
-                      <span className="text-sm font-medium">
+                      <span
+                        className={`${pixelMonoFont.className} text-sm font-medium text-[#00ff00]`}
+                      >
                         {currentChain.name.charAt(0)}
                       </span>
                     )}
                   </div>
-                  <span className="font-medium">{currentChain.name}</span>
+                  <span
+                    className={`${pixelMonoFont.className} font-medium text-[#00ffff]`}
+                  >
+                    {currentChain.name}
+                  </span>
                   {currentChain.type === "Testnet" && (
-                    <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded-full">
+                    <span
+                      className={`${pixelMonoFont.className} text-xs px-2 py-0.5 bg-[#ff00ff]/20 text-[#ff00ff] rounded-full`}
+                    >
                       Testnet
                     </span>
                   )}
                 </div>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 text-gray-400 ${
+                  className={`h-4 w-4 transition-transform duration-200 text-[#00ff00] ${
                     showNetworkDropdown ? "rotate-180" : ""
                   }`}
                 />
               </button>
 
               {showNetworkDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900/95 backdrop-blur-md border border-gray-800 rounded-xl shadow-xl z-[100] max-h-[400px] overflow-hidden">
-                  <div className="sticky top-0 bg-gray-900/95 backdrop-blur-md p-2 border-b border-gray-800">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-black/95 backdrop-blur-md border border-[#00ff00]/30 rounded-xl shadow-[0_0_15px_rgba(0,255,0,0.3)] z-[100] max-h-[400px] overflow-hidden">
+                  <div className="sticky top-0 bg-black/95 backdrop-blur-md p-2 border-b border-[#00ff00]/30">
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full pl-9 pr-9 py-2 bg-white/5 border border-gray-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FA4C15] text-sm"
+                        className="w-full pl-9 pr-9 py-2 bg-black/80 border border-[#00ff00]/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#00ff00] text-[#00ffff] text-sm"
                         placeholder="Search networks..."
                         value={networkSearchQuery}
                         onChange={(e) => setNetworkSearchQuery(e.target.value)}
                       />
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#00ff00]" />
                       {networkSearchQuery && (
                         <button
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 hover:text-white"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#00ff00] hover:text-[#00ffff]"
                           onClick={() => setNetworkSearchQuery("")}
                         >
                           <X className="h-4 w-4" />
@@ -334,7 +361,7 @@ export default function Home() {
                   <div className="overflow-y-auto max-h-[340px] p-2">
                     {!hasFilteredMainnetResults &&
                       !hasFilteredTestnetResults && (
-                        <div className="py-4 text-center text-gray-400">
+                        <div className="py-4 text-center text-[#00ff00]">
                           No networks found matching &quot;{networkSearchQuery}
                           &quot;
                         </div>
@@ -342,7 +369,9 @@ export default function Home() {
 
                     {hasFilteredMainnetResults && (
                       <div className="mb-2">
-                        <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase sticky top-0 bg-gray-900/95">
+                        <div
+                          className={`${pixelMonoFont.className} px-3 py-2 text-xs font-semibold text-[#00ffff] uppercase sticky top-0 bg-black/95`}
+                        >
                           Mainnet
                         </div>
 
@@ -356,15 +385,15 @@ export default function Home() {
                                 key={chain.id}
                                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
                                   selectedChain === chain.id
-                                    ? "bg-[#FA4C15]/20 text-[#FA4C15]"
-                                    : "hover:bg-white/5"
+                                    ? "bg-[#00ff00]/20 text-[#00ff00]"
+                                    : "hover:bg-black/80"
                                 }`}
                                 onClick={() => {
                                   setSelectedChain(chain.id);
                                   setShowNetworkDropdown(false);
                                 }}
                               >
-                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10">
+                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-black/80">
                                   {chain.logoUrl ? (
                                     <Image
                                       src={chain.logoUrl}
@@ -379,7 +408,7 @@ export default function Home() {
                                 </span>
                                 {chain.name}
                                 {selectedChain === chain.id && (
-                                  <CheckCircle className="h-4 w-4 ml-auto text-[#FA4C15]" />
+                                  <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
                                 )}
                               </button>
                             ))}
@@ -396,15 +425,15 @@ export default function Home() {
                                 key={chain.id}
                                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
                                   selectedChain === chain.id
-                                    ? "bg-[#FA4C15]/20 text-[#FA4C15]"
-                                    : "hover:bg-white/5"
+                                    ? "bg-[#00ff00]/20 text-[#00ff00]"
+                                    : "hover:bg-black/80"
                                 }`}
                                 onClick={() => {
                                   setSelectedChain(chain.id);
                                   setShowNetworkDropdown(false);
                                 }}
                               >
-                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10">
+                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-black/80">
                                   {chain.logoUrl ? (
                                     <Image
                                       src={chain.logoUrl}
@@ -419,7 +448,7 @@ export default function Home() {
                                 </span>
                                 {chain.name}
                                 {selectedChain === chain.id && (
-                                  <CheckCircle className="h-4 w-4 ml-auto text-[#FA4C15]" />
+                                  <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
                                 )}
                               </button>
                             ))}
@@ -436,15 +465,15 @@ export default function Home() {
                                 key={chain.id}
                                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
                                   selectedChain === chain.id
-                                    ? "bg-[#FA4C15]/20 text-[#FA4C15]"
-                                    : "hover:bg-white/5"
+                                    ? "bg-[#00ff00]/20 text-[#00ff00]"
+                                    : "hover:bg-black/80"
                                 }`}
                                 onClick={() => {
                                   setSelectedChain(chain.id);
                                   setShowNetworkDropdown(false);
                                 }}
                               >
-                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10">
+                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-black/80">
                                   {chain.logoUrl ? (
                                     <Image
                                       src={chain.logoUrl}
@@ -459,7 +488,7 @@ export default function Home() {
                                 </span>
                                 {chain.name}
                                 {selectedChain === chain.id && (
-                                  <CheckCircle className="h-4 w-4 ml-auto text-[#FA4C15]" />
+                                  <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
                                 )}
                               </button>
                             ))}
@@ -476,15 +505,15 @@ export default function Home() {
                                 key={chain.id}
                                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
                                   selectedChain === chain.id
-                                    ? "bg-[#FA4C15]/20 text-[#FA4C15]"
-                                    : "hover:bg-white/5"
+                                    ? "bg-[#00ff00]/20 text-[#00ff00]"
+                                    : "hover:bg-black/80"
                                 }`}
                                 onClick={() => {
                                   setSelectedChain(chain.id);
                                   setShowNetworkDropdown(false);
                                 }}
                               >
-                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10">
+                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-black/80">
                                   {chain.logoUrl ? (
                                     <Image
                                       src={chain.logoUrl}
@@ -499,7 +528,7 @@ export default function Home() {
                                 </span>
                                 {chain.name}
                                 {selectedChain === chain.id && (
-                                  <CheckCircle className="h-4 w-4 ml-auto text-[#FA4C15]" />
+                                  <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
                                 )}
                               </button>
                             ))}
@@ -530,15 +559,15 @@ export default function Home() {
                                 key={chain.id}
                                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
                                   selectedChain === chain.id
-                                    ? "bg-[#FA4C15]/20 text-[#FA4C15]"
-                                    : "hover:bg-white/5"
+                                    ? "bg-[#00ff00]/20 text-[#00ff00]"
+                                    : "hover:bg-black/80"
                                 }`}
                                 onClick={() => {
                                   setSelectedChain(chain.id);
                                   setShowNetworkDropdown(false);
                                 }}
                               >
-                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10">
+                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-black/80">
                                   {chain.logoUrl ? (
                                     <Image
                                       src={chain.logoUrl}
@@ -553,7 +582,7 @@ export default function Home() {
                                 </span>
                                 {chain.name}
                                 {selectedChain === chain.id && (
-                                  <CheckCircle className="h-4 w-4 ml-auto text-[#FA4C15]" />
+                                  <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
                                 )}
                               </button>
                             ))}
@@ -570,15 +599,15 @@ export default function Home() {
                                 key={chain.id}
                                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
                                   selectedChain === chain.id
-                                    ? "bg-[#FA4C15]/20 text-[#FA4C15]"
-                                    : "hover:bg-white/5"
+                                    ? "bg-[#00ff00]/20 text-[#00ff00]"
+                                    : "hover:bg-black/80"
                                 }`}
                                 onClick={() => {
                                   setSelectedChain(chain.id);
                                   setShowNetworkDropdown(false);
                                 }}
                               >
-                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10">
+                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-black/80">
                                   {chain.logoUrl ? (
                                     <Image
                                       src={chain.logoUrl}
@@ -593,7 +622,7 @@ export default function Home() {
                                 </span>
                                 {chain.name}
                                 {selectedChain === chain.id && (
-                                  <CheckCircle className="h-4 w-4 ml-auto text-[#FA4C15]" />
+                                  <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
                                 )}
                               </button>
                             ))}
@@ -610,15 +639,15 @@ export default function Home() {
                                 key={chain.id}
                                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
                                   selectedChain === chain.id
-                                    ? "bg-[#FA4C15]/20 text-[#FA4C15]"
-                                    : "hover:bg-white/5"
+                                    ? "bg-[#00ff00]/20 text-[#00ff00]"
+                                    : "hover:bg-black/80"
                                 }`}
                                 onClick={() => {
                                   setSelectedChain(chain.id);
                                   setShowNetworkDropdown(false);
                                 }}
                               >
-                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10">
+                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-black/80">
                                   {chain.logoUrl ? (
                                     <Image
                                       src={chain.logoUrl}
@@ -633,7 +662,7 @@ export default function Home() {
                                 </span>
                                 {chain.name}
                                 {selectedChain === chain.id && (
-                                  <CheckCircle className="h-4 w-4 ml-auto text-[#FA4C15]" />
+                                  <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
                                 )}
                               </button>
                             ))}
@@ -650,15 +679,15 @@ export default function Home() {
                                 key={chain.id}
                                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
                                   selectedChain === chain.id
-                                    ? "bg-[#FA4C15]/20 text-[#FA4C15]"
-                                    : "hover:bg-white/5"
+                                    ? "bg-[#00ff00]/20 text-[#00ff00]"
+                                    : "hover:bg-black/80"
                                 }`}
                                 onClick={() => {
                                   setSelectedChain(chain.id);
                                   setShowNetworkDropdown(false);
                                 }}
                               >
-                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10">
+                                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-black/80">
                                   {chain.logoUrl ? (
                                     <Image
                                       src={chain.logoUrl}
@@ -673,7 +702,7 @@ export default function Home() {
                                 </span>
                                 {chain.name}
                                 {selectedChain === chain.id && (
-                                  <CheckCircle className="h-4 w-4 ml-auto text-[#FA4C15]" />
+                                  <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
                                 )}
                               </button>
                             ))}
@@ -691,14 +720,16 @@ export default function Home() {
         </div>
 
         {isLoading && (
-          <div className="w-full max-w-xl p-8 backdrop-blur-lg bg-white/5 rounded-2xl border border-gray-800/50 flex flex-col items-center justify-center">
+          <div className="w-full max-w-xl p-8 backdrop-blur-lg bg-black/50 rounded-2xl border border-[#00ff00]/30 flex flex-col items-center justify-center">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full border-t-2 border-b-2 border-[#FA4C15] animate-spin"></div>
+              <div className="w-16 h-16 rounded-full border-t-2 border-b-2 border-[#00ff00] animate-spin"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <ShieldCheck className="h-6 w-6 text-[#FA4C15]" />
+                <ShieldCheck className="h-6 w-6 text-[#00ff00]" />
               </div>
             </div>
-            <p className="text-gray-300 mt-4 animate-pulse">
+            <p
+              className={`${pixelMonoFont.className} text-[#00ffff] mt-4 animate-pulse`}
+            >
               Analyzing wallet on {currentChain.name}...
             </p>
           </div>
@@ -710,7 +741,11 @@ export default function Home() {
               <AlertTriangle className="text-red-500 h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-medium text-red-400 mb-1">Error</h3>
+              <h3
+                className={`${pixelMonoFont.className} font-medium text-red-400 mb-1`}
+              >
+                Error
+              </h3>
               <p className="text-red-300 text-sm">{error}</p>
             </div>
           </div>
@@ -719,39 +754,53 @@ export default function Home() {
         {tokenData && !error && !isLoading && (
           <div className="w-full max-w-4xl space-y-8 relative z-[5] animate-fade-in">
             {/* Wallet Summary Card */}
-            <div className="p-6 backdrop-blur-lg bg-white/5 rounded-2xl border border-gray-800/50 shadow-lg overflow-hidden relative">
-              <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#FA4C15]/10 via-transparent to-transparent"></div>
+            <div className="p-6 backdrop-blur-lg bg-black/50 rounded-2xl border border-[#00ff00]/30 shadow-[0_0_15px_rgba(0,255,0,0.2)] overflow-hidden relative">
+              <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#00ff00]/10 via-transparent to-transparent"></div>
 
               <div className="flex items-center gap-2 mb-6">
-                <div className="h-9 w-9 rounded-lg bg-[#FA4C15]/10 flex items-center justify-center">
-                  <ShieldCheck className="h-5 w-5 text-[#FA4C15]" />
+                <div className="h-9 w-9 rounded-lg bg-[#00ff00]/10 flex items-center justify-center">
+                  <ShieldCheck className="h-5 w-5 text-[#00ff00]" />
                 </div>
-                <h3 className="text-xl font-bold">Wallet Security Overview</h3>
+                <h3
+                  className={`${pixelFont.className} text-xl font-bold text-[#00ffff]`}
+                >
+                  WALLET SECURITY
+                </h3>
               </div>
 
               <div className="flex flex-col md:flex-row gap-6">
-                <div className="space-y-4 text-gray-300 flex-1">
+                <div className="space-y-4 text-[#00ffff] flex-1">
                   <div className="space-y-1">
-                    <span className="text-xs text-gray-400">Address</span>
+                    <span
+                      className={`${pixelMonoFont.className} text-xs text-[#00ff00]`}
+                    >
+                      ADDRESS
+                    </span>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-mono bg-white/5 py-1 px-2 rounded-lg truncate">
+                      <span
+                        className={`${pixelMonoFont.className} text-sm font-mono bg-black/50 py-1 px-2 rounded-lg truncate border border-[#00ff00]/20`}
+                      >
                         {tokenData.data.address}
                       </span>
                       <a
                         href={`${currentChain.explorer}/address/${tokenData.data.address}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-white/5 text-[#FA4C15] hover:bg-white/10 transition-colors"
+                        className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-black/50 text-[#00ff00] hover:bg-black/70 hover:text-[#00ffff] transition-colors border border-[#00ff00]/30"
                       >
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-xs text-gray-400">Network</span>
+                    <span
+                      className={`${pixelMonoFont.className} text-xs text-[#00ff00]`}
+                    >
+                      NETWORK
+                    </span>
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1.5 bg-white/5 py-1 px-2 rounded-lg">
-                        <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
+                      <div className="flex items-center gap-1.5 bg-black/50 py-1 px-2 rounded-lg border border-[#00ff00]/20">
+                        <div className="w-4 h-4 rounded-full bg-black/80 flex items-center justify-center overflow-hidden border border-[#00ff00]/30">
                           <Image
                             src={
                               currentChain.logoUrl ||
@@ -763,11 +812,15 @@ export default function Home() {
                             className="rounded-full"
                           />
                         </div>
-                        <span className="text-sm font-medium">
+                        <span
+                          className={`${pixelMonoFont.className} text-sm font-medium`}
+                        >
                           {currentChain.name}
                         </span>
                         {currentChain.type === "Testnet" && (
-                          <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 text-purple-400 rounded-full">
+                          <span
+                            className={`${pixelMonoFont.className} text-xs px-1.5 py-0.5 bg-[#ff00ff]/20 text-[#ff00ff] rounded-full`}
+                          >
                             Testnet
                           </span>
                         )}
@@ -775,45 +828,73 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-xs text-gray-400">Last Scanned</span>
-                    <div className="text-sm bg-white/5 py-1 px-2 rounded-lg">
+                    <span
+                      className={`${pixelMonoFont.className} text-xs text-[#00ff00]`}
+                    >
+                      LAST SCANNED
+                    </span>
+                    <div
+                      className={`${pixelMonoFont.className} text-sm bg-black/50 py-1 px-2 rounded-lg border border-[#00ff00]/20`}
+                    >
                       {new Date(tokenData.data.updated_at).toLocaleString()}
                     </div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 flex-1">
-                  <div className="p-4 bg-white/5 rounded-xl border border-gray-800 text-center transform transition-all duration-300 hover:scale-105">
-                    <div className="text-3xl font-bold text-white mb-1">
+                  <div className="p-4 bg-black/70 rounded-xl border border-[#00ff00]/30 text-center transform transition-all duration-300 hover:scale-105 shadow-[0_0_10px_rgba(0,255,0,0.1)]">
+                    <div
+                      className={`${pixelFont.className} text-3xl font-bold text-[#00ffff] mb-1 glow-cyan-sm`}
+                    >
                       {spamStats.total}
                     </div>
-                    <div className="text-xs text-gray-400">Total Tokens</div>
+                    <div
+                      className={`${pixelMonoFont.className} text-xs text-[#00ff00]`}
+                    >
+                      TOTAL TOKENS
+                    </div>
                   </div>
-                  <div className="p-4 bg-red-950/20 rounded-xl border border-red-500/30 text-center transform transition-all duration-300 hover:scale-105">
-                    <div className="text-3xl font-bold text-red-400 mb-1">
+                  <div className="p-4 bg-black/70 rounded-xl border border-[#ff0000]/30 text-center transform transition-all duration-300 hover:scale-105 shadow-[0_0_10px_rgba(255,0,0,0.1)]">
+                    <div
+                      className={`${pixelFont.className} text-3xl font-bold text-[#ff5555] mb-1 glow-red-sm`}
+                    >
                       {spamStats.spam}
                     </div>
-                    <div className="text-xs text-red-400">Spam Tokens</div>
+                    <div
+                      className={`${pixelMonoFont.className} text-xs text-[#ff0000]`}
+                    >
+                      SPAM TOKENS
+                    </div>
                   </div>
-                  <div className="p-4 bg-green-950/20 rounded-xl border border-green-500/30 text-center transform transition-all duration-300 hover:scale-105">
-                    <div className="text-3xl font-bold text-green-400 mb-1">
+                  <div className="p-4 bg-black/70 rounded-xl border border-[#00ff00]/30 text-center transform transition-all duration-300 hover:scale-105 shadow-[0_0_10px_rgba(0,255,0,0.1)]">
+                    <div
+                      className={`${pixelFont.className} text-3xl font-bold text-[#00ff00] mb-1 glow-green-sm`}
+                    >
                       {spamStats.safe}
                     </div>
-                    <div className="text-xs text-green-400">Safe Tokens</div>
+                    <div
+                      className={`${pixelMonoFont.className} text-xs text-[#00ff00]`}
+                    >
+                      SAFE TOKENS
+                    </div>
                   </div>
                 </div>
               </div>
 
               {spamStats.spam > 0 && (
-                <div className="mt-6 p-4 border border-red-500/30 bg-red-950/20 rounded-xl flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                    <AlertTriangle className="h-4 w-4 text-red-500" />
+                <div className="mt-6 p-4 border border-[#ff0000]/30 bg-black/70 rounded-xl flex items-center gap-3 shadow-[0_0_10px_rgba(255,0,0,0.1)]">
+                  <div className="h-8 w-8 rounded-full bg-[#ff0000]/20 flex items-center justify-center flex-shrink-0 border border-[#ff0000]/30">
+                    <AlertTriangle className="h-4 w-4 text-[#ff0000]" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-red-400 text-sm">
-                      Security Alert
+                    <h4
+                      className={`${pixelMonoFont.className} font-semibold text-[#ff5555] text-sm`}
+                    >
+                      SECURITY ALERT
                     </h4>
-                    <p className="text-red-300 text-sm">
+                    <p
+                      className={`${pixelMonoFont.className} text-[#ff8888] text-sm`}
+                    >
                       This wallet contains {spamStats.spam} known spam tokens
                       that could be potential scams.
                     </p>
@@ -822,15 +903,19 @@ export default function Home() {
               )}
 
               {spamStats.spam === 0 && (
-                <div className="mt-6 p-4 border border-green-500/30 bg-green-950/20 rounded-xl flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                <div className="mt-6 p-4 border border-[#00ff00]/30 bg-black/70 rounded-xl flex items-center gap-3 shadow-[0_0_10px_rgba(0,255,0,0.1)]">
+                  <div className="h-8 w-8 rounded-full bg-[#00ff00]/20 flex items-center justify-center flex-shrink-0 border border-[#00ff00]/30">
+                    <CheckCircle className="h-4 w-4 text-[#00ff00]" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-green-400 text-sm">
-                      Security Status
+                    <h4
+                      className={`${pixelMonoFont.className} font-semibold text-[#00ff00] text-sm`}
+                    >
+                      SECURITY STATUS
                     </h4>
-                    <p className="text-green-300 text-sm">
+                    <p
+                      className={`${pixelMonoFont.className} text-[#00ffaa] text-sm`}
+                    >
                       No known spam tokens detected in this wallet.
                     </p>
                   </div>
@@ -840,9 +925,9 @@ export default function Home() {
 
             {/* Tokens List */}
             <div className="space-y-6">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/5 p-4 rounded-xl border border-gray-800/50">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-black/50 p-4 rounded-xl border border-[#00ff00]/30 shadow-[0_0_15px_rgba(0,255,0,0.1)]">
                 <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-lg bg-[#FA4C15]/10 flex items-center justify-center">
+                  <div className="h-8 w-8 rounded-lg bg-[#00ff00]/10 flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -851,14 +936,18 @@ export default function Home() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="h-4 w-4 text-[#FA4C15]"
+                      className="h-4 w-4 text-[#00ff00]"
                     >
                       <circle cx="8" cy="21" r="1" />
                       <circle cx="19" cy="21" r="1" />
                       <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold">Token Holdings</h3>
+                  <h3
+                    className={`${pixelFont.className} text-xl font-bold text-[#00ffff]`}
+                  >
+                    TOKEN HOLDINGS
+                  </h3>
                 </div>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
@@ -866,14 +955,14 @@ export default function Home() {
                     <input
                       type="text"
                       placeholder="Search tokens..."
-                      className="w-full pl-10 pr-4 py-2 bg-white/5 border border-gray-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FA4C15] text-sm"
+                      className="w-full pl-10 pr-4 py-2 bg-black/80 border border-[#00ff00]/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#00ff00] text-[#00ffff] text-sm"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#00ff00]" />
                     {searchQuery && (
                       <button
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 hover:text-white"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#00ff00] hover:text-[#00ffff]"
                         onClick={() => setSearchQuery("")}
                       >
                         <X className="h-4 w-4" />
@@ -881,12 +970,12 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div className="flex p-1 bg-white/5 border border-gray-800 rounded-lg overflow-hidden">
+                  <div className="flex p-1 bg-black/80 border border-[#00ff00]/50 rounded-lg overflow-hidden">
                     <button
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                         filterType === "all"
-                          ? "bg-[#FA4C15] text-white"
-                          : "text-gray-400 hover:bg-white/10"
+                          ? "bg-[#00ff00] text-black"
+                          : "text-[#00ff00] hover:bg-black/90"
                       }`}
                       onClick={() => setFilterType("all")}
                     >
@@ -895,8 +984,8 @@ export default function Home() {
                     <button
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                         filterType === "spam"
-                          ? "bg-[#FA4C15] text-white"
-                          : "text-gray-400 hover:bg-white/10"
+                          ? "bg-[#ff0000] text-black"
+                          : "text-[#00ff00] hover:bg-black/90"
                       }`}
                       onClick={() => setFilterType("spam")}
                     >
@@ -905,8 +994,8 @@ export default function Home() {
                     <button
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                         filterType === "safe"
-                          ? "bg-[#FA4C15] text-white"
-                          : "text-gray-400 hover:bg-white/10"
+                          ? "bg-[#00ff00] text-black"
+                          : "text-[#00ff00] hover:bg-black/90"
                       }`}
                       onClick={() => setFilterType("safe")}
                     >
@@ -917,8 +1006,8 @@ export default function Home() {
               </div>
 
               {filteredTokens.length === 0 && (
-                <div className="p-12 backdrop-blur-lg bg-white/5 rounded-2xl border border-gray-800/50 text-center">
-                  <div className="h-16 w-16 mx-auto mb-4 text-gray-500 opacity-60">
+                <div className="p-12 backdrop-blur-lg bg-black/50 rounded-2xl border border-[#00ff00]/30 text-center shadow-[0_0_15px_rgba(0,255,0,0.1)]">
+                  <div className="h-16 w-16 mx-auto mb-4 text-[#00ff00] opacity-60">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -933,10 +1022,14 @@ export default function Home() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-400 mb-2">
-                    No tokens found
+                  <h3
+                    className={`${pixelFont.className} text-lg font-medium text-[#00ffff] mb-2`}
+                  >
+                    NO TOKENS FOUND
                   </h3>
-                  <p className="text-gray-500 max-w-sm mx-auto">
+                  <p
+                    className={`${pixelMonoFont.className} text-[#00ff00] max-w-sm mx-auto`}
+                  >
                     No tokens match your current filters. Try changing your
                     search or filter settings.
                   </p>
@@ -949,15 +1042,15 @@ export default function Home() {
                     key={token.contract_address}
                     className={`p-5 backdrop-blur-lg rounded-xl border flex flex-col md:flex-row md:items-center gap-4 transition-all duration-300 hover:shadow-lg animate-fade-in ${
                       token.is_spam
-                        ? "bg-red-950/10 border-red-500/30"
+                        ? "bg-black/50 border-[#ff0000]/30 shadow-[0_0_10px_rgba(255,0,0,0.1)]"
                         : token.spamConfidence === "MAYBE"
-                        ? "bg-yellow-950/10 border-yellow-500/30"
-                        : "bg-white/5 border-gray-800/50 hover:border-gray-700/80"
+                        ? "bg-black/50 border-[#ffff00]/30 shadow-[0_0_10px_rgba(255,255,0,0.1)]"
+                        : "bg-black/50 border-[#00ff00]/30 shadow-[0_0_10px_rgba(0,255,0,0.1)]"
                     }`}
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 relative rounded-full overflow-hidden bg-white/10 flex-shrink-0 border border-gray-800/50">
+                      <div className="w-12 h-12 relative rounded-full overflow-hidden bg-black/80 flex-shrink-0 border border-[#00ff00]/30">
                         {token.logo_url ? (
                           <Image
                             src={token.logo_url}
@@ -967,8 +1060,10 @@ export default function Home() {
                             className="object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                            <span className="text-lg font-semibold text-gray-400">
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-black to-gray-900 border border-[#00ff00]/10">
+                            <span
+                              className={`${pixelMonoFont.className} text-lg font-semibold text-[#00ff00]`}
+                            >
                               {token.contract_ticker_symbol.charAt(0)}
                             </span>
                           </div>
@@ -978,78 +1073,94 @@ export default function Home() {
                         <div
                           className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-black ${
                             token.is_spam
-                              ? "bg-red-500"
+                              ? "bg-[#ff0000]"
                               : token.spamConfidence === "MAYBE"
-                              ? "bg-yellow-500"
-                              : "bg-green-500"
+                              ? "bg-[#ffff00]"
+                              : "bg-[#00ff00]"
                           }`}
                         ></div>
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h4 className="font-medium truncate">
+                          <h4
+                            className={`${pixelMonoFont.className} font-medium truncate text-[#00ffff]`}
+                          >
                             {token.contract_name}
                           </h4>
-                          <span className="text-sm px-2 py-0.5 bg-white/10 rounded-full text-gray-400">
+                          <span
+                            className={`${pixelMonoFont.className} text-sm px-2 py-0.5 bg-black/80 rounded-full text-[#00ff00] border border-[#00ff00]/30`}
+                          >
                             {token.contract_ticker_symbol}
                           </span>
 
                           {token.is_spam && (
-                            <span className="px-2 py-0.5 text-xs bg-red-500/20 text-red-400 rounded-full flex items-center gap-1">
-                              <AlertTriangle className="h-3 w-3" /> Spam Token
+                            <span className="px-2 py-0.5 text-xs bg-[#ff0000]/20 text-[#ff0000] rounded-full flex items-center gap-1 border border-[#ff0000]/30">
+                              <AlertTriangle className="h-3 w-3" /> SPAM TOKEN
                             </span>
                           )}
 
                           {!token.is_spam &&
                             token.spamConfidence === "MAYBE" && (
-                              <span className="px-2 py-0.5 text-xs bg-yellow-500/20 text-yellow-400 rounded-full flex items-center gap-1">
-                                <AlertCircle className="h-3 w-3" /> Caution
+                              <span className="px-2 py-0.5 text-xs bg-[#ffff00]/20 text-[#ffff00] rounded-full flex items-center gap-1 border border-[#ffff00]/30">
+                                <AlertCircle className="h-3 w-3" /> CAUTION
                               </span>
                             )}
 
                           {!token.is_spam && token.spamConfidence === "NO" && (
-                            <span className="px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded-full flex items-center gap-1">
-                              <CheckCircle className="h-3 w-3" /> Safe
+                            <span className="px-2 py-0.5 text-xs bg-[#00ff00]/20 text-[#00ff00] rounded-full flex items-center gap-1 border border-[#00ff00]/30">
+                              <CheckCircle className="h-3 w-3" /> SAFE
                             </span>
                           )}
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-1 text-sm">
-                          <div className="text-gray-400">
+                          <div
+                            className={`${pixelMonoFont.className} text-[#00ff00]`}
+                          >
                             Balance:{" "}
-                            <span className="text-white font-medium">
+                            <span className="text-[#00ffff] font-medium">
                               {parseFloat(token.balance) /
                                 Math.pow(10, token.contract_decimals)}{" "}
                               {token.contract_ticker_symbol}
                             </span>
                           </div>
-                          <div className="text-gray-400">
+                          <div
+                            className={`${pixelMonoFont.className} text-[#00ff00]`}
+                          >
                             Value:{" "}
-                            <span className="text-white font-medium">
+                            <span className="text-[#00ffff] font-medium">
                               {token.pretty_quote}
                             </span>
                           </div>
                         </div>
 
-                        <div className="mt-2 text-xs font-mono text-gray-500 truncate">
+                        <div
+                          className={`${pixelMonoFont.className} mt-2 text-xs font-mono text-[#00ffaa] truncate`}
+                        >
                           {token.contract_address}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex md:flex-col items-center md:items-end gap-3 md:gap-2 mt-3 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-800/50 md:ml-auto">
+                    <div className="flex md:flex-col items-center md:items-end gap-3 md:gap-2 mt-3 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-[#00ff00]/20 md:ml-auto">
                       <div
-                        className={`text-center px-3 py-1 rounded-lg ${
+                        className={`text-center px-3 py-1 rounded-lg border ${
                           token.is_spam
-                            ? "bg-red-500/20 text-red-400"
+                            ? "bg-black/90 text-[#ff0000] border-[#ff0000]/50"
                             : token.spamConfidence === "MAYBE"
-                            ? "bg-yellow-500/20 text-yellow-400"
-                            : "bg-green-500/20 text-green-400"
+                            ? "bg-black/90 text-[#ffff00] border-[#ffff00]/50"
+                            : "bg-black/90 text-[#00ff00] border-[#00ff00]/50"
                         }`}
                       >
-                        <div className="text-xs font-medium">Risk Level</div>
-                        <div className="text-sm font-semibold">
+                        <div
+                          className={`${pixelMonoFont.className} text-xs font-medium`}
+                        >
+                          RISK LEVEL
+                        </div>
+                        <div
+                          className={`${pixelMonoFont.className} text-sm font-semibold`}
+                        >
                           {token.spamScore}
                         </div>
                       </div>
@@ -1061,9 +1172,9 @@ export default function Home() {
                         )}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-gray-800 rounded-lg text-gray-300 hover:text-[#FA4C15] transition-colors text-xs gap-1.5"
+                        className={`${pixelMonoFont.className} inline-flex items-center justify-center px-3 py-1.5 bg-black/80 hover:bg-black/90 border border-[#00ff00]/50 rounded-lg text-[#00ffff] hover:text-[#00ff00] transition-colors text-xs gap-1.5`}
                       >
-                        <ExternalLink className="h-3 w-3" /> View in Explorer
+                        <ExternalLink className="h-3 w-3" /> VIEW EXPLORER
                       </a>
                     </div>
                   </div>
@@ -1074,22 +1185,27 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="w-full border-t border-gray-800/50 backdrop-blur-md bg-black/20 p-6 text-center mt-10">
+      <footer className="w-full border-t border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-6 text-center mt-10">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Image
               src="/logo.png"
-              alt="Bitcoin Mining Logo"
+              alt="ChainWatchDog Logo"
               width={20}
               height={20}
             />
-            <p className="text-lg font-semibold text-white">ChainWatchDog</p>
+            <p
+              className={`${pixelFont.className} text-lg font-semibold text-[#00ff00]`}
+            >
+              ChainWatchDog
+            </p>
           </div>
-          <p className="text-sm text-gray-400">
-            Powered by{" "}
-            <span className="text-[#FA4C15] font-semibold">ChainWatchDog</span>
+          <p className={`${pixelMonoFont.className} text-sm text-[#00ffff]`}>
+            RETRO FUTURISM IN DIGITAL FORM
           </p>
-          <p className="text-xs text-gray-600 mt-1">
+          <p
+            className={`${pixelMonoFont.className} text-xs text-[#ff00ff] mt-1`}
+          >
             Spam detection powered by CovalentHQ threat intelligence
           </p>
         </div>
@@ -1116,6 +1232,20 @@ export default function Home() {
           }
         }
 
+        @keyframes pulseSlow {
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.8;
+          }
+        }
+
+        .animate-pulse-slow {
+          animation: pulseSlow 3s ease-in-out infinite;
+        }
+
         .animate-fade-in-up {
           animation: fadeInUp 0.6s ease-out forwards;
         }
@@ -1130,6 +1260,32 @@ export default function Home() {
 
         .animation-delay-200 {
           animation-delay: 0.2s;
+        }
+
+        .glow-green-sm {
+          text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+
+        .glow-green-md {
+          text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+        }
+
+        .glow-cyan-sm {
+          text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+
+        .glow-red-sm {
+          text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+        }
+
+        body {
+          background-color: #000;
+          background-image: linear-gradient(
+              rgba(0, 255, 0, 0.05) 1px,
+              transparent 1px
+            ),
+            linear-gradient(90deg, rgba(0, 255, 0, 0.05) 1px, transparent 1px);
+          background-size: 30px 30px;
         }
       `}</style>
     </div>

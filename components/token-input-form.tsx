@@ -15,6 +15,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader2, Search, ShieldCheck } from "lucide-react";
+import { Press_Start_2P, VT323 } from "next/font/google";
+
+const pixelFont = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+});
+
+const pixelMonoFont = VT323({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
 
@@ -54,8 +65,10 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
             name="tokenAddress"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-400">
-                  Wallet Address
+                <FormLabel
+                  className={`${pixelMonoFont.className} text-sm font-medium text-[#00ff00]`}
+                >
+                  WALLET ADDRESS
                 </FormLabel>
                 <div className="relative">
                   <FormControl>
@@ -64,15 +77,15 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
                       {...field}
                       disabled={isLoading}
                       aria-label="Wallet Address Input"
-                      className="pl-10 py-6 bg-white/5 border-gray-800 focus:ring-[#FA4C15] focus:border-[#FA4C15]"
+                      className={`${pixelMonoFont.className} pl-10 py-6 bg-black/80 border-[#00ff00]/50 text-[#00ffff] focus:ring-[#00ff00] focus:border-[#00ff00] placeholder:text-[#00ffaa]/50`}
                     />
                   </FormControl>
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#00ff00]">
                     <Search className="h-5 w-5" />
                   </div>
                 </div>
                 <div className="pt-1">
-                  <FormMessage className="text-red-400 text-xs" />
+                  <FormMessage className="text-[#ff0000] text-xs" />
                 </div>
               </FormItem>
             )}
@@ -82,19 +95,19 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full py-6 bg-gradient-to-r from-[#FA4C15] to-[#FF8A3D] hover:opacity-90 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
+          className={`${pixelFont.className} w-full py-6 bg-black border-2 border-[#00ff00] hover:bg-[#00ff00]/10 text-[#00ff00] hover:text-[#00ffff] rounded-xl transition-all duration-200 shadow-[0_0_10px_rgba(0,255,0,0.3)] hover:shadow-[0_0_15px_rgba(0,255,0,0.5)]`}
         >
           {isLoading ? (
             <div className="flex items-center justify-center gap-2">
               <div className="relative">
                 <Loader2 className="h-5 w-5 animate-spin" />
               </div>
-              <span>Analyzing Wallet...</span>
+              <span>ANALYZING...</span>
             </div>
           ) : (
             <div className="flex items-center justify-center gap-2">
               <ShieldCheck className="h-5 w-5" />
-              <span>Scan for Spam Tokens</span>
+              <span>SCAN FOR SPAM</span>
             </div>
           )}
         </Button>
