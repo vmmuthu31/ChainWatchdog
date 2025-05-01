@@ -21,6 +21,8 @@ import { toast } from "sonner";
 import WalletConnect from "@/components/WalletConnect";
 import Image from "next/image";
 import { useMemo, useState, useRef, useEffect } from "react";
+import { useAccount } from "wagmi";
+import { RecentSpamTokens } from "@/components/RecentSpamTokens";
 
 const pixelFont = Press_Start_2P({
   weight: "400",
@@ -41,6 +43,14 @@ export default function Home() {
   const [networkSearchQuery, setNetworkSearchQuery] = useState("");
   const [selectedChain, setSelectedChain] = useState(supportedChains[0].id);
   const [showNetworkDropdown, setShowNetworkDropdown] = useState(false);
+  const [activeTab, setActiveTab] = useState<"search" | "wallet" | "recent">(
+    "search"
+  );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [walletTokens, setWalletTokens] = useState<any[]>([]);
+  const [isLoadingWalletTokens, setIsLoadingWalletTokens] = useState(false);
+
+  const { address: walletAddress, isConnected } = useAccount();
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -65,6 +75,24 @@ export default function Home() {
       setShowNetworkDropdown(false);
     }
   }, [isLoading]);
+
+  useEffect(() => {
+    if (isConnected && walletAddress && activeTab === "wallet") {
+      fetchWalletTokens(walletAddress);
+    }
+  }, [isConnected, walletAddress, activeTab, selectedChain]);
+
+  const fetchWalletTokens = async (address: string) => {
+    setIsLoadingWalletTokens(true);
+    try {
+      const result = await GoldRushServices(address, selectedChain);
+      setWalletTokens(result.data?.items || []);
+    } catch (err) {
+      console.error("Error fetching wallet tokens:", err);
+    } finally {
+      setIsLoadingWalletTokens(false);
+    }
+  };
 
   const currentChain = useMemo(() => {
     return (
@@ -283,7 +311,6 @@ export default function Home() {
             .
           </p>
         </div>
-
         <div className="w-full max-w-xl backdrop-blur-lg bg-black/50 p-4 sm:p-6 md:p-8 rounded-2xl border border-[#00ff00]/30 shadow-xl relative z-[10] transform transition-all duration-300 hover:shadow-[0_0_50px_-12px_rgba(0,255,0,0.5)]">
           {/* Network selector */}
           <div className="mb-6">
@@ -716,8 +743,266 @@ export default function Home() {
               )}
             </div>
           </div>
+          {/* Tab Selector */}
+          <div className="flex p-1 bg-black/80 border border-[#00ff00]/50 rounded-lg overflow-hidden mb-4">
+            <button
+              className={`flex-1 px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+                activeTab === "search"
+                  ? "bg-[#00ff00] text-black"
+                  : "text-[#00ff00] hover:bg-black/90"
+              }`}
+              onClick={() => setActiveTab("search")}
+            >
+              <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4 inline-block mr-1.5" />
+              Search Wallet
+            </button>
+            {isConnected && (
+              <button
+                className={`flex-1 px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+                  activeTab === "wallet"
+                    ? "bg-[#00ff00] text-black"
+                    : "text-[#00ff00] hover:bg-black/90"
+                }`}
+                onClick={() => setActiveTab("wallet")}
+              >
+                <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 inline-block mr-1.5" />
+                My Wallet
+              </button>
+            )}
+            <button
+              className={`flex-1 px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+                activeTab === "recent"
+                  ? "bg-[#ff0000] text-white"
+                  : "text-[#ff0000] hover:bg-black/90"
+              }`}
+              onClick={() => setActiveTab("recent")}
+            >
+              <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4 inline-block mr-1.5" />
+              Recent Spam
+            </button>
+          </div>
+          {activeTab === "search" ? (
+            <TokenInputForm onSubmit={handleCheckToken} isLoading={isLoading} />
+          ) : activeTab === "wallet" ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3
+                  className={`${pixelMonoFont.className} text-base sm:text-lg text-[#00ffff]`}
+                >
+                  Your Wallet Tokens
+                </h3>
+                <div className="flex p-1 bg-black/80 border border-[#00ff00]/50 rounded-lg overflow-hidden">
+                  <button
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      filterType === "all"
+                        ? "bg-[#00ff00] text-black"
+                        : "text-[#00ff00] hover:bg-black/90"
+                    }`}
+                    onClick={() => setFilterType("all")}
+                  >
+                    All
+                  </button>
+                  <button
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      filterType === "spam"
+                        ? "bg-[#ff0000] text-black"
+                        : "text-[#00ff00] hover:bg-black/90"
+                    }`}
+                    onClick={() => setFilterType("spam")}
+                  >
+                    Spam
+                  </button>
+                  <button
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      filterType === "safe"
+                        ? "bg-[#00ff00] text-black"
+                        : "text-[#00ff00] hover:bg-black/90"
+                    }`}
+                    onClick={() => setFilterType("safe")}
+                  >
+                    Safe
+                  </button>
+                </div>
+              </div>
 
-          <TokenInputForm onSubmit={handleCheckToken} isLoading={isLoading} />
+              {isLoadingWalletTokens ? (
+                <div className="flex justify-center p-8">
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-full border-t-2 border-b-2 border-[#00ff00] animate-spin"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <ShieldCheck className="h-6 w-6 text-[#00ff00]" />
+                    </div>
+                  </div>
+                </div>
+              ) : walletTokens.length > 0 ? (
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                  {walletTokens
+                    .filter((token) => {
+                      if (filterType === "spam") {
+                        return (
+                          token.is_spam || token.spamConfidence === "MAYBE"
+                        );
+                      } else if (filterType === "safe") {
+                        return !token.is_spam && token.spamConfidence === "NO";
+                      }
+                      return true;
+                    })
+                    .map((token) => (
+                      <div
+                        key={token.contract_address}
+                        className={`p-3 backdrop-blur-lg rounded-xl border flex items-center gap-3 transition-all duration-300 hover:shadow-md ${
+                          token.is_spam
+                            ? "bg-black/50 border-[#ff0000]/30 shadow-[0_0_10px_rgba(255,0,0,0.1)]"
+                            : token.spamConfidence === "MAYBE"
+                            ? "bg-black/50 border-[#ffff00]/30 shadow-[0_0_10px_rgba(255,255,0,0.1)]"
+                            : "bg-black/50 border-[#00ff00]/30 shadow-[0_0_10px_rgba(0,255,0,0.1)]"
+                        }`}
+                      >
+                        <div className="w-10 h-10 relative rounded-full overflow-hidden bg-black/80 flex-shrink-0 border border-[#00ff00]/30">
+                          {token.logo_url ? (
+                            <Image
+                              src={token.logo_url}
+                              alt={token.contract_name}
+                              width={40}
+                              height={40}
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-black to-gray-900 border border-[#00ff00]/10">
+                              <span
+                                className={`${pixelMonoFont.className} text-base font-semibold text-[#00ff00]`}
+                              >
+                                {token.contract_ticker_symbol.charAt(0)}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Security indicator dot */}
+                          <div
+                            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-black ${
+                              token.is_spam
+                                ? "bg-[#ff0000]"
+                                : token.spamConfidence === "MAYBE"
+                                ? "bg-[#ffff00]"
+                                : "bg-[#00ff00]"
+                            }`}
+                          ></div>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4
+                              className={`${pixelMonoFont.className} text-sm font-medium truncate text-[#00ffff]`}
+                            >
+                              {token.contract_name}
+                            </h4>
+                            <span
+                              className={`${pixelMonoFont.className} text-xs px-1.5 py-0.5 bg-black/80 rounded-full text-[#00ff00] border border-[#00ff00]/30`}
+                            >
+                              {token.contract_ticker_symbol}
+                            </span>
+
+                            {token.is_spam && (
+                              <span className="px-1.5 py-0.5 text-xs bg-[#ff0000]/20 text-[#ff0000] rounded-full flex items-center gap-1 border border-[#ff0000]/30">
+                                <AlertTriangle className="h-2.5 w-2.5" /> SPAM
+                              </span>
+                            )}
+
+                            {!token.is_spam &&
+                              token.spamConfidence === "MAYBE" && (
+                                <span className="px-1.5 py-0.5 text-xs bg-[#ffff00]/20 text-[#ffff00] rounded-full flex items-center gap-1 border border-[#ffff00]/30">
+                                  <AlertCircle className="h-2.5 w-2.5" />{" "}
+                                  CAUTION
+                                </span>
+                              )}
+
+                            {!token.is_spam &&
+                              token.spamConfidence === "NO" && (
+                                <span className="px-1.5 py-0.5 text-xs bg-[#00ff00]/20 text-[#00ff00] rounded-full flex items-center gap-1 border border-[#00ff00]/30">
+                                  <CheckCircle className="h-2.5 w-2.5" /> SAFE
+                                </span>
+                              )}
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-1 text-xs mt-1">
+                            <div
+                              className={`${pixelMonoFont.className} text-[#00ff00]`}
+                            >
+                              Balance:{" "}
+                              <span className="text-[#00ffff] font-medium">
+                                {parseFloat(token.balance) /
+                                  Math.pow(10, token.contract_decimals)}{" "}
+                                {token.contract_ticker_symbol}
+                              </span>
+                            </div>
+                            <div
+                              className={`${pixelMonoFont.className} text-[#00ff00]`}
+                            >
+                              Value:{" "}
+                              <span className="text-[#00ffff] font-medium">
+                                {token.pretty_quote}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <a
+                          href={getExplorerUrl(
+                            selectedChain,
+                            token.contract_address
+                          )}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-black/50 text-[#00ff00] hover:bg-black/70 hover:text-[#00ffff] transition-colors border border-[#00ff00]/30"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <div className="p-8 text-center">
+                  <div className="h-16 w-16 mx-auto mb-4 text-[#00ff00] opacity-60">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                  <h3
+                    className={`${pixelFont.className} text-base font-medium text-[#00ffff] mb-2`}
+                  >
+                    NO TOKENS FOUND
+                  </h3>
+                  <p
+                    className={`${pixelMonoFont.className} text-[#00ff00] max-w-sm mx-auto`}
+                  >
+                    No tokens found in your wallet on this chain. Try selecting
+                    a different network.
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3
+                  className={`${pixelMonoFont.className} text-base sm:text-lg text-[#ff0000]`}
+                >
+                  Recent Spam Token Alerts
+                </h3>
+              </div>
+              <RecentSpamTokens chainId={selectedChain} />
+            </div>
+          )}
         </div>
 
         {isLoading && (
