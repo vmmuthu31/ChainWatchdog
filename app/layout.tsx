@@ -25,6 +25,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="stylesheet" href="/fix-selection.css" />
+        {/* Inline critical CSS to fix selection colors immediately */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+          input::selection { background-color: rgba(0, 255, 0, 0.5) !important; color: #00ffff !important; -webkit-text-fill-color: #00ffff !important; }
+          input, input:focus, input:active { color: #00ffff !important; -webkit-text-fill-color: #00ffff !important; }
+          ::selection { color: #00ffff !important; -webkit-text-fill-color: #00ffff !important; background-color: rgba(0, 255, 0, 0.5) !important; }
+        `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

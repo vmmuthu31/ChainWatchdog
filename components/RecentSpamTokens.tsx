@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { AlertTriangle, ExternalLink, Clock, Search } from "lucide-react";
+import { AlertTriangle, ExternalLink, Search } from "lucide-react";
 import { Press_Start_2P, VT323 } from "next/font/google";
 import { getExplorerUrl } from "@/lib/services/goldrush";
 import yaml from "js-yaml";
@@ -421,7 +421,7 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
 
   // Search UI
   const renderSearchSection = () => (
-    <div className="mb-4 pt-2">
+    <div className="mb-6 pt-3">
       <form onSubmit={handleSearch} className="flex gap-2">
         <div className="relative flex-1">
           <input
@@ -429,35 +429,37 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search Token or NFT contract address"
-            className="w-full px-3 py-2 bg-black/70 border border-[#ff0000]/30 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-[#ff0000] placeholder:text-gray-500"
+            className="w-full px-4 py-3 bg-black/70 border border-[#ff0000]/30 rounded-lg text-[#ffffff] text-base sm:text-lg focus:outline-none focus:ring-1 focus:ring-[#ff0000] placeholder:text-gray-500"
           />
           {isSearching && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <div className="w-4 h-4 rounded-full border-t-2 border-b-2 border-[#ff0000] animate-spin"></div>
+              <div className="w-5 h-5 rounded-full border-t-2 border-b-2 border-[#ff0000] animate-spin"></div>
             </div>
           )}
         </div>
         <button
           type="submit"
           disabled={isSearching}
-          className="px-3 py-2 bg-[#ff0000]/10 hover:bg-[#ff0000]/20 text-[#ff8888] rounded-lg border border-[#ff0000]/30 flex items-center gap-1 transition-colors disabled:opacity-50"
+          className="px-4 py-3 bg-[#ff0000]/10 hover:bg-[#ff0000]/20 text-[#ff8888] rounded-lg border border-[#ff0000]/30 flex items-center gap-2 transition-colors disabled:opacity-50 text-base"
         >
-          <Search className="h-4 w-4" />
+          <Search className="h-5 w-5" />
           <span>Search</span>
         </button>
       </form>
 
       {searchResult && (
-        <div className="mt-3 p-3 bg-black/70 border border-[#ff0000]/30 rounded-lg animate-fade-in">
+        <div className="mt-4 p-4 bg-black/70 border border-[#ff0000]/30 rounded-lg animate-fade-in">
           {searchResult.found ? (
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <span
-                  className={`${pixelMonoFont.className} text-[#ff0000] font-bold`}
+                  className={`${pixelMonoFont.className} text-lg sm:text-xl text-[#ff0000] font-bold`}
                 >
                   SPAM ALERT!
                 </span>
-                <span className={`${pixelMonoFont.className} text-[#ff8888]`}>
+                <span
+                  className={`${pixelMonoFont.className} text-base sm:text-lg text-[#ff8888]`}
+                >
                   Contract found in {searchResult.network} spam list
                 </span>
               </div>
@@ -468,14 +470,16 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 text-xs text-[#ff8888] hover:text-[#ff5555] flex items-center gap-1 transition-colors w-fit"
+                className="mt-3 text-sm sm:text-base text-[#ff8888] hover:text-[#ff5555] flex items-center gap-2 transition-colors w-fit"
               >
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-4 w-4" />
                 View on explorer
               </a>
             </div>
           ) : (
-            <p className={`${pixelMonoFont.className} text-green-400`}>
+            <p
+              className={`${pixelMonoFont.className} text-lg sm:text-xl text-green-400`}
+            >
               This contract was not found in our spam lists. However, always do
               your own research.
             </p>
@@ -490,18 +494,18 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
       <div className="p-4 sm:p-6 backdrop-blur-lg bg-black/50 rounded-xl border border-[#ff0000]/30 shadow-[0_0_15px_rgba(255,0,0,0.2)] relative">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#ff0000]/10 via-transparent to-transparent blur-3xl"></div>
         <div className="flex items-center gap-2 mb-4">
-          <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-[#ff0000]/10 flex items-center justify-center">
-            <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-[#ff0000]" />
+          <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-[#ff0000]/10 flex items-center justify-center">
+            <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-[#ff0000]" />
           </div>
           <h3
-            className={`${pixelFont.className} text-base sm:text-lg font-bold text-[#ff0000]`}
+            className={`${pixelFont.className} text-base sm:text-lg font-medium text-[#ff0000]`}
           >
-            RECENT SPAM ALERTS
+            RECENT SPAM TOKENS
           </h3>
         </div>
         {renderSearchSection()}
         <div className="flex justify-center py-8">
-          <div className="w-8 h-8 rounded-full border-t-2 border-b-2 border-[#ff0000] animate-spin"></div>
+          <div className="w-10 h-10 rounded-full border-t-2 border-b-2 border-[#ff0000] animate-spin"></div>
         </div>
       </div>
     );
@@ -512,23 +516,25 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
       <div className="p-4 sm:p-6 backdrop-blur-lg bg-black/50 rounded-xl border border-[#ff0000]/30 shadow-[0_0_15px_rgba(255,0,0,0.2)] relative">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#ff0000]/10 via-transparent to-transparent blur-3xl"></div>
         <div className="flex items-center gap-2 mb-4">
-          <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-[#ff0000]/10 flex items-center justify-center">
-            <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-[#ff0000]" />
+          <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-[#ff0000]/10 flex items-center justify-center">
+            <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-[#ff0000]" />
           </div>
           <h3
-            className={`${pixelFont.className} text-base sm:text-lg font-bold text-[#ff0000]`}
+            className={`${pixelFont.className} text-base sm:text-lg font-medium text-[#ff0000]`}
           >
-            RECENT SPAM ALERTS
+            RECENT SPAM TOKENS
           </h3>
         </div>
         {renderSearchSection()}
-        <div className="text-center py-4">
-          <p className={`${pixelMonoFont.className} text-[#ff8888]`}>
+        <div className="text-center py-6">
+          <p
+            className={`${pixelMonoFont.className} text-lg sm:text-xl text-[#ff8888]`}
+          >
             {error || "No recent spam contracts found"}
           </p>
           <button
             onClick={() => setShowRecentFromAll(!showRecentFromAll)}
-            className="mt-3 px-3 py-1 rounded-md bg-[#ff0000]/10 text-[#ff8888] hover:bg-[#ff0000]/20 transition-colors text-sm"
+            className="mt-4 px-4 py-2 rounded-md bg-[#ff0000]/10 text-[#ff8888] hover:bg-[#ff0000]/20 transition-colors text-base sm:text-lg"
           >
             {toggleModeLabel}
           </button>
@@ -538,214 +544,201 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
   }
 
   return (
-    <div className="p-4 sm:p-6 backdrop-blur-lg bg-black/50 rounded-xl border border-[#ff0000]/30 shadow-[0_0_15px_rgba(255,0,0,0.2)] relative animate-fade-in">
+    <div className="p-4 sm:p-6 backdrop-blur-lg bg-black/50 rounded-xl border border-[#ff0000]/30 shadow-[0_0_15px_rgba(255,0,0,0.2)] relative">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#ff0000]/10 via-transparent to-transparent blur-3xl"></div>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-[#ff0000]/10 flex items-center justify-center">
-            {showRecentFromAll ? (
-              <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-[#ff0000]" />
-            ) : (
-              <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-[#ff0000]" />
-            )}
-          </div>
-          <h3
-            className={`${pixelFont.className} text-base sm:text-lg font-bold text-[#ff0000]`}
-          >
-            {showRecentFromAll ? "MOST RECENT SPAM" : "RECENT SPAM ALERTS"}
-          </h3>
+      <div className="flex items-center gap-2 mb-4">
+        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-[#ff0000]/10 flex items-center justify-center">
+          <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-[#ff0000]" />
         </div>
-        <button
-          onClick={() => setShowRecentFromAll(!showRecentFromAll)}
-          className="px-2 py-1 text-xs rounded-md bg-[#ff0000]/10 text-[#ff8888] hover:bg-[#ff0000]/20 transition-colors"
+        <h3
+          className={`${pixelFont.className} text-base sm:text-lg font-medium text-[#ff0000]`}
         >
-          {showRecentFromAll ? "Show by chain" : "Show most recent"}
-        </button>
+          RECENT SPAM TOKENS
+        </h3>
       </div>
 
+      {/* Search section */}
       {renderSearchSection()}
 
-      <p className={`${pixelMonoFont.className} text-sm text-[#ff8888] mb-3`}>
-        {showRecentFromAll
-          ? "These are the most recently identified spam across all chains."
-          : "These items have recently been flagged as spam. Be cautious if you encounter them."}
-      </p>
+      {/* Tabs for Tokens and NFTs */}
+      <Tabs
+        defaultValue="tokens"
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as "tokens" | "nfts")}
+        className="space-y-4 mt-2"
+      >
+        <TabsList className="bg-black/50 border border-[#ff0000]/20 p-1 rounded-lg">
+          <TabsTrigger
+            value="tokens"
+            className={`px-4 py-2 text-base rounded-md data-[state=active]:bg-[#ff0000]/10 data-[state=active]:text-[#ff0000] data-[state=active]:font-semibold text-gray-400`}
+          >
+            Spam Tokens
+          </TabsTrigger>
+          <TabsTrigger
+            value="nfts"
+            className={`px-4 py-2 text-base rounded-md data-[state=active]:bg-[#ff0000]/10 data-[state=active]:text-[#ff0000] data-[state=active]:font-semibold text-gray-400`}
+          >
+            Spam NFTs
+          </TabsTrigger>
+        </TabsList>
 
-      <div className="mb-4">
-        <Tabs
-          defaultValue="tokens"
-          value={activeTab}
-          onValueChange={(val) => setActiveTab(val as "tokens" | "nfts")}
-        >
-          <TabsList className="grid grid-cols-2 mb-3 bg-[#ff0000]/10">
-            <TabsTrigger
-              value="tokens"
-              className={`${pixelMonoFont.className} text-[#ff8888] data-[state=active]:text-[#ff0000] data-[state=active]:bg-black/40`}
-            >
-              ERC20 Tokens
-            </TabsTrigger>
-            <TabsTrigger
-              value="nfts"
-              className={`${pixelMonoFont.className} text-[#ff8888] data-[state=active]:text-[#ff0000] data-[state=active]:bg-black/40`}
-            >
-              NFTs
-            </TabsTrigger>
-          </TabsList>
+        <TabsContent value="tokens" className="mt-0">
+          <div className="space-y-3">
+            {recentSpamTokens.map((token, index) => (
+              <div
+                key={token.address + token.networkId}
+                className="p-4 sm:p-5 bg-black/70 border border-[#ff0000]/30 rounded-lg flex items-center gap-4 animate-fade-in"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden bg-black/80 flex-shrink-0 border border-[#ff0000]/30 flex items-center justify-center">
+                  <span
+                    className={`${pixelMonoFont.className} text-base sm:text-lg font-semibold text-[#ff0000]`}
+                  >
+                    {token.symbol?.[0] ||
+                      token.address.substring(2, 4).toUpperCase()}
+                  </span>
+                </div>
 
-          <TabsContent value="tokens" className="mt-0">
-            <div className="space-y-3">
-              {recentSpamTokens.map((token, index) => (
-                <div
-                  key={token.address + token.networkId}
-                  className="p-3 bg-black/70 border border-[#ff0000]/30 rounded-lg flex items-center gap-3 animate-fade-in"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-black/80 flex-shrink-0 border border-[#ff0000]/30 flex items-center justify-center">
-                    <span
-                      className={`${pixelMonoFont.className} text-sm font-semibold text-[#ff0000]`}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <h4
+                      className={`${pixelMonoFont.className} text-lg sm:text-xl font-medium truncate text-[#ff5555]`}
                     >
-                      {token.symbol?.[0] ||
-                        token.address.substring(2, 4).toUpperCase()}
+                      {token.name ||
+                        `Unknown Token (${token.address.substring(
+                          0,
+                          6
+                        )}...${token.address.substring(38)})`}
+                    </h4>
+                    {token.symbol && (
+                      <span
+                        className={`${pixelMonoFont.className} text-base px-2 py-1 bg-black/80 rounded-full text-[#ff0000] border border-[#ff0000]/30`}
+                      >
+                        {token.symbol}
+                      </span>
+                    )}
+                    {token.score && (
+                      <span
+                        className={`${pixelMonoFont.className} text-base px-2 py-1 bg-black/80 rounded-full text-[#ff0000] border border-[#ff0000]/30`}
+                      >
+                        Score: {token.score}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`${pixelMonoFont.className} text-base sm:text-lg text-[#ff0000]/80`}
+                    >
+                      {token.network}
+                    </span>
+                    <span
+                      className={`${pixelMonoFont.className} text-sm sm:text-base text-[#ff8888] truncate`}
+                    >
+                      {token.address.substring(0, 8)}...
+                      {token.address.substring(36)}
                     </span>
                   </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <h4
-                        className={`${pixelMonoFont.className} text-sm font-medium truncate text-[#ff5555]`}
-                      >
-                        {token.name ||
-                          `Unknown Token (${token.address.substring(
-                            0,
-                            6
-                          )}...${token.address.substring(38)})`}
-                      </h4>
-                      {token.symbol && (
-                        <span
-                          className={`${pixelMonoFont.className} text-xs px-1.5 py-0.5 bg-black/80 rounded-full text-[#ff0000] border border-[#ff0000]/30`}
-                        >
-                          {token.symbol}
-                        </span>
-                      )}
-                      {token.score && (
-                        <span
-                          className={`${pixelMonoFont.className} text-xs px-1.5 py-0.5 bg-black/80 rounded-full text-[#ff0000] border border-[#ff0000]/30`}
-                        >
-                          Score: {token.score}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`${pixelMonoFont.className} text-xs text-[#ff0000]/80`}
-                      >
-                        {token.network}
-                      </span>
-                      <span
-                        className={`${pixelMonoFont.className} text-xs text-[#ff8888] truncate`}
-                      >
-                        {token.address.substring(0, 8)}...
-                        {token.address.substring(36)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <a
-                    href={getExplorerUrl(token.networkId, token.address)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center p-2 rounded-full bg-black/80 text-[#ff0000] hover:text-[#ff5555] transition-colors border border-[#ff0000]/30"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
                 </div>
-              ))}
 
-              {recentSpamTokens.length === 0 && (
-                <div className="p-6 text-center bg-black/30 rounded-lg border border-[#ff0000]/20">
-                  <p className={`${pixelMonoFont.className} text-[#ff8888]`}>
-                    No recent spam tokens found
-                  </p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="nfts" className="mt-0">
-            <div className="space-y-3">
-              {recentSpamNFTs.map((nft, index) => (
-                <div
-                  key={nft.address + nft.networkId}
-                  className="p-3 bg-black/70 border border-[#ff0000]/30 rounded-lg flex items-center gap-3 animate-fade-in"
-                  style={{ animationDelay: `${index * 50}ms` }}
+                <a
+                  href={getExplorerUrl(token.networkId, token.address)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center p-3 rounded-full bg-black/80 text-[#ff0000] hover:text-[#ff5555] transition-colors border border-[#ff0000]/30"
                 >
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-black/80 flex-shrink-0 border border-[#ff0000]/30 flex items-center justify-center">
+                  <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5" />
+                </a>
+              </div>
+            ))}
+
+            {recentSpamTokens.length === 0 && (
+              <div className="p-6 text-center bg-black/30 rounded-lg border border-[#ff0000]/20">
+                <p
+                  className={`${pixelMonoFont.className} text-lg sm:text-xl text-[#ff8888]`}
+                >
+                  No recent spam tokens found
+                </p>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="nfts" className="mt-0">
+          <div className="space-y-3">
+            {recentSpamNFTs.map((nft, index) => (
+              <div
+                key={nft.address + nft.networkId}
+                className="p-4 sm:p-5 bg-black/70 border border-[#ff0000]/30 rounded-lg flex items-center gap-4 animate-fade-in"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden bg-black/80 flex-shrink-0 border border-[#ff0000]/30 flex items-center justify-center">
+                  <span
+                    className={`${pixelMonoFont.className} text-base sm:text-lg font-semibold text-[#ff0000]`}
+                  >
+                    NFT
+                  </span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <h4
+                      className={`${pixelMonoFont.className} text-lg sm:text-xl font-medium truncate text-[#ff5555]`}
+                    >
+                      {nft.name || `Unknown NFT Collection`}
+                    </h4>
                     <span
-                      className={`${pixelMonoFont.className} text-sm font-semibold text-[#ff0000]`}
+                      className={`${pixelMonoFont.className} text-base px-2 py-1 bg-black/80 rounded-full text-[#ff0000] border border-[#ff0000]/30`}
                     >
                       NFT
                     </span>
+                    {nft.score && (
+                      <span
+                        className={`${pixelMonoFont.className} text-base px-2 py-1 bg-black/80 rounded-full text-[#ff0000] border border-[#ff0000]/30`}
+                      >
+                        Risk: {nft.score}
+                      </span>
+                    )}
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <h4
-                        className={`${pixelMonoFont.className} text-sm font-medium truncate text-[#ff5555]`}
-                      >
-                        {nft.name || `Unknown NFT Collection`}
-                      </h4>
-                      <span
-                        className={`${pixelMonoFont.className} text-xs px-1.5 py-0.5 bg-black/80 rounded-full text-[#ff0000] border border-[#ff0000]/30`}
-                      >
-                        NFT
-                      </span>
-                      {nft.score && (
-                        <span
-                          className={`${pixelMonoFont.className} text-xs px-1.5 py-0.5 bg-black/80 rounded-full text-[#ff0000] border border-[#ff0000]/30`}
-                        >
-                          Risk: {nft.score}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`${pixelMonoFont.className} text-xs text-[#ff0000]/80`}
-                      >
-                        {nft.network}
-                      </span>
-                      <span
-                        className={`${pixelMonoFont.className} text-xs text-[#ff8888] truncate`}
-                      >
-                        {nft.address.substring(0, 8)}...
-                        {nft.address.substring(36)}
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`${pixelMonoFont.className} text-base sm:text-lg text-[#ff0000]/80`}
+                    >
+                      {nft.network}
+                    </span>
+                    <span
+                      className={`${pixelMonoFont.className} text-sm sm:text-base text-[#ff8888] truncate`}
+                    >
+                      {nft.address.substring(0, 8)}...
+                      {nft.address.substring(36)}
+                    </span>
                   </div>
-
-                  <a
-                    href={getExplorerUrl(nft.networkId, nft.address)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center p-2 rounded-full bg-black/80 text-[#ff0000] hover:text-[#ff5555] transition-colors border border-[#ff0000]/30"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
                 </div>
-              ))}
 
-              {recentSpamNFTs.length === 0 && (
-                <div className="p-6 text-center bg-black/30 rounded-lg border border-[#ff0000]/20">
-                  <p className={`${pixelMonoFont.className} text-[#ff8888]`}>
-                    No recent spam NFTs found
-                  </p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+                <a
+                  href={getExplorerUrl(nft.networkId, nft.address)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center p-3 rounded-full bg-black/80 text-[#ff0000] hover:text-[#ff5555] transition-colors border border-[#ff0000]/30"
+                >
+                  <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5" />
+                </a>
+              </div>
+            ))}
+
+            {recentSpamNFTs.length === 0 && (
+              <div className="p-6 text-center bg-black/30 rounded-lg border border-[#ff0000]/20">
+                <p
+                  className={`${pixelMonoFont.className} text-lg sm:text-xl text-[#ff8888]`}
+                >
+                  No recent spam NFTs found
+                </p>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

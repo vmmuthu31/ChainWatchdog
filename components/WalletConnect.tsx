@@ -2,6 +2,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Press_Start_2P, VT323 } from "next/font/google";
+import { useState } from "react";
 
 const pixelFont = Press_Start_2P({
   weight: "400",
@@ -12,6 +13,31 @@ const pixelMonoFont = VT323({
   weight: "400",
   subsets: ["latin"],
 });
+
+// Add this component to handle chain icon fallbacks
+const ChainIcon = ({ src, alt }: { src?: string; alt: string }) => {
+  const [error, setError] = useState(false);
+
+  if (!src || error) {
+    return (
+      <span className="w-full h-full flex items-center justify-center text-[#00ff00] text-xs">
+        {alt.charAt(0)}
+      </span>
+    );
+  }
+
+  return (
+    <Image
+      alt={alt || "Chain icon"}
+      src={src}
+      width={16}
+      height={16}
+      className="object-cover"
+      onError={() => setError(true)}
+      unoptimized // This helps with external images
+    />
+  );
+};
 
 function WalletConnect() {
   return (
@@ -78,18 +104,13 @@ function WalletConnect() {
                       <div
                         className="relative w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 rounded-full overflow-hidden border border-[#00ff00]/30"
                         style={{
-                          background: chain.iconBackground,
+                          background: chain.iconBackground || "#000",
                         }}
                       >
-                        {chain.iconUrl && (
-                          <Image
-                            alt={chain.name ?? "Chain icon"}
-                            src={chain.iconUrl}
-                            width={16}
-                            height={16}
-                            className="object-cover"
-                          />
-                        )}
+                        <ChainIcon
+                          src={chain.iconUrl}
+                          alt={chain.name || "Chain"}
+                        />
                       </div>
                     )}
                     <span className="text-[10px] xs:text-xs sm:text-sm font-medium hidden xs:inline">

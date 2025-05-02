@@ -119,4 +119,24 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Enhanced selection styling for all elements */
+  ::selection {
+    background-color: rgba(0, 255, 0, 0.4) !important;
+    color: inherit !important;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+  }
+
+  ::-moz-selection {
+    background-color: rgba(0, 255, 0, 0.4) !important;
+    color: inherit !important;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Force text color for inputs */
+  input {
+    color: #00ffff !important;
+    -webkit-text-fill-color: #00ffff !important;
+    caret-color: #00ff00 !important;
+  }
 }

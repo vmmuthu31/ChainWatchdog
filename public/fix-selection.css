@@ -1,0 +1,63 @@
+/* Force text behavior on all textual inputs */
+* {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+body {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Additional CSS to fix text selection */
+input::selection,
+textarea::selection,
+.wallet-input::selection,
+[type="text"]::selection {
+  background-color: rgba(0, 255, 0, 0.5) !important;
+  color: #00ffff !important;
+  -webkit-text-fill-color: #00ffff !important;
+  text-shadow: 0 0 4px #000 !important;
+}
+
+input::-moz-selection,
+textarea::-moz-selection,
+.wallet-input::-moz-selection,
+[type="text"]::-moz-selection {
+  background-color: rgba(0, 255, 0, 0.5) !important;
+  color: #00ffff !important;
+  text-shadow: 0 0 4px #000 !important;
+}
+
+/* Prevent background color from changing when autofilled */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #000000 inset !important;
+  -webkit-text-fill-color: #00ffff !important;
+  caret-color: #00ff00 !important;
+  transition-delay: 9999s !important;
+}
+
+/* Style active and selected input fields */
+input,
+input:focus,
+input:active,
+input:hover,
+textarea,
+.wallet-input,
+[type="text"] {
+  color: #00ffff !important;
+  -webkit-text-fill-color: #00ffff !important;
+  caret-color: #00ff00 !important;
+  background-color: #111 !important;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Ensures selected text shows properly on mobile devices */
+@media (max-width: 768px) {
+  ::selection {
+    color: #00ffff !important;
+    background-color: rgba(0, 255, 0, 0.6) !important;
+    -webkit-text-fill-color: #00ffff !important;
+  }
+}
