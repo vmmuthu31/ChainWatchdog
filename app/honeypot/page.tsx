@@ -563,7 +563,7 @@ export default function HoneypotPage() {
         <div className="w-full max-w-xl">
           <div className="flex p-1 bg-black/80 border border-[#ffa500]/50 rounded-lg overflow-hidden mb-4">
             <button
-              className={`flex-1 px-2 py-3 text-sm sm:text-base font-medium rounded-md transition-colors flex items-center gap-1.5 ${
+              className={`flex-1 px-2 py-3 text-sm font-medium rounded-md transition-colors flex items-center gap-1 ${
                 endpoint === "honeypot"
                   ? "bg-[#ffa500] text-black"
                   : "text-[#ffa500] hover:bg-black/90"
@@ -575,10 +575,10 @@ export default function HoneypotPage() {
               }}
             >
               <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />
-              <span>Honeypot Check</span>
+              <span className="whitespace-nowrap">Honeypot Check</span>
             </button>
             <button
-              className={`flex-1 px-2 py-3 text-sm sm:text-base md:text-lg font-medium rounded-md transition-colors flex items-center gap-1.5 ${
+              className={`flex-1 px-2 py-3 text-sm font-medium rounded-md transition-colors flex items-center gap-1 ${
                 endpoint === "contract"
                   ? "bg-[#ffa500] text-black"
                   : "text-[#ffa500] hover:bg-black/90"
@@ -590,10 +590,10 @@ export default function HoneypotPage() {
               }}
             >
               <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
-              <span>Contract Verify</span>
+              <span className="whitespace-nowrap">Contract Verify</span>
             </button>
             <button
-              className={`flex-1 px-2 py-3 text-sm sm:text-base md:text-lg font-medium rounded-md transition-colors flex items-center justify-center gap-1.5 ${
+              className={`flex-1 px-2 py-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-1 ${
                 endpoint === "pairs"
                   ? "bg-[#ffa500] text-black"
                   : "text-[#ffa500] hover:bg-black/90"
@@ -605,10 +605,10 @@ export default function HoneypotPage() {
               }}
             >
               <Search className="h-4 w-4 sm:h-5 sm:w-5" />
-              <span>Get Pairs</span>
+              <span className="whitespace-nowrap">Get Pairs</span>
             </button>
             <button
-              className={`flex-1 px-2 py-3 text-sm sm:text-base md:text-lg font-medium rounded-md transition-colors flex items-center justify-center gap-1.5 ${
+              className={`flex-1 px-2 py-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-1 ${
                 endpoint === "holders"
                   ? "bg-[#ffa500] text-black"
                   : "text-[#ffa500] hover:bg-black/90"
@@ -620,7 +620,7 @@ export default function HoneypotPage() {
               }}
             >
               <Info className="h-4 w-4 sm:h-5 sm:w-5" />
-              <span>Top Holders</span>
+              <span className="whitespace-nowrap">Top Holders</span>
             </button>
           </div>
         </div>
