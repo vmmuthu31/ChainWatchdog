@@ -1663,50 +1663,81 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="w-full border-t border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-6 sm:p-8 text-center mt-10">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col items-center mb-5">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <Image
-                src="/logo.png"
-                alt="ChainWatchDog Logo"
-                width={24}
-                height={24}
-              />
+      <footer className="w-full border-t border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-4 sm:p-6 md:p-8 text-center mt-10">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4">
+          <div className="flex flex-col md:flex-row md:justify-between gap-6 sm:gap-8 py-4">
+            {/* Logo and Brand */}
+            <div className="flex flex-col items-center md:items-start">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#00ff00] to-[#00ffff] rounded-full blur-sm opacity-70"></div>
+                  <div className="relative">
+                    <Image
+                      src="/logo.png"
+                      alt="ChainWatchDog Logo"
+                      width={36}
+                      height={36}
+                      className="relative"
+                    />
+                  </div>
+                </div>
+                <p
+                  className={`${pixelFont.className} text-2xl sm:text-3xl font-semibold text-[#00ff00]`}
+                >
+                  ChainWatchDog
+                </p>
+              </div>
               <p
-                className={`${pixelFont.className} text-xl sm:text-2xl font-semibold text-[#00ff00]`}
+                className={`${pixelMonoFont.className} text-base sm:text-lg text-[#00ffff] mb-4 sm:text-left`}
               >
-                ChainWatchDog
+                RETRO FUTURISM IN DIGITAL FORM
               </p>
             </div>
-            <p
-              className={`${pixelMonoFont.className} text-base sm:text-lg text-[#00ffff] mb-4`}
-            >
-              RETRO FUTURISM IN DIGITAL FORM
-            </p>
-            <div className="flex flex-wrap justify-center gap-5 mb-3">
-              <span
-                className={`${pixelMonoFont.className} text-sm sm:text-base text-[#00ff00]`}
+
+            {/* About */}
+            <div className="flex flex-col items-center md:items-end max-w-md">
+              <p
+                className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400 sm:text-right leading-relaxed`}
               >
-                SPAM DETECTION
-              </span>
-              <span
-                className={`${pixelMonoFont.className} text-sm sm:text-base text-[#ffa500]`}
-              >
-                HONEYPOT CHECKER
-              </span>
-              <span
-                className={`${pixelMonoFont.className} text-sm sm:text-base text-[#00ffff]/60`}
-              >
-                AI AGENT (SOON)
-              </span>
+                ChainWatchDog helps you identify and protect against crypto
+                scams, spam tokens, and honeypots across multiple blockchains.
+              </p>
+              <div className="mt-4 flex flex-wrap items-center justify-center md:justify-end gap-3">
+                <span
+                  className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
+                >
+                  Powered by{" "}
+                  <span className="text-[#ff00ff] font-medium">Covalent</span>
+                </span>
+                <span className="text-gray-500 mx-1">•</span>
+                <span
+                  className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
+                >
+                  Built by{" "}
+                  <span className="text-[#00ffff] font-medium">ForgeXAI</span>
+                </span>
+              </div>
             </div>
           </div>
-          <div className="text-center">
-            <p className={`${pixelMonoFont.className} text-sm text-gray-400`}>
-              Powered by <span className="text-[#ff00ff]">Covalent</span> •
-              Built by the <span className="text-[#00ffff]">ForgeXAI</span> team
+
+          <div className="border-t border-[#00ff00]/10 mt-4 pt-4 flex flex-col sm:flex-row justify-between items-center">
+            <p className={`${pixelMonoFont.className} text-base text-gray-500`}>
+              © {new Date().getFullYear()} ChainWatchDog. All rights reserved.
             </p>
+            <div className="flex mt-3 sm:mt-0 gap-4">
+              <Link
+                href="/"
+                className={`${pixelMonoFont.className} text-base text-[#00ff00] hover:text-[#00ffff] transition-colors`}
+              >
+                SPAM DETECTION
+              </Link>
+              <Link
+                href="/honeypot"
+                className={`${pixelMonoFont.className} text-base text-[#ffa500] hover:text-[#ffcc00] transition-colors`}
+              >
+                HONEYPOT CHECKER
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
