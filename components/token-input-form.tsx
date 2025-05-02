@@ -40,7 +40,7 @@ type TokenInputFormProps = {
   isLoading: boolean;
 };
 
-// Add a custom CSS style block to prevent autofill background color
+// Add a more comprehensive style fix to address autofill and selection issues
 const AutofillStyleFix = () => (
   <style jsx global>{`
     /* Force text color for all states */
@@ -57,7 +57,16 @@ const AutofillStyleFix = () => (
     input:-webkit-autofill:focus,
     input:-webkit-autofill:active {
       -webkit-box-shadow: 0 0 0 30px black inset !important;
+      -webkit-text-fill-color: #00ffff !important;
       transition: background-color 5000s ease-in-out 0s;
+      color: #00ffff !important;
+    }
+
+    /* Override browser styles for autofill suggestions */
+    input:-internal-autofill-selected {
+      -webkit-text-fill-color: #00ffff !important;
+      color: #00ffff !important;
+      background-color: black !important;
     }
 
     /* Customize text selection colors */
@@ -95,7 +104,7 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
       if (inputElementRef.current) {
         inputElementRef.current.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
         inputElementRef.current.style.color = "#00ffff";
-        inputElementRef.current.style.fontSize = "16px";
+        inputElementRef.current.style.webkitTextFillColor = "#00ffff";
       }
     };
 
@@ -108,20 +117,29 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
       const handleFocus = () => {
         inputElement.style.backgroundColor = "#0a0a0a";
         inputElement.style.color = "#00ffff";
+        inputElement.style.webkitTextFillColor = "#00ffff";
       };
 
       const handleBlur = () => {
         inputElement.style.backgroundColor = "#111";
         inputElement.style.color = "#00ffff";
+        inputElement.style.webkitTextFillColor = "#00ffff";
+      };
+
+      const handleInput = () => {
+        inputElement.style.color = "#00ffff";
+        inputElement.style.webkitTextFillColor = "#00ffff";
       };
 
       inputElement.addEventListener("focus", handleFocus);
       inputElement.addEventListener("blur", handleBlur);
+      inputElement.addEventListener("input", handleInput);
 
       // Clean up
       return () => {
         inputElement.removeEventListener("focus", handleFocus);
         inputElement.removeEventListener("blur", handleBlur);
+        inputElement.removeEventListener("input", handleInput);
       };
     }
   }, []);
@@ -152,7 +170,7 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
                 if (element) {
                   element.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
                   element.style.color = "#00ffff";
-                  element.style.fontSize = "16px";
+                  element.style.webkitTextFillColor = "#00ffff";
                 }
               };
 
@@ -171,35 +189,43 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
                         placeholder="Enter a wallet address (0x...)"
                         disabled={isLoading}
                         aria-label="Wallet Address Input"
-                        className={`${pixelMonoFont.className} w-full pl-12 pr-4 py-5 sm:py-6 rounded-md bg-[#111] border border-[#00ff00]/50 text-[#00ffff] focus:ring-[#00ff00] focus:border-[#00ff00] focus:outline-none focus:ring-2 text-lg sm:text-xl md:text-2xl placeholder:text-[#00ffaa]/50`}
+                        className={`${pixelMonoFont.className} w-full pl-10 pr-3 py-4 sm:py-5 rounded-md bg-[#111] border border-[#00ff00]/50 text-[#00ffff] focus:ring-[#00ff00] focus:border-[#00ff00] focus:outline-none focus:ring-2 text-base sm:text-lg md:text-xl placeholder:text-[#00ffaa]/50`}
                         style={{
                           backgroundColor: "#111",
                           color: "#00ffff",
                           caretColor: "#00ff00",
-                          fontSize: "18px",
                           textShadow: "0 0 2px rgba(0, 0, 0, 0.5)",
                           WebkitTextFillColor: "#00ffff",
                         }}
                         onFocus={(e) => {
                           e.target.style.backgroundColor = "#0a0a0a";
                           e.target.style.color = "#00ffff";
-                          e.target.style.fontSize = "18px";
                           e.target.style.webkitTextFillColor = "#00ffff";
                         }}
                         onBlur={(e) => {
                           e.target.style.backgroundColor = "#111";
                           e.target.style.color = "#00ffff";
-                          e.target.style.fontSize = "18px";
                           e.target.style.webkitTextFillColor = "#00ffff";
                         }}
                         onSelect={(e) => {
                           e.currentTarget.style.color = "#00ffff";
                           e.currentTarget.style.webkitTextFillColor = "#00ffff";
                         }}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          e.target.style.color = "#00ffff";
+                          e.target.style.webkitTextFillColor = "#00ffff";
+                        }}
+                        onAnimationStart={(e) => {
+                          // Handle autofill animation events
+                          const input = e.target as HTMLInputElement;
+                          input.style.color = "#00ffff";
+                          input.style.webkitTextFillColor = "#00ffff";
+                        }}
                       />
                     </FormControl>
-                    <div className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-[#00ff00]">
-                      <Search className="h-5 w-5 sm:h-6 sm:w-6" />
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#00ff00]">
+                      <Search className="h-4 w-4 sm:h-5 sm:w-5" />
                     </div>
                   </div>
                   <div className="pt-1">
@@ -214,18 +240,18 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
         <Button
           type="submit"
           disabled={isLoading}
-          className={`${pixelFont.className} w-full py-5 sm:py-6 md:py-7 bg-black border-2 border-[#00ff00] hover:bg-[#00ff00]/10 text-[#00ff00] hover:text-[#00ffff] rounded-xl transition-all duration-200 shadow-[0_0_10px_rgba(0,255,0,0.3)] hover:shadow-[0_0_15px_rgba(0,255,0,0.5)] text-sm sm:text-base md:text-lg`}
+          className={`${pixelFont.className} w-full py-4 sm:py-5 md:py-6 bg-black border-2 border-[#00ff00] hover:bg-[#00ff00]/10 text-[#00ff00] hover:text-[#00ffff] rounded-xl transition-all duration-200 shadow-[0_0_10px_rgba(0,255,0,0.3)] hover:shadow-[0_0_15px_rgba(0,255,0,0.5)] text-sm sm:text-base`}
         >
           {isLoading ? (
             <div className="flex items-center justify-center gap-2 sm:gap-3">
               <div className="relative">
-                <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin" />
+                <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
               </div>
               <span>ANALYZING...</span>
             </div>
           ) : (
             <div className="flex items-center justify-center gap-2 sm:gap-3">
-              <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6" />
+              <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>SCAN FOR SPAM</span>
             </div>
           )}

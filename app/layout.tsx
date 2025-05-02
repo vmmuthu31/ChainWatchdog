@@ -32,8 +32,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
           input::selection { background-color: rgba(0, 255, 0, 0.5) !important; color: #00ffff !important; -webkit-text-fill-color: #00ffff !important; }
-          input, input:focus, input:active { color: #00ffff !important; -webkit-text-fill-color: #00ffff !important; }
+          input, input:focus, input:active { color: #00ffff !important; -webkit-text-fill-color: #00ffff !important; background-color: #111 !important; }
           ::selection { color: #00ffff !important; -webkit-text-fill-color: #00ffff !important; background-color: rgba(0, 255, 0, 0.5) !important; }
+          input:-webkit-autofill, input:-webkit-autofill:focus { -webkit-box-shadow: 0 0 0 1000px #000000 inset !important; -webkit-text-fill-color: #00ffff !important; }
+          input:-internal-autofill-selected { background-color: #000000 !important; -webkit-text-fill-color: #00ffff !important; color: #00ffff !important; }
         `,
           }}
         />

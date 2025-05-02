@@ -139,4 +139,21 @@
     -webkit-text-fill-color: #00ffff !important;
     caret-color: #00ff00 !important;
   }
+
+  /* Handle autofill styling */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #000000 inset !important;
+    -webkit-text-fill-color: #00ffff !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* Fix for autofill suggestion selection */
+  input:-internal-autofill-selected {
+    background-color: #000000 !important;
+    -webkit-text-fill-color: #00ffff !important;
+    color: #00ffff !important;
+    box-shadow: 0 0 0 1000px #000000 inset !important;
+  }
 }
