@@ -402,6 +402,12 @@ export default function HoneypotPage() {
               >
                 AI Agent (Soon)
               </Link>
+              <Link
+                href="#"
+                className={`${pixelMonoFont.className} text-lg text-[#00ffff]/60 hover:text-[#00ffff] transition-colors`}
+              >
+                Chrome Extension (Soon)
+              </Link>
             </div>
           </nav>
 
