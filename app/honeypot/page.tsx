@@ -557,7 +557,7 @@ export default function HoneypotPage() {
         <div className="w-full max-w-xl">
           <div className="flex p-1 bg-black/80 border border-[#ffa500]/50 rounded-lg overflow-hidden mb-4">
             <button
-              className={`flex-1 px-2 py-3 text-sm sm:text-base md:text-lg font-medium rounded-md transition-colors flex items-center justify-center gap-1.5 ${
+              className={`flex-1 px-2 py-3 text-sm sm:text-base font-medium rounded-md transition-colors flex items-center gap-1.5 ${
                 endpoint === "honeypot"
                   ? "bg-[#ffa500] text-black"
                   : "text-[#ffa500] hover:bg-black/90"
@@ -572,7 +572,7 @@ export default function HoneypotPage() {
               <span>Honeypot Check</span>
             </button>
             <button
-              className={`flex-1 px-2 py-3 text-sm sm:text-base md:text-lg font-medium rounded-md transition-colors flex items-center justify-center gap-1.5 ${
+              className={`flex-1 px-2 py-3 text-sm sm:text-base md:text-lg font-medium rounded-md transition-colors flex items-center gap-1.5 ${
                 endpoint === "contract"
                   ? "bg-[#ffa500] text-black"
                   : "text-[#ffa500] hover:bg-black/90"
@@ -703,20 +703,6 @@ export default function HoneypotPage() {
               <p className={`${pixelMonoFont.className} text-lg`}>{error}</p>
             </div>
           )}
-
-          <div className="mt-6 p-4 sm:p-5 border border-[#ffa500]/30 bg-black/70 rounded-xl flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-[#ffa500]/20 flex items-center justify-center flex-shrink-0 border border-[#ffa500]/30">
-              <Info className="h-5 w-5 text-[#ffa500]" />
-            </div>
-            <div>
-              <p
-                className={`${pixelMonoFont.className} text-[#ffa500] text-base sm:text-lg md:text-xl`}
-              >
-                IMPORTANT! API Key system is not yet implemented. You do NOT
-                need to provide an API key to use the API at this time.
-              </p>
-            </div>
-          </div>
         </div>
 
         {/* Honeypot Check Results */}
