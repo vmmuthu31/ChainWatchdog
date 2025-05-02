@@ -57,16 +57,16 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="w-full max-w-lg space-y-6"
+        className="w-full max-w-lg space-y-4 sm:space-y-6"
       >
-        <div className="space-y-2">
+        <div className="space-y-1 sm:space-y-2">
           <FormField
             control={form.control}
             name="tokenAddress"
             render={({ field }) => (
               <FormItem>
                 <FormLabel
-                  className={`${pixelMonoFont.className} text-sm font-medium text-[#00ff00]`}
+                  className={`${pixelMonoFont.className} text-xs sm:text-sm font-medium text-[#00ff00]`}
                 >
                   WALLET ADDRESS
                 </FormLabel>
@@ -77,15 +77,15 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
                       {...field}
                       disabled={isLoading}
                       aria-label="Wallet Address Input"
-                      className={`${pixelMonoFont.className} pl-10 py-6 bg-black/80 border-[#00ff00]/50 text-[#00ffff] focus:ring-[#00ff00] focus:border-[#00ff00] placeholder:text-[#00ffaa]/50`}
+                      className={`${pixelMonoFont.className} pl-8 sm:pl-10 py-4 sm:py-6 bg-black/80 border-[#00ff00]/50 text-[#00ffff] focus:ring-[#00ff00] focus:border-[#00ff00] text-xs sm:text-base placeholder:text-[#00ffaa]/50`}
                     />
                   </FormControl>
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#00ff00]">
-                    <Search className="h-5 w-5" />
+                  <div className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-[#00ff00]">
+                    <Search className="h-4 w-4 sm:h-5 sm:w-5" />
                   </div>
                 </div>
                 <div className="pt-1">
-                  <FormMessage className="text-[#ff0000] text-xs" />
+                  <FormMessage className="text-[#ff0000] text-[10px] xs:text-xs" />
                 </div>
               </FormItem>
             )}
@@ -95,18 +95,18 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
         <Button
           type="submit"
           disabled={isLoading}
-          className={`${pixelFont.className} w-full py-6 bg-black border-2 border-[#00ff00] hover:bg-[#00ff00]/10 text-[#00ff00] hover:text-[#00ffff] rounded-xl transition-all duration-200 shadow-[0_0_10px_rgba(0,255,0,0.3)] hover:shadow-[0_0_15px_rgba(0,255,0,0.5)]`}
+          className={`${pixelFont.className} w-full py-4 sm:py-6 bg-black border-2 border-[#00ff00] hover:bg-[#00ff00]/10 text-[#00ff00] hover:text-[#00ffff] rounded-xl transition-all duration-200 shadow-[0_0_10px_rgba(0,255,0,0.3)] hover:shadow-[0_0_15px_rgba(0,255,0,0.5)] text-[10px] xs:text-xs sm:text-sm`}
         >
           {isLoading ? (
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-1 sm:gap-2">
               <div className="relative">
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 sm:h-5 sm:w-5 animate-spin" />
               </div>
               <span>ANALYZING...</span>
             </div>
           ) : (
-            <div className="flex items-center justify-center gap-2">
-              <ShieldCheck className="h-5 w-5" />
+            <div className="flex items-center justify-center gap-1 sm:gap-2">
+              <ShieldCheck className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
               <span>SCAN FOR SPAM</span>
             </div>
           )}

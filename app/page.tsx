@@ -22,6 +22,7 @@ import Image from "next/image";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { RecentSpamTokens } from "@/components/RecentSpamTokens";
+import Link from "next/link";
 
 const pixelFont = Press_Start_2P({
   weight: "400",
@@ -48,6 +49,7 @@ export default function Home() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [walletTokens, setWalletTokens] = useState<any[]>([]);
   const [isLoadingWalletTokens, setIsLoadingWalletTokens] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { address: walletAddress, isConnected } = useAccount();
 
@@ -80,6 +82,31 @@ export default function Home() {
       fetchWalletTokens(walletAddress);
     }
   }, [isConnected, walletAddress, activeTab, selectedChain]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const mobileMenuElement = document.getElementById(
+        "mobile-menu-container"
+      );
+      if (
+        mobileMenuElement &&
+        !mobileMenuElement.contains(event.target as Node) &&
+        !document
+          .getElementById("mobile-menu-button")
+          ?.contains(event.target as Node)
+      ) {
+        setMobileMenuOpen(false);
+      }
+    }
+
+    if (mobileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [mobileMenuOpen]);
 
   const fetchWalletTokens = async (address: string) => {
     setIsLoadingWalletTokens(true);
@@ -259,28 +286,179 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-black text-white">
-      <header className="w-full border-b border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-2 sm:p-3 md:p-4 sticky top-0 z-50">
+      <header className="w-full border-b border-[#ffa500]/20 backdrop-blur-md bg-black/50 p-2 sm:p-3 md:p-4 sticky top-0 z-50">
         <div className="container mx-auto px-2 flex items-center justify-between">
-          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
-            <div className="relative hidden xs:block">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#00ff00] to-[#00ffff] rounded-full blur opacity-70"></div>
-              <div className="relative">
-                <Image
-                  src="/logo.png"
-                  alt="ChainWatchDog Logo"
-                  width={16}
-                  height={16}
-                  className="sm:w-[20px] sm:h-[20px]"
-                />
-              </div>
-            </div>
-            <h1
-              className={`${pixelFont.className} text-xs sm:text-sm md:text-xl font-bold bg-gradient-to-r from-[#00ff00] to-[#00ffff] bg-clip-text text-transparent glow-green-sm`}
+          {/* Left section - Logo */}
+          <div className="flex items-center">
+            <Link
+              href="/"
+              className="flex items-center gap-1 sm:gap-1.5 md:gap-2"
             >
-              ChainWatchDog
-            </h1>
+              <div className="relative block">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-[#00ff00] to-[#00ffff] rounded-full blur opacity-70"></div>
+                <div className="relative">
+                  <Image
+                    src="/logo.png"
+                    alt="ChainWatchDog Logo"
+                    width={16}
+                    height={16}
+                    className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]"
+                  />
+                </div>
+              </div>
+              <h1
+                className={`${pixelFont.className} text-xs sm:text-sm md:text-xl font-bold bg-gradient-to-r from-[#00ff00] to-[#00ffff] bg-clip-text text-transparent glow-green-sm`}
+              >
+                ChainWatchDog
+              </h1>
+            </Link>
           </div>
-          <WalletConnect />
+
+          {/* Center section - Navigation (Desktop only) */}
+          <nav className="hidden md:flex items-center justify-center flex-1">
+            <div className="flex items-center space-x-6">
+              <Link
+                href="/"
+                className={`${pixelMonoFont.className} text-base text-[#00ff00] hover:text-[#00ffff] border-b-2 border-[#00ff00] pb-1 transition-colors`}
+              >
+                Spam Detector
+              </Link>
+              <Link
+                href="/honeypot"
+                className={`${pixelMonoFont.className} text-base text-[#ffa500] hover:text-[#ffcc00] transition-colors`}
+              >
+                Honeypot Check
+              </Link>
+              <Link
+                href="#"
+                className={`${pixelMonoFont.className} text-base text-[#00ffff]/60 hover:text-[#00ffff] transition-colors`}
+              >
+                AI Agent (Soon)
+              </Link>
+            </div>
+          </nav>
+
+          {/* Right section - Desktop Wallet connect and Mobile Menu */}
+          <div className="flex items-center gap-2">
+            {/* Desktop Wallet Connect */}
+            <div className="hidden md:block">
+              <WalletConnect />
+            </div>
+
+            {/* Mobile navigation button */}
+            <div className="block md:hidden relative z-50">
+              <button
+                id="mobile-menu-button"
+                className="btn btn-sm btn-circle bg-[#00ff00]/10 hover:bg-[#00ff00]/20 border border-[#00ff00]/40 text-[#00ff00]"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h7"
+                  />
+                </svg>
+              </button>
+
+              {/* Mobile Menu Dropdown */}
+              {mobileMenuOpen && (
+                <div
+                  id="mobile-menu-container"
+                  className="z-[100] bg-black/95 backdrop-blur-md rounded-xl shadow-[0_0_15px_rgba(0,255,0,0.3)] border border-[#00ff00]/30 fixed top-14 right-2 w-64 overflow-hidden"
+                >
+                  <div className="flex flex-col p-4 space-y-4 max-h-[80vh] overflow-y-auto">
+                    {/* Mobile Navigation Menu */}
+                    <div className="space-y-3">
+                      <div className="px-2 py-1 text-[#00ffff] text-xs font-semibold uppercase">
+                        Navigation
+                      </div>
+                      <Link
+                        href="/"
+                        className={`${pixelMonoFont.className} flex items-center gap-2 px-3 py-2.5 text-sm text-[#00ff00] hover:text-[#00ffff] hover:bg-[#00ff00]/10 rounded-lg transition-colors`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                          />
+                        </svg>
+                        Spam Detector
+                      </Link>
+                      <Link
+                        href="/honeypot"
+                        className={`${pixelMonoFont.className} flex items-center gap-2 px-3 py-2.5 text-sm text-[#ffa500] hover:text-[#ffcc00] hover:bg-[#ffa500]/10 rounded-lg transition-colors`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                          />
+                        </svg>
+                        Honeypot Check
+                      </Link>
+                      <Link
+                        href="#"
+                        className={`${pixelMonoFont.className} flex items-center gap-2 px-3 py-2.5 text-sm text-[#00ffff]/60 hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded-lg transition-colors`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                          />
+                        </svg>
+                        AI Agent (Soon)
+                      </Link>
+                    </div>
+
+                    {/* Mobile Wallet Connect */}
+                    <div className="border-t border-[#00ff00]/20 pt-4">
+                      <div className="px-2 py-1 text-[#00ffff] text-xs font-semibold uppercase">
+                        Wallet
+                      </div>
+                      <div className="p-2">
+                        <WalletConnect />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </header>
 
@@ -314,71 +492,71 @@ export default function Home() {
             <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
-                className="w-full flex items-center justify-between p-3 bg-black/80 border border-[#00ff00]/50 rounded-xl hover:bg-black/90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#00ff00]/50"
+                className="w-full flex items-center justify-between p-2 sm:p-3 bg-black/80 border border-[#00ff00]/50 rounded-xl hover:bg-black/90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#00ff00]/50"
                 onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-black/80 flex items-center justify-center overflow-hidden border border-[#00ff00]/30">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-black/80 flex items-center justify-center overflow-hidden border border-[#00ff00]/30">
                     {currentChain.logoUrl ? (
                       <Image
                         src={currentChain.logoUrl}
                         alt={currentChain.name}
                         width={16}
                         height={16}
-                        className="object-contain"
+                        className="object-contain w-3 h-3 sm:w-4 sm:h-4"
                       />
                     ) : (
                       <span
-                        className={`${pixelMonoFont.className} text-sm font-medium text-[#00ff00]`}
+                        className={`${pixelMonoFont.className} text-xs sm:text-sm font-medium text-[#00ff00]`}
                       >
                         {currentChain.name.charAt(0)}
                       </span>
                     )}
                   </div>
                   <span
-                    className={`${pixelMonoFont.className} font-medium text-[#00ffff]`}
+                    className={`${pixelMonoFont.className} text-xs sm:text-base font-medium text-[#00ffff] truncate max-w-[150px] sm:max-w-none`}
                   >
                     {currentChain.name}
                   </span>
                   {currentChain.type === "Testnet" && (
                     <span
-                      className={`${pixelMonoFont.className} text-xs px-2 py-0.5 bg-[#ff00ff]/20 text-[#ff00ff] rounded-full`}
+                      className={`${pixelMonoFont.className} text-[10px] xs:text-xs px-1 sm:px-2 py-0.5 bg-[#ff00ff]/20 text-[#ff00ff] rounded-full`}
                     >
                       Testnet
                     </span>
                   )}
                 </div>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 text-[#00ff00] ${
+                  className={`h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform duration-200 text-[#00ff00] ${
                     showNetworkDropdown ? "rotate-180" : ""
                   }`}
                 />
               </button>
 
               {showNetworkDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-black/95 backdrop-blur-md border border-[#00ff00]/30 rounded-xl shadow-[0_0_15px_rgba(0,255,0,0.3)] z-[100] max-h-[400px] overflow-hidden">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-black/95 backdrop-blur-md border border-[#00ff00]/30 rounded-xl shadow-[0_0_15px_rgba(0,255,0,0.3)] z-[100] max-h-[60vh] sm:max-h-[400px] overflow-hidden">
                   <div className="sticky top-0 bg-black/95 backdrop-blur-md p-2 border-b border-[#00ff00]/30">
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full pl-9 pr-9 py-2 bg-black/80 border border-[#00ff00]/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#00ff00] text-[#00ffff] text-sm"
+                        className="w-full pl-8 sm:pl-9 pr-9 py-1.5 sm:py-2 bg-black/80 border border-[#00ff00]/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#00ff00] text-[#00ffff] text-xs sm:text-sm"
                         placeholder="Search networks..."
                         value={networkSearchQuery}
                         onChange={(e) => setNetworkSearchQuery(e.target.value)}
                       />
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#00ff00]" />
+                      <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#00ff00]" />
                       {networkSearchQuery && (
                         <button
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#00ff00] hover:text-[#00ffff]"
+                          className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#00ff00] hover:text-[#00ffff]"
                           onClick={() => setNetworkSearchQuery("")}
                         >
-                          <X className="h-4 w-4" />
+                          <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         </button>
                       )}
                     </div>
                   </div>
 
-                  <div className="overflow-y-auto max-h-[340px] p-2">
+                  <div className="overflow-y-auto max-h-[calc(60vh-48px)] sm:max-h-[340px] p-2">
                     {!hasFilteredMainnetResults &&
                       !hasFilteredTestnetResults && (
                         <div className="py-4 text-center text-[#00ff00]">
@@ -738,39 +916,39 @@ export default function Home() {
           {/* Tab Selector */}
           <div className="flex p-1 bg-black/80 border border-[#00ff00]/50 rounded-lg overflow-hidden mb-4">
             <button
-              className={`flex-1 px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+              className={`flex-1 px-2 xs:px-3 py-2 text-[10px] xs:text-xs sm:text-sm font-medium rounded-md transition-colors flex items-center justify-center ${
                 activeTab === "search"
                   ? "bg-[#00ff00] text-black"
                   : "text-[#00ff00] hover:bg-black/90"
               }`}
               onClick={() => setActiveTab("search")}
             >
-              <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4 inline-block mr-1.5" />
-              Search Wallet
+              <Search className="h-3 w-3 xs:h-3.5 xs:w-3.5 sm:h-4 sm:w-4 inline-block mr-1" />
+              <span>Search</span>
             </button>
             {isConnected && (
               <button
-                className={`flex-1 px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+                className={`flex-1 px-2 xs:px-3 py-2 text-[10px] xs:text-xs sm:text-sm font-medium rounded-md transition-colors flex items-center justify-center ${
                   activeTab === "wallet"
                     ? "bg-[#00ff00] text-black"
                     : "text-[#00ff00] hover:bg-black/90"
                 }`}
                 onClick={() => setActiveTab("wallet")}
               >
-                <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 inline-block mr-1.5" />
-                My Wallet
+                <ShieldCheck className="h-3 w-3 xs:h-3.5 xs:w-3.5 sm:h-4 sm:w-4 inline-block mr-1" />
+                <span>My Wallet</span>
               </button>
             )}
             <button
-              className={`flex-1 px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+              className={`flex-1 px-2 xs:px-3 py-2 text-[10px] xs:text-xs sm:text-sm font-medium rounded-md transition-colors flex items-center justify-center ${
                 activeTab === "recent"
                   ? "bg-[#ff0000] text-white"
                   : "text-[#ff0000] hover:bg-black/90"
               }`}
               onClick={() => setActiveTab("recent")}
             >
-              <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4 inline-block mr-1.5" />
-              Recent Spam
+              <AlertTriangle className="h-3 w-3 xs:h-3.5 xs:w-3.5 sm:h-4 sm:w-4 inline-block mr-1" />
+              <span>Recent</span>
             </button>
           </div>
           {activeTab === "search" ? (
@@ -785,7 +963,7 @@ export default function Home() {
                 </h3>
                 <div className="flex p-1 bg-black/80 border border-[#00ff00]/50 rounded-lg overflow-hidden">
                   <button
-                    className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    className={`px-1.5 xs:px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] xs:text-xs font-medium rounded-md transition-colors ${
                       filterType === "all"
                         ? "bg-[#00ff00] text-black"
                         : "text-[#00ff00] hover:bg-black/90"
@@ -795,7 +973,7 @@ export default function Home() {
                     All
                   </button>
                   <button
-                    className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    className={`px-1.5 xs:px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] xs:text-xs font-medium rounded-md transition-colors ${
                       filterType === "spam"
                         ? "bg-[#ff0000] text-black"
                         : "text-[#00ff00] hover:bg-black/90"
@@ -805,7 +983,7 @@ export default function Home() {
                     Spam
                   </button>
                   <button
-                    className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    className={`px-1.5 xs:px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] xs:text-xs font-medium rounded-md transition-colors ${
                       filterType === "safe"
                         ? "bg-[#00ff00] text-black"
                         : "text-[#00ff00] hover:bg-black/90"
@@ -1263,7 +1441,7 @@ export default function Home() {
 
                   <div className="flex p-1 bg-black/80 border border-[#00ff00]/50 rounded-lg overflow-hidden">
                     <button
-                      className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      className={`px-1.5 xs:px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] xs:text-xs font-medium rounded-md transition-colors ${
                         filterType === "all"
                           ? "bg-[#00ff00] text-black"
                           : "text-[#00ff00] hover:bg-black/90"
@@ -1273,7 +1451,7 @@ export default function Home() {
                       All
                     </button>
                     <button
-                      className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      className={`px-1.5 xs:px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] xs:text-xs font-medium rounded-md transition-colors ${
                         filterType === "spam"
                           ? "bg-[#ff0000] text-black"
                           : "text-[#00ff00] hover:bg-black/90"
@@ -1283,7 +1461,7 @@ export default function Home() {
                       Spam
                     </button>
                     <button
-                      className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      className={`px-1.5 xs:px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] xs:text-xs font-medium rounded-md transition-colors ${
                         filterType === "safe"
                           ? "bg-[#00ff00] text-black"
                           : "text-[#00ff00] hover:bg-black/90"
@@ -1466,27 +1644,49 @@ export default function Home() {
 
       <footer className="w-full border-t border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-6 text-center mt-10">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Image
-              src="/logo.png"
-              alt="ChainWatchDog Logo"
-              width={20}
-              height={20}
-            />
+          <div className="flex flex-col items-center mb-4">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Image
+                src="/logo.png"
+                alt="ChainWatchDog Logo"
+                width={20}
+                height={20}
+              />
+              <p
+                className={`${pixelFont.className} text-lg font-semibold text-[#00ff00]`}
+              >
+                ChainWatchDog
+              </p>
+            </div>
             <p
-              className={`${pixelFont.className} text-lg font-semibold text-[#00ff00]`}
+              className={`${pixelMonoFont.className} text-sm text-[#00ffff] mb-2`}
             >
-              ChainWatchDog
+              RETRO FUTURISM IN DIGITAL FORM
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 mb-2">
+              <span
+                className={`${pixelMonoFont.className} text-xs text-[#00ff00]`}
+              >
+                SPAM DETECTION
+              </span>
+              <span
+                className={`${pixelMonoFont.className} text-xs text-[#ffa500]`}
+              >
+                HONEYPOT CHECKER
+              </span>
+              <span
+                className={`${pixelMonoFont.className} text-xs text-[#00ffff]/60`}
+              >
+                AI AGENT (SOON)
+              </span>
+            </div>
+          </div>
+          <div className="text-center">
+            <p className={`${pixelMonoFont.className} text-xs text-gray-400`}>
+              Powered by <span className="text-[#ff00ff]">Covalent</span> •
+              Built by the <span className="text-[#00ffff]">ForgeXAI</span> team
             </p>
           </div>
-          <p className={`${pixelMonoFont.className} text-sm text-[#00ffff]`}>
-            RETRO FUTURISM IN DIGITAL FORM
-          </p>
-          <p
-            className={`${pixelMonoFont.className} text-xs text-[#ff00ff] mt-1`}
-          >
-            Spam detection powered by CovalentHQ threat intelligence
-          </p>
         </div>
       </footer>
 
