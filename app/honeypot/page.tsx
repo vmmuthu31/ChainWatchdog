@@ -1870,61 +1870,68 @@ export default function HoneypotPage() {
           </div>
         )}
       </main>
-      <div className="w-full max-w-5xl grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 px-4 sm:px-0 animate-fade-in animation-delay-200">
-        <div className="p-4 backdrop-blur-lg bg-black/40 rounded-xl border border-[#ffa500]/20 flex flex-col items-center justify-center text-center">
-          <div
-            className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
-          >
-            4M+
+      <div className="w-full max-w-5xl bg-black/40 backdrop-blur-md p-4 sm:p-6 rounded-xl border border-[#ffa500]/20 animate-fade-in animation-delay-200">
+        <h3
+          className={`${pixelFont.className} text-center text-base sm:text-lg text-[#ffa500] mb-4`}
+        >
+          HONEYPOT DETECTION COVERAGE
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+          <div className="p-4 backdrop-blur-lg bg-black/40 rounded-xl border border-[#ffa500]/20 flex flex-col items-center justify-center text-center">
+            <div
+              className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
+            >
+              4M+
+            </div>
+            <div
+              className={`${pixelMonoFont.className} text-xs sm:text-sm text-[#ffa500]/80 mt-1`}
+            >
+              Tokens Scanned
+              <span className="block text-[#ffa500]/60 text-xs">
+                (BSC highest)
+              </span>
+            </div>
           </div>
-          <div
-            className={`${pixelMonoFont.className} text-xs sm:text-sm text-[#ffa500]/80 mt-1`}
-          >
-            Tokens Scanned
-            <span className="block text-[#ffa500]/60 text-xs">
-              (BSC highest)
-            </span>
+          <div className="p-4 backdrop-blur-lg bg-black/40 rounded-xl border border-[#ffa500]/20 flex flex-col items-center justify-center text-center">
+            <div
+              className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
+            >
+              926K+
+            </div>
+            <div
+              className={`${pixelMonoFont.className} text-xs sm:text-sm text-[#ffa500]/80 mt-1`}
+            >
+              NFTs Analyzed
+              <span className="block text-[#ffa500]/60 text-xs">
+                (Polygon leads)
+              </span>
+            </div>
           </div>
-        </div>
-        <div className="p-4 backdrop-blur-lg bg-black/40 rounded-xl border border-[#ffa500]/20 flex flex-col items-center justify-center text-center">
-          <div
-            className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
-          >
-            926K+
+          <div className="p-4 backdrop-blur-lg bg-black/40 rounded-xl border border-[#ffa500]/20 flex flex-col items-center justify-center text-center">
+            <div
+              className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
+            >
+              6 Chains
+            </div>
+            <div
+              className={`${pixelMonoFont.className} text-xs sm:text-sm text-[#ffa500]/80 mt-1`}
+            >
+              Actively Protected
+              <span className="block text-[#ffa500]/60 text-xs">Networks</span>
+            </div>
           </div>
-          <div
-            className={`${pixelMonoFont.className} text-xs sm:text-sm text-[#ffa500]/80 mt-1`}
-          >
-            NFTs Analyzed
-            <span className="block text-[#ffa500]/60 text-xs">
-              (Polygon leads)
-            </span>
-          </div>
-        </div>
-        <div className="p-4 backdrop-blur-lg bg-black/40 rounded-xl border border-[#ffa500]/20 flex flex-col items-center justify-center text-center">
-          <div
-            className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
-          >
-            6 Chains
-          </div>
-          <div
-            className={`${pixelMonoFont.className} text-xs sm:text-sm text-[#ffa500]/80 mt-1`}
-          >
-            Actively Protected
-            <span className="block text-[#ffa500]/60 text-xs">Networks</span>
-          </div>
-        </div>
-        <div className="p-4 backdrop-blur-lg bg-black/40 rounded-xl border border-[#ffa500]/20 flex flex-col items-center justify-center text-center">
-          <div
-            className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
-          >
-            5.5M+
-          </div>
-          <div
-            className={`${pixelMonoFont.className} text-xs sm:text-sm text-[#ffa500]/80 mt-1`}
-          >
-            Wallets Flagged
-            <span className="block text-[#ffa500]/60 text-xs">for Risk</span>
+          <div className="p-4 backdrop-blur-lg bg-black/40 rounded-xl border border-[#ffa500]/20 flex flex-col items-center justify-center text-center">
+            <div
+              className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
+            >
+              5.5M+
+            </div>
+            <div
+              className={`${pixelMonoFont.className} text-xs sm:text-sm text-[#ffa500]/80 mt-1`}
+            >
+              Wallets Flagged
+              <span className="block text-[#ffa500]/60 text-xs">for Risk</span>
+            </div>
           </div>
         </div>
       </div>
