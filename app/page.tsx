@@ -556,21 +556,13 @@ export default function Home() {
                 onClick={() => setShowNetworkDropdown(!showNetworkDropdown)}
               >
                 <div className="flex items-center gap-1.5 sm:gap-2">
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-black/80 flex items-center justify-center overflow-hidden border border-[#00ff00]/30">
-                    {currentChain.logoUrl ? (
-                      <TokenLogo
-                        src={currentChain.logoUrl}
-                        alt={currentChain.name}
-                        size={16}
-                      />
-                    ) : (
-                      <span
-                        className={`${pixelMonoFont.className} text-xs sm:text-sm font-medium text-[#00ff00]`}
-                      >
-                        {currentChain.name.charAt(0)}
-                      </span>
-                    )}
-                  </div>
+                  {currentChain.logoUrl && (
+                    <TokenLogo
+                      src={currentChain.logoUrl}
+                      alt={currentChain.name}
+                      size={16}
+                    />
+                  )}
                   <span
                     className={`${pixelMonoFont.className} text-xs sm:text-base font-medium text-[#00ffff] truncate max-w-[150px] sm:max-w-none`}
                   >
@@ -626,7 +618,7 @@ export default function Home() {
                     {hasFilteredMainnetResults && (
                       <div className="mb-2">
                         <div
-                          className={`${pixelMonoFont.className} px-3 py-2 text-xs font-semibold text-[#00ffff] uppercase sticky top-0 bg-black/95`}
+                          className={`${pixelMonoFont.className} px-3 py-2 text-xs font-semibold text-[#00ffff] uppercase top-0 bg-black/95`}
                         >
                           Mainnet
                         </div>
@@ -864,10 +856,11 @@ export default function Home() {
                                     chain.name.charAt(0)
                                   )}
                                 </span>
-                                {chain.name}
+                                ` {chain.name}
                                 {selectedChain === chain.id && (
                                   <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
                                 )}
+                                `
                               </button>
                             ))}
                           </>
@@ -1102,7 +1095,7 @@ export default function Home() {
                             : "bg-black/50 border-[#00ff00]/30 shadow-[0_0_10px_rgba(0,255,0,0.1)]"
                         }`}
                       >
-                        <div className="w-10 h-10 relative rounded-full overflow-hidden bg-black/80 flex-shrink-0 border border-[#00ff00]/30">
+                        <div>
                           <TokenLogo
                             src={token.logo_url}
                             alt={
@@ -1110,15 +1103,8 @@ export default function Home() {
                               token.contract_name ||
                               "?"
                             }
-                            size={48}
+                            size={40}
                           />
-
-                          {/* Security indicator dot */}
-                          <div
-                            className={`absolute bottom-0 right-0 w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 border-black ${
-                              token.is_spam ? "bg-[#ff0000]" : "bg-[#00ff00]"
-                            }`}
-                          ></div>
                         </div>
 
                         <div className="flex-1 min-w-0">
@@ -1553,24 +1539,15 @@ export default function Home() {
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <div className="flex items-center gap-4 w-full">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 relative rounded-full overflow-hidden bg-black/80 flex-shrink-0 border border-[#00ff00]/30">
-                        <TokenLogo
-                          src={token.logo_url}
-                          alt={
-                            token.contract_ticker_symbol ||
-                            token.contract_name ||
-                            "?"
-                          }
-                          size={token.is_spam ? 56 : 48}
-                        />
-
-                        {/* Security indicator dot */}
-                        <div
-                          className={`absolute bottom-0 right-0 w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 border-black ${
-                            token.is_spam ? "bg-[#ff0000]" : "bg-[#00ff00]"
-                          }`}
-                        ></div>
-                      </div>
+                      <TokenLogo
+                        src={token.logo_url}
+                        alt={
+                          token.contract_ticker_symbol ||
+                          token.contract_name ||
+                          "?"
+                        }
+                        size={token.is_spam ? 56 : 48}
+                      />
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 sm:mb-2 flex-wrap">
@@ -1645,7 +1622,9 @@ export default function Home() {
                         <div
                           className={`${pixelMonoFont.className} text-base sm:text-lg font-semibold`}
                         >
-                          {token.spamScore}
+                          {token.spamScore === "Medium"
+                            ? "Low"
+                            : token.spamScore}
                         </div>
                       </div>
 
