@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "chainwatchdog",
+      "name": "RugProof",
       "dependencies": {
         "@covalenthq/client-sdk": "^2.2.6",
         "@covalenthq/goldrush-enhanced-spam-lists": "^0.0.1",

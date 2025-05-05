@@ -1,8 +1,8 @@
-# ChainWatchDog
+# RugProof
 
-ChainWatchDog is a blockchain security tool designed to detect spam tokens and security threats across multiple blockchain networks. It helps users identify potentially malicious tokens in their wallets before they can cause harm.
+RugProof is a blockchain security tool designed to detect spam tokens and security threats across multiple blockchain networks. It helps users identify potentially malicious tokens in their wallets before they can cause harm.
 
-![ChainWatchDog](https://placeholder-for-your-screenshot.com/screenshot.png)
+![RugProof](https://placeholder-for-your-screenshot.com/screenshot.png)
 
 ## Features
 
@@ -33,8 +33,8 @@ ChainWatchDog is a blockchain security tool designed to detect spam tokens and s
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/chainwatchdog.git
-   cd chainwatchdog
+   git clone https://github.com/vmmuthu31/RugProof.git
+   cd RugProof
    ```
 
 2. Install dependencies:
@@ -77,7 +77,7 @@ ChainWatchDog is a blockchain security tool designed to detect spam tokens and s
 
 The application can be easily deployed on Vercel:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fchainwatchdog)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2FRugProof)
 
 ## License
 

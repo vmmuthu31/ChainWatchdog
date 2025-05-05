@@ -7,7 +7,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ReactNode } from "react";
 
 const config = getDefaultConfig({
-  appName: "ChainWatchDog",
+  appName: "RugProof",
   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "",
   chains: [mainnet],
   ssr: true,

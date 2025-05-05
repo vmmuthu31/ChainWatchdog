@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ChainWatchDog - Protect Your Crypto Assets",
+  title: "RugProof - Protect Your Crypto Assets",
   description: "Detect and protect against crypto spam, honeypots, and scams",
 };
 

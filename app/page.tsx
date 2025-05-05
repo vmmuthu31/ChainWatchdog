@@ -345,7 +345,7 @@ export default function Home() {
                 <div className="relative">
                   <Image
                     src="/logo.png"
-                    alt="ChainWatchDog Logo"
+                    alt="RugProof Logo"
                     width={20}
                     height={20}
                     className="w-[20px] h-[20px] sm:w-[24px] sm:h-[24px]"
@@ -355,7 +355,7 @@ export default function Home() {
               <h1
                 className={`${pixelFont.className} text-sm sm:text-lg md:text-2xl font-bold bg-gradient-to-r from-[#00ff00] to-[#00ffff] bg-clip-text text-transparent glow-green-sm`}
               >
-                ChainWatchDog
+                RugProof
               </h1>
             </Link>
           </div>
@@ -1659,7 +1659,7 @@ export default function Home() {
                   <div className="relative">
                     <Image
                       src="/logo.png"
-                      alt="ChainWatchDog Logo"
+                      alt="RugProof Logo"
                       width={36}
                       height={36}
                       className="relative"
@@ -1669,7 +1669,7 @@ export default function Home() {
                 <p
                   className={`${pixelFont.className} text-2xl sm:text-3xl font-semibold text-[#00ff00]`}
                 >
-                  ChainWatchDog
+                  RugProof
                 </p>
               </div>
               <p
@@ -1684,8 +1684,8 @@ export default function Home() {
               <p
                 className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400 sm:text-right leading-relaxed`}
               >
-                ChainWatchDog helps you identify and protect against crypto
-                scams, spam tokens, and honeypots across multiple blockchains.
+                RugProof helps you identify and protect against crypto scams,
+                spam tokens, and honeypots across multiple blockchains.
               </p>
               <div className="mt-4 flex flex-wrap items-center justify-center md:justify-end gap-3">
                 <span
@@ -1699,7 +1699,7 @@ export default function Home() {
                   className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
                 >
                   Built by{" "}
-                  <span className="text-[#00ffff] font-medium">ForgeXAI</span>
+                  <span className="text-[#00ffff] font-medium">ForgeX</span>
                 </span>
               </div>
             </div>
@@ -1707,7 +1707,7 @@ export default function Home() {
 
           <div className="border-t border-[#00ff00]/10 mt-4 pt-4 flex flex-col sm:flex-row justify-between items-center">
             <p className={`${pixelMonoFont.className} text-base text-gray-500`}>
-              © {new Date().getFullYear()} ChainWatchDog. All rights reserved.
+              © {new Date().getFullYear()} RugProof. All rights reserved.
             </p>
             <div className="flex mt-3 sm:mt-0 gap-4">
               <Link

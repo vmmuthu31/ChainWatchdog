@@ -3,7 +3,7 @@
 import { Press_Start_2P, VT323 } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Loader2,
   Search,
@@ -186,6 +186,9 @@ export default function HoneypotPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [contractAddress, setContractAddress] = useState("");
   const [selectedChain, setSelectedChain] = useState("1"); // Default to Ethereum
+  const [autoDetectChain, setAutoDetectChain] = useState(true); // New state for auto-detection toggle
+  const [detectedChain, setDetectedChain] = useState<string | null>(null); // Track detected chain
+  const [isDetectingChain, setIsDetectingChain] = useState(false); // For detection loading state
   const [endpoint, setEndpoint] = useState<EndpointType>("honeypot");
   const [honeypotResult, setHoneypotResult] = useState<HoneypotResponse | null>(
     null
@@ -211,6 +214,195 @@ export default function HoneypotPage() {
       !mobileMenuButton.contains(event.target as Node)
     ) {
       setMobileMenuOpen(false);
+    }
+  };
+
+  // Chain detection function
+  const detectChain = async (address: string) => {
+    if (!address || address.length < 42) return null;
+
+    setIsDetectingChain(true);
+    setDetectedChain(null);
+
+    const chainsToCheck = [
+      {
+        id: "1",
+        name: "Ethereum",
+        explorer: "https://api.etherscan.io",
+        apikey: process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY,
+      },
+      {
+        id: "56",
+        name: "BSC",
+        explorer: "https://api.bscscan.com",
+        apikey: process.env.NEXT_PUBLIC_BSCSCAN_API_KEY,
+      },
+      {
+        id: "137",
+        name: "Polygon",
+        explorer: "https://api.polygonscan.com",
+        apikey: process.env.NEXT_PUBLIC_POLYGONSCAN_API_KEY,
+      },
+      {
+        id: "43114",
+        name: "Avalanche",
+        explorer: "https://glacier-api.avax.network",
+        apikey: process.env.NEXT_PUBLIC_AVALANCHE_API_KEY,
+      },
+      {
+        id: "42161",
+        name: "Arbitrum",
+        explorer: "https://api.arbiscan.io",
+        apikey: process.env.NEXT_PUBLIC_ARBITRUM_API_KEY,
+      },
+      {
+        id: "10",
+        name: "Optimism",
+        explorer: "https://api.optimistic.etherscan.io",
+        apikey: process.env.NEXT_PUBLIC_OPTIMISM_API_KEY,
+      },
+    ];
+
+    try {
+      // Try block explorers directly - the most reliable method
+      for (const chainObj of chainsToCheck) {
+        try {
+          // Special case for Avalanche - using Glacier API
+          if (chainObj.id === "43114") {
+            try {
+              const response = await fetch(
+                `${chainObj.explorer}/v1/chains/${chainObj.id}/addresses/${address}`,
+                {
+                  headers: {
+                    "x-glacier-api-key": chainObj.apikey || "",
+                  },
+                }
+              );
+
+              if (response.ok) {
+                const data = await response.json();
+                if (data && data.address) {
+                  console.log(
+                    `Contract found on ${chainObj.name} via Glacier API`
+                  );
+                  setDetectedChain(chainObj.id);
+                  setSelectedChain(chainObj.id);
+                  setIsDetectingChain(false);
+                  return chainObj.id;
+                }
+              }
+            } catch (error) {
+              console.log(`Error checking Glacier API for Avalanche:`, error);
+            }
+            continue;
+          }
+
+          // Standard approach for all other chains
+          const explorerResponse = await fetch(
+            `${chainObj.explorer}/api?module=contract&action=getabi&address=${address}&apikey=${chainObj.apikey}`
+          );
+
+          if (explorerResponse.ok) {
+            const explorerData = await explorerResponse.json();
+            // Different explorers may have slightly different response formats
+            if (
+              explorerData.status === "1" ||
+              (explorerData.result &&
+                explorerData.result !== "Contract source code not verified" &&
+                explorerData.result !== "" &&
+                explorerData.result !== null)
+            ) {
+              console.log(`Contract found on ${chainObj.name} via explorer`);
+              setDetectedChain(chainObj.id);
+              setSelectedChain(chainObj.id);
+              setIsDetectingChain(false);
+              return chainObj.id;
+            }
+          }
+        } catch (error) {
+          console.log(
+            `Error checking explorer for chain ${chainObj.id} (${chainObj.name}):`,
+            error
+          );
+        }
+      }
+
+      // Secondary approach: Just check if the address exists (not necessarily as a contract)
+      for (const chainObj of chainsToCheck) {
+        try {
+          // Skip Avalanche here as we've already checked with Glacier API
+          if (chainObj.id === "43114") continue;
+
+          const response = await fetch(
+            `${chainObj.explorer}/api?module=account&action=balance&address=${address}&apikey=${chainObj.apikey}`
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.status === "1") {
+              console.log(
+                `Address found on ${chainObj.name} with balance ${data.result}`
+              );
+              // Even if it's just an EOA, at least we know the address exists on this chain
+              setDetectedChain(chainObj.id);
+              setSelectedChain(chainObj.id);
+              setIsDetectingChain(false);
+              return chainObj.id;
+            }
+          }
+        } catch (error) {
+          console.log(
+            `Error checking account balance for chain ${chainObj.id}:`,
+            error
+          );
+        }
+      }
+
+      // If we couldn't detect the chain, default to Ethereum
+      console.log("Couldn't detect chain, defaulting to null");
+      setIsDetectingChain(false);
+      return null;
+    } catch (error) {
+      console.error("Error in chain detection:", error);
+      setIsDetectingChain(false);
+      return null;
+    }
+  };
+
+  // Handle contract address change
+  useEffect(() => {
+    // Debounce the chain detection to avoid too many API calls
+    const timer = setTimeout(() => {
+      if (contractAddress && contractAddress.length >= 42 && autoDetectChain) {
+        detectChain(contractAddress);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [contractAddress, autoDetectChain]);
+
+  // The chain detection system uses blockchain explorers directly:
+  // - Standard explorers (Etherscan, BSCScan, etc.) for most chains
+  // - Glacier API for Avalanche
+  // This provides reliable cross-chain contract detection without requiring user input
+
+  // Get chain name from ID
+  const getChainName = (chainId: string) => {
+    switch (chainId) {
+      case "1":
+        return "Ethereum";
+      case "56":
+        return "Binance Smart Chain";
+      case "137":
+        return "Polygon";
+      case "43114":
+        return "Avalanche";
+      case "42161":
+        return "Arbitrum";
+      case "10":
+        return "Optimism";
+      default:
+        return "Unknown Chain";
     }
   };
 
@@ -305,6 +497,14 @@ export default function HoneypotPage() {
     setHoldersResult(null);
 
     try {
+      // If auto-detect is on and we don't have a detected chain yet, try to detect it
+      if (autoDetectChain && !detectedChain && !isDetectingChain) {
+        const chainId = await detectChain(contractAddress);
+        if (chainId) {
+          setSelectedChain(chainId);
+        }
+      }
+
       switch (endpoint) {
         case "honeypot":
           const honeypotData = await fetchHoneypotData(
@@ -366,7 +566,7 @@ export default function HoneypotPage() {
                 <div className="relative">
                   <Image
                     src="/logo.png"
-                    alt="ChainWatchDog Logo"
+                    alt="RugProof Logo"
                     width={20}
                     height={20}
                     className="w-[20px] h-[20px] sm:w-[24px] sm:h-[24px]"
@@ -376,7 +576,7 @@ export default function HoneypotPage() {
               <h1
                 className={`${pixelFont.className} text-sm sm:text-lg md:text-2xl font-bold bg-gradient-to-r from-[#00ff00] to-[#00ffff] bg-clip-text text-transparent glow-green-sm`}
               >
-                ChainWatchDog
+                RugProof
               </h1>
             </Link>
           </div>
@@ -549,13 +749,13 @@ export default function HoneypotPage() {
           <h2
             className={`${pixelFont.className} text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-[#ffa500] via-[#ffcc00] to-[#ff8800] bg-clip-text text-transparent glow-green-md animate-pulse-slow`}
           >
-            HONEYPOT CONTRACT CHECKER
+            IS THIS TOKEN SAFE TO TRADE?
           </h2>
           <p
             className={`${pixelMonoFont.className} text-xl sm:text-2xl md:text-3xl text-[#ffa500] leading-relaxed max-w-xl mx-auto animate-fade-in-up animation-delay-100`}
           >
-            Verify if a token contract is safe to trade or a dangerous honeypot
-            trap.
+            Instantly verify any token contract across major chains. Avoid
+            scams. Trade with confidence.
           </p>
         </div>
 
@@ -657,29 +857,93 @@ export default function HoneypotPage() {
             </div>
 
             <div className="space-y-2 sm:space-y-3">
-              <label
-                className={`${pixelMonoFont.className} block text-lg sm:text-xl font-medium text-[#ffa500] mb-2`}
-              >
-                BLOCKCHAIN NETWORK
-              </label>
-              <select
-                value={selectedChain}
-                onChange={(e) => setSelectedChain(e.target.value)}
-                disabled={isLoading}
-                className={`${pixelMonoFont.className} w-full px-3 py-2 sm:py-3 rounded-md bg-[#111] border border-[#ffa500]/50 text-[#00ffff] focus:ring-[#ffa500] focus:border-[#ffa500] focus:outline-none focus:ring-2 text-base sm:text-lg`}
-                style={{
-                  backgroundColor: "#111",
-                  color: "#00ffff",
-                  WebkitTextFillColor: "#00ffff",
-                }}
-              >
-                <option value="1">Ethereum</option>
-                <option value="56">Binance Smart Chain</option>
-                <option value="137">Polygon</option>
-                <option value="43114">Avalanche</option>
-                <option value="42161">Arbitrum</option>
-                <option value="10">Optimism</option>
-              </select>
+              <div className="flex justify-between items-center">
+                <label
+                  className={`${pixelMonoFont.className} block text-lg sm:text-xl font-medium text-[#ffa500] mb-2`}
+                >
+                  BLOCKCHAIN NETWORK
+                </label>
+
+                {/* Auto-detect toggle */}
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`${pixelMonoFont.className} text-sm text-[#00ffff]`}
+                  >
+                    Auto-detect
+                  </span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={autoDetectChain}
+                      onChange={() => setAutoDetectChain(!autoDetectChain)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-[#222] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#ffa500] after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#005500]"></div>
+                  </label>
+                </div>
+              </div>
+
+              <div className="relative">
+                <select
+                  value={selectedChain}
+                  onChange={(e) => setSelectedChain(e.target.value)}
+                  disabled={isLoading || (autoDetectChain && isDetectingChain)}
+                  className={`${
+                    pixelMonoFont.className
+                  } w-full px-3 py-2 sm:py-3 rounded-md bg-[#111] border border-[#ffa500]/50 text-[#00ffff] focus:ring-[#ffa500] focus:border-[#ffa500] focus:outline-none focus:ring-2 text-base sm:text-lg ${
+                    autoDetectChain && isDetectingChain ? "opacity-60" : ""
+                  }`}
+                  style={{
+                    backgroundColor: "#111",
+                    color: "#00ffff",
+                    WebkitTextFillColor: "#00ffff",
+                  }}
+                >
+                  <option value="1">Ethereum</option>
+                  <option value="56">Binance Smart Chain</option>
+                  <option value="137">Polygon</option>
+                  <option value="43114">Avalanche</option>
+                  <option value="42161">Arbitrum</option>
+                  <option value="10">Optimism</option>
+                </select>
+
+                {/* Show loading indicator when detecting */}
+                {autoDetectChain && isDetectingChain && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <Loader2 className="h-4 w-4 animate-spin text-[#ffa500]" />
+                  </div>
+                )}
+
+                {/* Show checkmark when chain is detected */}
+                {autoDetectChain && detectedChain && !isDetectingChain && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <CheckCircle className="h-4 w-4 text-[#00ff00]" />
+                  </div>
+                )}
+              </div>
+
+              {/* Chain detection status message */}
+              {autoDetectChain && (
+                <div
+                  className={`text-xs sm:text-sm ${pixelMonoFont.className} mt-1`}
+                >
+                  {isDetectingChain ? (
+                    <span className="text-[#ffa500]">Detecting chain...</span>
+                  ) : detectedChain ? (
+                    <span className="text-[#00ff00]">
+                      Chain detected: {getChainName(detectedChain)}
+                    </span>
+                  ) : contractAddress && contractAddress.length >= 42 ? (
+                    <span className="text-[#ff0000]">
+                      Couldn&apos;t detect chain. Please select manually.
+                    </span>
+                  ) : (
+                    <span className="text-[#00ffff]">
+                      Chain will be auto-detected when you enter an address
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="pt-2">
@@ -1125,8 +1389,8 @@ export default function HoneypotPage() {
                     >
                       This analysis is provided for informational purposes only.
                       Always do your own research (DYOR) before investing.
-                      ChainWatchDog is not responsible for any trading decisions
-                      made based on this information.
+                      RugProof is not responsible for any trading decisions made
+                      based on this information.
                     </p>
                   </div>
                 </div>
@@ -1318,8 +1582,8 @@ export default function HoneypotPage() {
                     >
                       This analysis is provided for informational purposes only.
                       Always do your own research (DYOR) before investing.
-                      ChainWatchDog is not responsible for any trading decisions
-                      made based on this information.
+                      RugProof is not responsible for any trading decisions made
+                      based on this information.
                     </p>
                   </div>
                 </div>
@@ -1624,7 +1888,7 @@ export default function HoneypotPage() {
                   <div className="relative">
                     <Image
                       src="/logo.png"
-                      alt="ChainWatchDog Logo"
+                      alt="RugProof Logo"
                       width={36}
                       height={36}
                       className="relative"
@@ -1634,7 +1898,7 @@ export default function HoneypotPage() {
                 <p
                   className={`${pixelFont.className} text-2xl sm:text-3xl font-semibold text-[#00ff00]`}
                 >
-                  ChainWatchDog
+                  RugProof
                 </p>
               </div>
               <p
@@ -1649,8 +1913,8 @@ export default function HoneypotPage() {
               <p
                 className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400 sm:text-right leading-relaxed`}
               >
-                ChainWatchDog helps you identify and protect against crypto
-                scams, spam tokens, and honeypots across multiple blockchains.
+                RugProof helps you identify and protect against crypto scams,
+                spam tokens, and honeypots across multiple blockchains.
               </p>
               <div className="mt-4 flex flex-wrap items-center justify-center md:justify-end gap-3">
                 <span
@@ -1664,7 +1928,7 @@ export default function HoneypotPage() {
                   className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
                 >
                   Built by{" "}
-                  <span className="text-[#00ffff] font-medium">ForgeXAI</span>
+                  <span className="text-[#00ffff] font-medium">ForgeX</span>
                 </span>
               </div>
             </div>
@@ -1672,7 +1936,7 @@ export default function HoneypotPage() {
 
           <div className="border-t border-[#00ff00]/10 mt-4 pt-4 flex flex-col sm:flex-row justify-between items-center">
             <p className={`${pixelMonoFont.className} text-base text-gray-500`}>
-              © {new Date().getFullYear()} ChainWatchDog. All rights reserved.
+              © {new Date().getFullYear()} RugProof. All rights reserved.
             </p>
             <div className="flex mt-3 sm:mt-0 gap-4">
               <Link
