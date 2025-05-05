@@ -92,6 +92,32 @@ interface RecentSpamTokensProps {
 // Client-side cache for YAML content
 const yamlCache: Record<string, { SpamContracts?: string[] }> = {};
 
+// Add renderChainNotification function
+const renderChainNotification = (chainId: string | undefined) => {
+  // Only in the recent spam tab, show a message when using unsupported chain
+  const supportedChainIds = [
+    "eth-mainnet",
+    "bsc-mainnet",
+    "matic-mainnet",
+    "optimism-mainnet",
+    "gnosis-mainnet",
+    "base-mainnet",
+  ];
+
+  if (chainId && !supportedChainIds.includes(chainId)) {
+    return (
+      <div className="mb-4 p-3 bg-black/70 border border-[#ff0000]/30 rounded-lg">
+        <p className={`${pixelMonoFont.className} text-base text-[#ff8888]`}>
+          Note: Spam token data is only available for Ethereum, BSC, Polygon,
+          Optimism, Gnosis, and Base chains. Showing data from Ethereum.
+        </p>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
   const [recentSpamTokens, setRecentSpamTokens] = useState<SpamToken[]>([]);
   const [recentSpamNFTs, setRecentSpamNFTs] = useState<SpamToken[]>([]);
@@ -102,6 +128,9 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
   const [activeTab, setActiveTab] = useState<"tokens" | "nfts">("tokens");
+  const [selectedChain, setSelectedChain] = useState<string | undefined>(
+    chainId
+  );
 
   // Function to get a random timestamp in the past
   const getRandomTimestamp = useCallback(() => {
@@ -224,9 +253,9 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
           .flat()
           .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
           .slice(0, 5);
-      } else if (chainId && chainToNetwork[chainId]) {
+      } else if (selectedChain && chainToNetwork[selectedChain]) {
         // Fetch tokens for specific chain
-        const { networkKey } = chainToNetwork[chainId];
+        const { networkKey } = chainToNetwork[selectedChain];
         const network = networkMapping[networkKey];
         tokens = await parseSpamList(networkKey, network.yamlPath, 10);
         tokens = tokens.slice(0, 5);
@@ -267,7 +296,7 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [chainId, showRecentFromAll, parseSpamList]);
+  }, [selectedChain, showRecentFromAll, parseSpamList]);
 
   // Function to fetch recent spam NFTs
   const fetchRecentSpamNFTs = useCallback(async () => {
@@ -303,9 +332,9 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
           .flat()
           .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
           .slice(0, 5);
-      } else if (chainId && chainToNetwork[chainId]) {
+      } else if (selectedChain && chainToNetwork[selectedChain]) {
         // Fetch NFTs for specific chain
-        const { networkKey } = chainToNetwork[chainId];
+        const { networkKey } = chainToNetwork[selectedChain];
         const network = networkMapping[networkKey];
         nfts = await parseSpamList(networkKey, network.nftYamlPath, 10);
         nfts = nfts.slice(0, 5);
@@ -346,7 +375,7 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [chainId, showRecentFromAll, parseSpamList]);
+  }, [selectedChain, showRecentFromAll, parseSpamList]);
 
   // Function to handle token search
   const handleSearch = async (e: React.FormEvent) => {
@@ -409,9 +438,35 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
   };
 
   useEffect(() => {
+    if (chainId) {
+      // Check if chainId is in our supported list for spam tokens
+      const supportedChainIds = [
+        "eth-mainnet",
+        "bsc-mainnet",
+        "matic-mainnet",
+        "optimism-mainnet",
+        "gnosis-mainnet",
+        "base-mainnet",
+      ];
+
+      if (supportedChainIds.includes(chainId)) {
+        setSelectedChain(chainId);
+      } else {
+        // Default to Ethereum for unsupported chains
+        setSelectedChain("eth-mainnet");
+      }
+    }
+  }, [chainId]);
+
+  useEffect(() => {
     fetchRecentSpamTokens();
     fetchRecentSpamNFTs();
-  }, [chainId, showRecentFromAll, fetchRecentSpamTokens, fetchRecentSpamNFTs]);
+  }, [
+    selectedChain,
+    showRecentFromAll,
+    fetchRecentSpamTokens,
+    fetchRecentSpamNFTs,
+  ]);
 
   const toggleModeLabel = showRecentFromAll
     ? "Show chain specific tokens"
@@ -555,8 +610,21 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
         </h3>
       </div>
 
+      {/* Show chain notification if needed */}
+      {renderChainNotification(chainId)}
+
       {/* Search section */}
       {renderSearchSection()}
+
+      {/* Mode toggle button */}
+      <div className="mb-4">
+        <button
+          onClick={() => setShowRecentFromAll(!showRecentFromAll)}
+          className="w-full px-4 py-2 rounded-md bg-[#ff0000]/10 text-[#ff8888] hover:bg-[#ff0000]/20 transition-colors text-base sm:text-lg"
+        >
+          {toggleModeLabel}
+        </button>
+      </div>
 
       {/* Tabs for Tokens and NFTs */}
       <Tabs
