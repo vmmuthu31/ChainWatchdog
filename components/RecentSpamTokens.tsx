@@ -37,15 +37,13 @@ const networkMapping: Record<
   POLYGON_MAINNET: {
     id: "matic-mainnet",
     name: "Polygon",
-    yamlPath:
-      "/spam-lists/tokens/polygon_mainnet_token_spam_contracts_yes.yaml",
+    yamlPath: "/spam-lists/tokens/pol_mainnet_token_spam_contracts_yes.yaml",
     nftYamlPath: "/spam-lists/nft/pol_mainnet_nft_spam_contracts.yaml",
   },
   OPTIMISM_MAINNET: {
     id: "optimism-mainnet",
     name: "Optimism",
-    yamlPath:
-      "/spam-lists/tokens/optimism_mainnet_token_spam_contracts_yes.yaml",
+    yamlPath: "/spam-lists/tokens/op_mainnet_token_spam_contracts_yes.yaml",
     nftYamlPath: "/spam-lists/nft/op_mainnet_nft_spam_contracts.yaml",
   },
   GNOSIS_MAINNET: {
