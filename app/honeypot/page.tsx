@@ -1874,7 +1874,7 @@ export default function HoneypotPage() {
         <h3
           className={`${pixelFont.className} text-center text-base sm:text-lg text-[#ffa500] mb-4`}
         >
-          HONEYPOT DETECTION COVERAGE
+          Honeypot Scanner Stats{" "}
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
           <div className="p-4 backdrop-blur-lg bg-black/40 rounded-xl border border-[#ffa500]/20 flex flex-col items-center justify-center text-center">
@@ -1972,13 +1972,6 @@ export default function HoneypotPage() {
                 spam tokens, and honeypots across multiple blockchains.
               </p>
               <div className="mt-4 flex flex-wrap items-center justify-center md:justify-end gap-3">
-                <span
-                  className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
-                >
-                  Powered by{" "}
-                  <span className="text-[#ff00ff] font-medium">Covalent</span>
-                </span>
-                <span className="text-gray-500 mx-1">•</span>
                 <span
                   className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
                 >

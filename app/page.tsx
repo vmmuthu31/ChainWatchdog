@@ -580,7 +580,8 @@ export default function Home() {
           <h2
             className={`${pixelFont.className} text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-[#00ff00] via-[#00ffff] to-[#ff00ff] bg-clip-text text-transparent glow-green-md animate-pulse-slow`}
           >
-            SCAN YOUR WALLET. NUKE THE THREATS.
+            <span className="md:text-[40px]">SCAN YOUR WALLET.</span> NUKE THE
+            THREATS.
           </h2>
           <p
             className={`${pixelMonoFont.className} text-xl sm:text-2xl md:text-3xl text-[#00ff00] leading-relaxed max-w-xl mx-auto animate-fade-in-up animation-delay-100`}
@@ -1727,7 +1728,7 @@ export default function Home() {
         <h3
           className={`${pixelFont.className} text-center text-base sm:text-lg text-[#00ff00] mb-4`}
         >
-          NETWORK SECURITY SCANNER STATS
+          Spam Scanner Stats{" "}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="p-3 sm:p-4 bg-black/60 rounded-lg border border-[#00ff00]/10">
@@ -1845,6 +1846,17 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <div className=" bg-black/60 rounded-lg flex justify-end w-full items-center">
+          <div className="text-sm text-[#00ff00] mt-4 flex gap-1 justify-between items-center">
+            <span>Powered by</span>
+            <Link
+              href="https://goldrush.dev/docs/resources/enhanced-spam-lists"
+              className="text-[#00ffff]"
+            >
+              Covalent (Goldrush)
+            </Link>
+          </div>
+        </div>
       </div>
       <footer className="w-full border-t border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-4 sm:p-6 md:p-8 text-center mt-10">
         <div className="max-w-6xl mx-auto px-3 sm:px-4">
@@ -1885,7 +1897,12 @@ export default function Home() {
                   className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
                 >
                   Powered by{" "}
-                  <span className="text-[#ff00ff] font-medium">Covalent</span>
+                  <Link
+                    href="https://goldrush.dev/docs/resources/enhanced-spam-lists"
+                    className="text-[#ff00ff] font-medium"
+                  >
+                    Covalent
+                  </Link>
                 </span>
                 <span className="text-gray-500 mx-1">•</span>
                 <span
