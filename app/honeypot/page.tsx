@@ -561,18 +561,13 @@ export default function HoneypotPage() {
               href="/"
               className="flex items-center gap-1.5 sm:gap-2 md:gap-3"
             >
-              <div className="relative block">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-[#00ff00] to-[#00ffff] rounded-full blur opacity-70"></div>
-                <div className="relative">
-                  <Image
-                    src="/logo.png"
-                    alt="RugProof Logo"
-                    width={20}
-                    height={20}
-                    className="w-[20px] h-[20px] sm:w-[24px] sm:h-[24px]"
-                  />
-                </div>
-              </div>
+              <Image
+                src="/logo.png"
+                alt="RugProof Logo"
+                width={40}
+                height={40}
+                className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]"
+              />
               <h1
                 className={`${pixelFont.className} text-sm sm:text-lg md:text-2xl font-bold bg-gradient-to-r from-[#00ff00] to-[#00ffff] bg-clip-text text-transparent glow-green-sm`}
               >
@@ -1883,18 +1878,13 @@ export default function HoneypotPage() {
             {/* Logo and Brand */}
             <div className="flex flex-col items-center md:items-start">
               <div className="flex items-center gap-3 mb-4">
-                <div className="relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-[#00ff00] to-[#00ffff] rounded-full blur-sm opacity-70"></div>
-                  <div className="relative">
-                    <Image
-                      src="/logo.png"
-                      alt="RugProof Logo"
-                      width={36}
-                      height={36}
-                      className="relative"
-                    />
-                  </div>
-                </div>
+                <Image
+                  src="/logo.png"
+                  alt="RugProof Logo"
+                  width={40}
+                  height={40}
+                  className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]"
+                />
                 <p
                   className={`${pixelFont.className} text-2xl sm:text-3xl font-semibold text-[#00ff00]`}
                 >
