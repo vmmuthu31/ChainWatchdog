@@ -4,6 +4,7 @@ import { Press_Start_2P, VT323 } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Loader2,
   Search,
@@ -183,6 +184,8 @@ interface TopHoldersResponse {
 type EndpointType = "honeypot" | "contract" | "pairs" | "holders";
 
 export default function HoneypotPage() {
+  const searchParams = useSearchParams();
+
   const [isLoading, setIsLoading] = useState(false);
   const [contractAddress, setContractAddress] = useState("");
   const [selectedChain, setSelectedChain] = useState("1"); // Default to Ethereum
@@ -201,6 +204,47 @@ export default function HoneypotPage() {
   );
   const [error, setError] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [initialQueryHandled, setInitialQueryHandled] = useState(false);
+
+  // Handle URL query parameters
+  useEffect(() => {
+    const address = searchParams.get("address");
+    const chainId = searchParams.get("chainId");
+
+    if (address && !initialQueryHandled) {
+      setContractAddress(address);
+
+      if (chainId) {
+        setSelectedChain(chainId);
+        setAutoDetectChain(false);
+        setDetectedChain(chainId);
+      }
+
+      // Automatically run the check with the provided parameters
+      const runInitialCheck = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+          const chainToUse = chainId || selectedChain;
+          const honeypotData = await fetchHoneypotData(address, chainToUse);
+          setHoneypotResult(honeypotData);
+        } catch (err) {
+          const errorMessage =
+            err instanceof Error
+              ? err.message
+              : "Failed to check contract. Please try again.";
+          setError(errorMessage);
+          console.error(err);
+        } finally {
+          setIsLoading(false);
+          setInitialQueryHandled(true);
+        }
+      };
+
+      runInitialCheck();
+    }
+  }, [searchParams, initialQueryHandled]);
 
   // Handle mobile menu click outside
   const handleClickOutside = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -371,15 +415,22 @@ export default function HoneypotPage() {
 
   // Handle contract address change
   useEffect(() => {
-    // Debounce the chain detection to avoid too many API calls
-    const timer = setTimeout(() => {
-      if (contractAddress && contractAddress.length >= 42 && autoDetectChain) {
-        detectChain(contractAddress);
-      }
-    }, 500);
+    // Don't run auto-detection if we're handling initial query params
+    if (initialQueryHandled) {
+      // Debounce the chain detection to avoid too many API calls
+      const timer = setTimeout(() => {
+        if (
+          contractAddress &&
+          contractAddress.length >= 42 &&
+          autoDetectChain
+        ) {
+          detectChain(contractAddress);
+        }
+      }, 500);
 
-    return () => clearTimeout(timer);
-  }, [contractAddress, autoDetectChain]);
+      return () => clearTimeout(timer);
+    }
+  }, [contractAddress, autoDetectChain, initialQueryHandled]);
 
   // The chain detection system uses blockchain explorers directly:
   // - Standard explorers (Etherscan, BSCScan, etc.) for most chains
@@ -605,10 +656,10 @@ export default function HoneypotPage() {
                 Honeypot Check
               </Link>
               <Link
-                href="#"
-                className={`${pixelMonoFont.className} text-lg text-[#00ffff]/60 hover:text-[#00ffff] transition-colors`}
+                href="/agent"
+                className={`${pixelMonoFont.className} text-lg text-[#00ffff] hover:text-[#00ffff] transition-colors`}
               >
-                AI Agent (Soon)
+                AI Agent
               </Link>
               <Link
                 href="#"
@@ -712,7 +763,7 @@ export default function HoneypotPage() {
                         Honeypot Check
                       </Link>
                       <Link
-                        href="#"
+                        href="/agent"
                         className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#00ffff]/60 hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded-lg transition-colors`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
@@ -730,7 +781,7 @@ export default function HoneypotPage() {
                             d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                           />
                         </svg>
-                        AI Agent (Soon)
+                        AI Agent
                       </Link>
                     </div>
 
