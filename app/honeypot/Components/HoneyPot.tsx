@@ -1152,7 +1152,7 @@ function HoneyPot() {
                       <div className="flex-1 md:w-28 h-full flex flex-col p-3 rounded-2xl border border-[#ffa500]/30 bg-black/70">
                         <div className="flex-1 flex items-center justify-center">
                           <div
-                            className={`${pixelFont.className} text-3xl font-bold text-[#ffa500]`}
+                            className={`${pixelFont.className} text-lg font-bold text-[#ffa500]`}
                           >
                             {honeypotResult?.simulationResult?.buyTax.toFixed(
                               1
@@ -1174,7 +1174,7 @@ function HoneyPot() {
                       <div className="flex-1 md:w-28 h-full flex flex-col p-3 rounded-2xl border border-[#ffa500]/30 bg-black/70">
                         <div className="flex-1 flex items-center justify-center">
                           <div
-                            className={`${pixelFont.className} text-3xl font-bold text-[#ffa500]`}
+                            className={`${pixelFont.className} text-lg font-bold text-[#ffa500]`}
                           >
                             {honeypotResult?.simulationResult?.sellTax.toFixed(
                               1

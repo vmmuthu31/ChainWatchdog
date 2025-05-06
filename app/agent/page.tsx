@@ -1510,7 +1510,7 @@ export default function AgentPage() {
           onClick={() => {
             form.setValue(
               "userQuestion",
-              "Check this token for honeypot 0x3eefc78d05d4e745ffdd0d8ea1157a948c185411 on BSC"
+              "Check this token for honeypot 0xC65d6849550bccA4F8f5e096565A874aa70B816c"
             );
             form.handleSubmit(onSubmit)();
           }}
@@ -1523,7 +1523,7 @@ export default function AgentPage() {
           onClick={() => {
             form.setValue(
               "userQuestion",
-              "Scan this wallet for spam tokens: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 on Ethereum"
+              "Scan this wallet for spam tokens: 0x5b17c05bf59D82266e29C0Ca86aa1359F9cE801A on Base"
             );
             form.handleSubmit(onSubmit)();
           }}
@@ -1536,7 +1536,7 @@ export default function AgentPage() {
           onClick={() => {
             form.setValue(
               "userQuestion",
-              "Check if this token is in the spam database: 0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0 on Polygon"
+              "Check if this token is in the spam database: 0x66c55fddc9599602e57d2092ba7e16f7d6fd798e on Ethereum"
             );
             form.handleSubmit(onSubmit)();
           }}
@@ -1544,19 +1544,6 @@ export default function AgentPage() {
         >
           <span className="inline-block w-1.5 h-1.5 bg-[#00aa00] rounded-full mr-2"></span>
           Spam check: 0x7d1...ebb0 (Polygon)
-        </button>
-        <button
-          onClick={() => {
-            form.setValue(
-              "userQuestion",
-              "Show token balance for 0x388C818CA8B9251b393131C08a736A67ccB19297 on Optimism"
-            );
-            form.handleSubmit(onSubmit)();
-          }}
-          className={`${pixelMonoFont.className} p-2 bg-black/50 border border-[#ff00ff]/30 rounded-md text-[#ff88ff] hover:bg-[#ff00ff]/10 transition-colors text-left text-sm flex items-center`}
-        >
-          <span className="inline-block w-1.5 h-1.5 bg-[#ff00ff] rounded-full mr-2"></span>
-          Balance check: 0x388...9297 (Optimism)
         </button>
       </div>
     </div>
