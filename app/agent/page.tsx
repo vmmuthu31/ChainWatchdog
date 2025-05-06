@@ -1442,43 +1442,55 @@ export default function AgentPage() {
       <div className="grid grid-cols-1 gap-2">
         <button
           onClick={() => {
-            form.setValue("userQuestion", "What is a honeypot token?");
+            form.setValue(
+              "userQuestion",
+              "What is a honeypot token and how can I detect one?"
+            );
             form.handleSubmit(onSubmit)();
           }}
           className={`${pixelMonoFont.className} p-2 bg-black/50 border border-[#00ff00]/30 rounded-md text-[#00ff00] hover:bg-[#00ff00]/10 transition-colors text-left text-sm flex items-center`}
         >
           <span className="inline-block w-1.5 h-1.5 bg-[#00ff00] rounded-full mr-2 animate-pulse"></span>
-          What is a honeypot token?
+          What is a honeypot token and how can I detect one?
         </button>
         <button
           onClick={() => {
-            form.setValue("userQuestion", "How to identify spam tokens?");
+            form.setValue(
+              "userQuestion",
+              "How to identify spam tokens in my wallet?"
+            );
             form.handleSubmit(onSubmit)();
           }}
           className={`${pixelMonoFont.className} p-2 bg-black/50 border border-[#00ff00]/30 rounded-md text-[#00ff00] hover:bg-[#00ff00]/10 transition-colors text-left text-sm flex items-center`}
         >
           <span className="inline-block w-1.5 h-1.5 bg-[#00ff00] rounded-full mr-2 animate-pulse"></span>
-          How to identify spam tokens?
+          How to identify spam tokens in my wallet?
         </button>
         <button
           onClick={() => {
-            form.setValue("userQuestion", "Analyze my wallet for spam tokens");
+            form.setValue(
+              "userQuestion",
+              "What are safe ways to sell tokens with high slippage?"
+            );
             form.handleSubmit(onSubmit)();
           }}
           className={`${pixelMonoFont.className} p-2 bg-black/50 border border-[#00ff00]/30 rounded-md text-[#00ff00] hover:bg-[#00ff00]/10 transition-colors text-left text-sm flex items-center`}
         >
           <span className="inline-block w-1.5 h-1.5 bg-[#00ff00] rounded-full mr-2 animate-pulse"></span>
-          Analyze my wallet for spam tokens
+          What are safe ways to sell tokens with high slippage?
         </button>
         <button
           onClick={() => {
-            form.setValue("userQuestion", "Which chains do you support?");
+            form.setValue(
+              "userQuestion",
+              "How to protect my wallet from dust attacks?"
+            );
             form.handleSubmit(onSubmit)();
           }}
           className={`${pixelMonoFont.className} p-2 bg-black/50 border border-[#00ff00]/30 rounded-md text-[#00ff00] hover:bg-[#00ff00]/10 transition-colors text-left text-sm flex items-center`}
         >
           <span className="inline-block w-1.5 h-1.5 bg-[#00ff00] rounded-full mr-2 animate-pulse"></span>
-          Which chains do you support?
+          How to protect my wallet from dust attacks?
         </button>
       </div>
     </div>
@@ -1498,40 +1510,53 @@ export default function AgentPage() {
           onClick={() => {
             form.setValue(
               "userQuestion",
-              "Check this token on Ethereum 0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0"
-            );
-            form.handleSubmit(onSubmit)();
-          }}
-          className={`${pixelMonoFont.className} p-2 bg-black/50 border border-[#00aa00]/30 rounded-md text-[#00ffaa] hover:bg-[#00aa00]/10 transition-colors text-left text-sm flex items-center`}
-        >
-          <span className="inline-block w-1.5 h-1.5 bg-[#00aa00] rounded-full mr-2"></span>
-          Check ETH token: 0x7d1...ebb0
-        </button>
-        <button
-          onClick={() => {
-            form.setValue(
-              "userQuestion",
-              "Check this token on BSC 0x3eefc78d05d4e745ffdd0d8ea1157a948c185411"
+              "Check this token for honeypot 0x3eefc78d05d4e745ffdd0d8ea1157a948c185411 on BSC"
             );
             form.handleSubmit(onSubmit)();
           }}
           className={`${pixelMonoFont.className} p-2 bg-black/50 border border-[#ffaa00]/30 rounded-md text-[#ffcc00] hover:bg-[#ffaa00]/10 transition-colors text-left text-sm flex items-center`}
         >
           <span className="inline-block w-1.5 h-1.5 bg-[#ffaa00] rounded-full mr-2"></span>
-          Check BSC token: 0x3ee...5411
+          Honeypot scan: 0x3ee...5411 (BSC)
         </button>
         <button
           onClick={() => {
             form.setValue(
               "userQuestion",
-              "Analyze this wallet on Ethereum: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+              "Scan this wallet for spam tokens: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 on Ethereum"
             );
             form.handleSubmit(onSubmit)();
           }}
           className={`${pixelMonoFont.className} p-2 bg-black/50 border border-[#00ffff]/30 rounded-md text-[#00ffff] hover:bg-[#00ffff]/10 transition-colors text-left text-sm flex items-center`}
         >
           <span className="inline-block w-1.5 h-1.5 bg-[#00ffff] rounded-full mr-2"></span>
-          Check ETH wallet: 0xd8d...6045
+          Spam scan: 0xd8d...6045 (ETH wallet)
+        </button>
+        <button
+          onClick={() => {
+            form.setValue(
+              "userQuestion",
+              "Check if this token is in the spam database: 0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0 on Polygon"
+            );
+            form.handleSubmit(onSubmit)();
+          }}
+          className={`${pixelMonoFont.className} p-2 bg-black/50 border border-[#00aa00]/30 rounded-md text-[#00ffaa] hover:bg-[#00aa00]/10 transition-colors text-left text-sm flex items-center`}
+        >
+          <span className="inline-block w-1.5 h-1.5 bg-[#00aa00] rounded-full mr-2"></span>
+          Spam check: 0x7d1...ebb0 (Polygon)
+        </button>
+        <button
+          onClick={() => {
+            form.setValue(
+              "userQuestion",
+              "Show token balance for 0x388C818CA8B9251b393131C08a736A67ccB19297 on Optimism"
+            );
+            form.handleSubmit(onSubmit)();
+          }}
+          className={`${pixelMonoFont.className} p-2 bg-black/50 border border-[#ff00ff]/30 rounded-md text-[#ff88ff] hover:bg-[#ff00ff]/10 transition-colors text-left text-sm flex items-center`}
+        >
+          <span className="inline-block w-1.5 h-1.5 bg-[#ff00ff] rounded-full mr-2"></span>
+          Balance check: 0x388...9297 (Optimism)
         </button>
       </div>
     </div>
