@@ -657,10 +657,11 @@ function HoneyPot() {
                   Honeypot Check
                 </Link>
                 <Link
-                  href="/agent"
-                  className={`${pixelMonoFont.className} text-lg text-[#00ffff] hover:text-[#00ffff] transition-colors`}
+                  // href="/agent"
+                  href="#"
+                  className={`${pixelMonoFont.className} text-lg text-[#00ffff]/60 hover:text-[#00ffff] transition-colors`}
                 >
-                  AI Agent
+                  AI Agent (Coming Soon)
                 </Link>
                 <Link
                   href="#"
@@ -764,7 +765,8 @@ function HoneyPot() {
                           Honeypot Check
                         </Link>
                         <Link
-                          href="/agent"
+                          // href="/agent"
+                          href="#"
                           className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#00ffff]/60 hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded-lg transition-colors`}
                           onClick={() => setMobileMenuOpen(false)}
                         >
@@ -782,7 +784,7 @@ function HoneyPot() {
                               d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                             />
                           </svg>
-                          AI Agent
+                          AI Agent (Coming Soon)
                         </Link>
                       </div>
 
