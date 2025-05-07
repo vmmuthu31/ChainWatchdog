@@ -1154,12 +1154,6 @@ export default function Home() {
                           >
                             NO TOKENS FOUND
                           </h3>
-                          <p
-                            className={`${pixelMonoFont.className} text-[#00ff00] max-w-sm mx-auto`}
-                          >
-                            No tokens match your current filter. Try selecting a
-                            different filter option.
-                          </p>
                         </div>
                       );
                     }
