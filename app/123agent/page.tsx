@@ -1747,7 +1747,7 @@ export default function AgentPage() {
               <h1
                 className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl text-[#00ffff] mb-1`}
               >
-                CRYPTO AI ASSISTANT
+                RugProof AI{" "}
               </h1>
               <p
                 className={`${pixelMonoFont.className} text-base text-[#00ff00]/80`}
