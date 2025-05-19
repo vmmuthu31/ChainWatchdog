@@ -157,3 +157,76 @@
     box-shadow: 0 0 0 1000px #000000 inset !important;
   }
 }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulseSlow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 3s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animation-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.glow-green-sm {
+  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+.glow-green-md {
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+}
+
+.glow-cyan-sm {
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+.glow-red-sm {
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+}
+
+body {
+  background-color: #000;
+  background-image: linear-gradient(rgba(0, 255, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 0, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
