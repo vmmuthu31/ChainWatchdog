@@ -1,8 +1,5 @@
 "use client";
 
-import { Press_Start_2P, VT323 } from "next/font/google";
-import Image from "next/image";
-import Link from "next/link";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
@@ -12,186 +9,27 @@ import {
   CheckCircle,
   ExternalLink,
   Info,
-  X,
 } from "lucide-react";
-import WalletConnect from "@/components/WalletConnect";
-
-const pixelFont = Press_Start_2P({
-  weight: "400",
-  subsets: ["latin"],
-});
-
-const pixelMonoFont = VT323({
-  weight: "400",
-  subsets: ["latin"],
-});
-
-// Define proper types for the API responses
-interface Token {
-  name: string;
-  symbol: string;
-  decimals: number;
-  address: string;
-  totalHolders: number;
-}
-
-interface WithToken {
-  name: string;
-  symbol: string;
-  decimals: number;
-  address: string;
-  totalHolders: number;
-}
-
-interface Summary {
-  risk: "very_low" | "low" | "medium" | "high" | "very_high";
-  riskLevel: number;
-}
-
-interface HoneypotResult {
-  isHoneypot: boolean;
-  honeypotReason?: string;
-}
-
-interface MaxValues {
-  token: number;
-  tokenWei: string;
-  withToken: number;
-  withTokenWei: string;
-}
-
-interface SimulationResult {
-  maxBuy?: MaxValues;
-  maxSell?: MaxValues;
-  buyTax: number;
-  sellTax: number;
-  transferTax: number;
-  buyGas: string;
-  sellGas: string;
-}
-
-interface TaxDistribution {
-  tax: number;
-  count: number;
-}
-
-interface HolderAnalysis {
-  holders: string;
-  successful: string;
-  failed: string;
-  siphoned: string;
-  averageTax: number;
-  averageGas: number;
-  highestTax: number;
-  highTaxWallets: string;
-  taxDistribution: TaxDistribution[];
-}
-
-interface ContractCode {
-  openSource: boolean;
-  rootOpenSource: boolean;
-  isProxy: boolean;
-  hasProxyCalls: boolean;
-}
-
-interface Chain {
-  id: string;
-  name: string;
-  shortName: string;
-  currency: string;
-}
-
-interface PairInfo {
-  name: string;
-  address: string;
-  token0: string;
-  token1: string;
-  type: "UniswapV2" | "UniswapV3";
-}
-
-interface Pair {
-  pair: PairInfo;
-  chainId: string;
-  reserves0: string;
-  reserves1: string;
-  liquidity: number;
-  router: string;
-  createdAtTimestamp: string;
-  creationTxHash: string;
-}
-
-interface HoneypotResponse {
-  token: Token;
-  withToken?: WithToken;
-  summary: Summary;
-  simulationSuccess: boolean;
-  simulationError?: string;
-  honeypotResult: HoneypotResult;
-  simulationResult: SimulationResult;
-  holderAnalysis?: HolderAnalysis;
-  flags: string[];
-  contractCode?: ContractCode;
-  chain: Chain;
-  router?: string;
-  pair?: Pair;
-  pairAddress?: string;
-}
-
-// Contract verification response type
-interface ContractVerificationResponse {
-  isContract: boolean;
-  isRootOpenSource: boolean;
-  fullCheckPerformed: boolean;
-  summary?: {
-    isOpenSource: boolean;
-    hasProxyCalls: boolean;
-  };
-  contractsOpenSource?: Record<string, boolean>;
-  contractCalls?: Array<{
-    caller: string;
-    callee: string;
-    type: string;
-  }>;
-}
-
-// Pair response type
-interface PairResponse {
-  ChainID: number;
-  Pair: {
-    Name: string;
-    Tokens: string[];
-    Address: string;
-  };
-  Reserves: number[];
-  Liquidity: number;
-  Router: string;
-}
-
-// Top holders response type
-interface Holder {
-  address: string;
-  balance: string;
-  alias: string;
-  isContract: boolean;
-}
-
-interface TopHoldersResponse {
-  totalSupply: string;
-  holders: Holder[];
-}
-
-// Supported endpoints
-type EndpointType = "honeypot" | "contract" | "pairs" | "holders";
+import Navbar from "@/components/Navbar";
+import { pixelFont, pixelMonoFont } from "@/lib/font";
+import {
+  ContractVerificationResponse,
+  EndpointType,
+  HoneypotResponse,
+  PairResponse,
+  TopHoldersResponse,
+} from "@/lib/types";
+import Footer from "@/components/Footer";
 
 function HoneyPot() {
   const searchParams = useSearchParams();
 
   const [isLoading, setIsLoading] = useState(false);
   const [contractAddress, setContractAddress] = useState("");
-  const [selectedChain, setSelectedChain] = useState("1"); // Default to Ethereum
-  const [autoDetectChain, setAutoDetectChain] = useState(true); // New state for auto-detection toggle
-  const [detectedChain, setDetectedChain] = useState<string | null>(null); // Track detected chain
-  const [isDetectingChain, setIsDetectingChain] = useState(false); // For detection loading state
+  const [selectedChain, setSelectedChain] = useState("1");
+  const [autoDetectChain, setAutoDetectChain] = useState(true);
+  const [detectedChain, setDetectedChain] = useState<string | null>(null);
+  const [isDetectingChain, setIsDetectingChain] = useState(false);
   const [endpoint, setEndpoint] = useState<EndpointType>("honeypot");
   const [honeypotResult, setHoneypotResult] = useState<HoneypotResponse | null>(
     null
@@ -203,65 +41,8 @@ function HoneyPot() {
     null
   );
   const [error, setError] = useState<string | null>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [initialQueryHandled, setInitialQueryHandled] = useState(false);
 
-  // Handle URL query parameters
-  useEffect(() => {
-    const address = searchParams.get("address");
-    const chainId = searchParams.get("chainId");
-
-    if (address && !initialQueryHandled) {
-      setContractAddress(address);
-
-      if (chainId) {
-        setSelectedChain(chainId);
-        setAutoDetectChain(false);
-        setDetectedChain(chainId);
-      }
-
-      // Automatically run the check with the provided parameters
-      const runInitialCheck = async () => {
-        setIsLoading(true);
-        setError(null);
-
-        try {
-          const chainToUse = chainId || selectedChain;
-          const honeypotData = await fetchHoneypotData(address, chainToUse);
-          setHoneypotResult(honeypotData);
-        } catch (err) {
-          const errorMessage =
-            err instanceof Error
-              ? err.message
-              : "Failed to check contract. Please try again.";
-          setError(errorMessage);
-          console.error(err);
-        } finally {
-          setIsLoading(false);
-          setInitialQueryHandled(true);
-        }
-      };
-
-      runInitialCheck();
-    }
-  }, [searchParams, initialQueryHandled]);
-
-  // Handle mobile menu click outside
-  const handleClickOutside = (event: React.MouseEvent<HTMLDivElement>) => {
-    const mobileMenuElement = document.getElementById("mobile-menu-container");
-    const mobileMenuButton = document.getElementById("mobile-menu-button");
-
-    if (
-      mobileMenuElement &&
-      !mobileMenuElement.contains(event.target as Node) &&
-      mobileMenuButton &&
-      !mobileMenuButton.contains(event.target as Node)
-    ) {
-      setMobileMenuOpen(false);
-    }
-  };
-
-  // Chain detection function
   const detectChain = async (address: string) => {
     if (!address || address.length < 42) return null;
 
@@ -308,10 +89,8 @@ function HoneyPot() {
     ];
 
     try {
-      // Try block explorers directly - the most reliable method
       for (const chainObj of chainsToCheck) {
         try {
-          // Special case for Avalanche - using Glacier API
           if (chainObj.id === "43114") {
             try {
               const response = await fetch(
@@ -326,9 +105,6 @@ function HoneyPot() {
               if (response.ok) {
                 const data = await response.json();
                 if (data && data.address) {
-                  console.log(
-                    `Contract found on ${chainObj.name} via Glacier API`
-                  );
                   setDetectedChain(chainObj.id);
                   setSelectedChain(chainObj.id);
                   setIsDetectingChain(false);
@@ -336,19 +112,17 @@ function HoneyPot() {
                 }
               }
             } catch (error) {
-              console.log(`Error checking Glacier API for Avalanche:`, error);
+              console.error(`Error checking Glacier API for Avalanche:`, error);
             }
             continue;
           }
 
-          // Standard approach for all other chains
           const explorerResponse = await fetch(
             `${chainObj.explorer}/api?module=contract&action=getabi&address=${address}&apikey=${chainObj.apikey}`
           );
 
           if (explorerResponse.ok) {
             const explorerData = await explorerResponse.json();
-            // Different explorers may have slightly different response formats
             if (
               explorerData.status === "1" ||
               (explorerData.result &&
@@ -356,7 +130,6 @@ function HoneyPot() {
                 explorerData.result !== "" &&
                 explorerData.result !== null)
             ) {
-              console.log(`Contract found on ${chainObj.name} via explorer`);
               setDetectedChain(chainObj.id);
               setSelectedChain(chainObj.id);
               setIsDetectingChain(false);
@@ -364,17 +137,15 @@ function HoneyPot() {
             }
           }
         } catch (error) {
-          console.log(
+          console.error(
             `Error checking explorer for chain ${chainObj.id} (${chainObj.name}):`,
             error
           );
         }
       }
 
-      // Secondary approach: Just check if the address exists (not necessarily as a contract)
       for (const chainObj of chainsToCheck) {
         try {
-          // Skip Avalanche here as we've already checked with Glacier API
           if (chainObj.id === "43114") continue;
 
           const response = await fetch(
@@ -384,10 +155,6 @@ function HoneyPot() {
           if (response.ok) {
             const data = await response.json();
             if (data.status === "1") {
-              console.log(
-                `Address found on ${chainObj.name} with balance ${data.result}`
-              );
-              // Even if it's just an EOA, at least we know the address exists on this chain
               setDetectedChain(chainObj.id);
               setSelectedChain(chainObj.id);
               setIsDetectingChain(false);
@@ -395,15 +162,13 @@ function HoneyPot() {
             }
           }
         } catch (error) {
-          console.log(
+          console.error(
             `Error checking account balance for chain ${chainObj.id}:`,
             error
           );
         }
       }
 
-      // If we couldn't detect the chain, default to Ethereum
-      console.log("Couldn't detect chain, defaulting to null");
       setIsDetectingChain(false);
       return null;
     } catch (error) {
@@ -413,31 +178,6 @@ function HoneyPot() {
     }
   };
 
-  // Handle contract address change
-  useEffect(() => {
-    // Don't run auto-detection if we're handling initial query params
-    if (initialQueryHandled) {
-      // Debounce the chain detection to avoid too many API calls
-      const timer = setTimeout(() => {
-        if (
-          contractAddress &&
-          contractAddress.length >= 42 &&
-          autoDetectChain
-        ) {
-          detectChain(contractAddress);
-        }
-      }, 500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [contractAddress, autoDetectChain, initialQueryHandled]);
-
-  // The chain detection system uses blockchain explorers directly:
-  // - Standard explorers (Etherscan, BSCScan, etc.) for most chains
-  // - Glacier API for Avalanche
-  // This provides reliable cross-chain contract detection without requiring user input
-
-  // Get chain name from ID
   const getChainName = (chainId: string) => {
     switch (chainId) {
       case "1":
@@ -561,7 +301,6 @@ function HoneyPot() {
     setHoldersResult(null);
 
     try {
-      // If auto-detect is on and we don't have a detected chain yet, try to detect it
       if (autoDetectChain && !detectedChain && !isDetectingChain) {
         const chainId = await detectChain(contractAddress);
         if (chainId) {
@@ -611,199 +350,65 @@ function HoneyPot() {
     }
   };
 
+  useEffect(() => {
+    const address = searchParams.get("address");
+    const chainId = searchParams.get("chainId");
+
+    if (address && !initialQueryHandled) {
+      setContractAddress(address);
+
+      if (chainId) {
+        setSelectedChain(chainId);
+        setAutoDetectChain(false);
+        setDetectedChain(chainId);
+      }
+
+      const runInitialCheck = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+          const chainToUse = chainId || selectedChain;
+          const honeypotData = await fetchHoneypotData(address, chainToUse);
+          setHoneypotResult(honeypotData);
+        } catch (err) {
+          const errorMessage =
+            err instanceof Error
+              ? err.message
+              : "Failed to check contract. Please try again.";
+          setError(errorMessage);
+          console.error(err);
+        } finally {
+          setIsLoading(false);
+          setInitialQueryHandled(true);
+        }
+      };
+
+      runInitialCheck();
+    }
+  }, [searchParams, initialQueryHandled]);
+
+  useEffect(() => {
+    if (initialQueryHandled) {
+      const timer = setTimeout(() => {
+        if (
+          contractAddress &&
+          contractAddress.length >= 42 &&
+          autoDetectChain
+        ) {
+          detectChain(contractAddress);
+        }
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [contractAddress, autoDetectChain, initialQueryHandled]);
+
   return (
     <Suspense>
-      <div
-        className="flex min-h-screen flex-col items-center bg-black text-white"
-        onClick={handleClickOutside}
-      >
+      <div className="flex min-h-screen flex-col items-center bg-black text-white">
         {/* Header */}
-        <header className="w-full border-b border-[#ffa500]/20 backdrop-blur-md bg-black/50 p-3 sm:p-4 md:p-5 sticky top-0 z-50">
-          <div className="container mx-auto px-2 flex items-center justify-between">
-            {/* Left section - Logo */}
-            <div className="flex items-center">
-              <Link
-                href="/"
-                className="flex items-center gap-1.5 sm:gap-2 md:gap-3"
-              >
-                <Image
-                  src="/logo.png"
-                  alt="RugProof Logo"
-                  width={40}
-                  height={40}
-                  className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]"
-                />
-                <h1
-                  className={`${pixelFont.className} text-sm sm:text-lg md:text-2xl font-bold bg-gradient-to-r from-[#00ff00] to-[#00ffff] bg-clip-text text-transparent glow-green-sm`}
-                >
-                  RugProof
-                </h1>
-              </Link>
-            </div>
-
-            {/* Center section - Navigation (Desktop only) */}
-            <nav className="hidden md:flex items-center justify-center flex-1">
-              <div className="flex items-center space-x-8">
-                <Link
-                  href="/"
-                  className={`${pixelMonoFont.className} text-lg text-[#00ff00] hover:text-[#00ffff] transition-colors`}
-                >
-                  Spam Detector
-                </Link>
-                <Link
-                  href="/honeypot"
-                  className={`${pixelMonoFont.className} text-lg text-[#ffa500] hover:text-[#ffcc00] border-b-2 border-[#ffa500] pb-1 transition-colors`}
-                >
-                  Honeypot Check
-                </Link>
-                <Link
-                  // href="/agent"
-                  href="#"
-                  className={`${pixelMonoFont.className} text-lg text-[#00ffff]/60 hover:text-[#00ffff] transition-colors`}
-                >
-                  AI Agent (Coming Soon)
-                </Link>
-                <Link
-                  href="#"
-                  className={`${pixelMonoFont.className} text-lg text-[#00ffff]/60 hover:text-[#00ffff] transition-colors`}
-                >
-                  Chrome Extension (Soon)
-                </Link>
-              </div>
-            </nav>
-
-            {/* Right section - Desktop Wallet connect and Mobile Menu */}
-            <div className="flex items-center gap-2">
-              {/* Desktop Wallet Connect */}
-              <div className="hidden md:block">
-                <WalletConnect />
-              </div>
-
-              {/* Mobile navigation button */}
-              <div className="block md:hidden relative z-50">
-                <button
-                  id="mobile-menu-button"
-                  className="btn btn-sm btn-circle bg-[#ffa500]/10 hover:bg-[#ffa500]/20 border border-[#ffa500]/40 text-[#ffa500]"
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 6h16M4 12h16M4 18h7"
-                    />
-                  </svg>
-                </button>
-
-                {/* Mobile Menu Dropdown */}
-                {mobileMenuOpen && (
-                  <div
-                    id="mobile-menu-container"
-                    className="z-[100] bg-black/95 backdrop-blur-md rounded-xl shadow-[0_0_15px_rgba(255,165,0,0.3)] border border-[#ffa500]/30 fixed top-16 right-2 w-72 overflow-hidden"
-                  >
-                    <div className="flex flex-col p-4 space-y-4 max-h-[80vh] overflow-y-auto">
-                      {/* Close button */}
-                      <button
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="absolute top-2 right-2 text-[#ffa500] hover:text-[#ffcc00] p-2"
-                      >
-                        <X className="h-6 w-6" />
-                      </button>
-
-                      {/* Mobile Navigation Menu */}
-                      <div className="space-y-4 mt-2">
-                        <div className="px-2 py-1 text-[#00ffff] text-sm font-semibold uppercase">
-                          Navigation
-                        </div>
-                        <Link
-                          href="/"
-                          className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#00ff00] hover:text-[#00ffff] hover:bg-[#00ff00]/10 rounded-lg transition-colors`}
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                            />
-                          </svg>
-                          Spam Detector
-                        </Link>
-                        <Link
-                          href="/honeypot"
-                          className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#ffa500] hover:text-[#ffcc00] bg-[#ffa500]/10 rounded-lg transition-colors`}
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                            />
-                          </svg>
-                          Honeypot Check
-                        </Link>
-                        <Link
-                          // href="/agent"
-                          href="#"
-                          className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#00ffff]/60 hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded-lg transition-colors`}
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                            />
-                          </svg>
-                          AI Agent (Coming Soon)
-                        </Link>
-                      </div>
-
-                      {/* Mobile Wallet Connect */}
-                      <div className="border-t border-[#ffa500]/20 pt-4 mt-2">
-                        <div className="px-2 py-1 text-[#00ffff] text-sm font-semibold uppercase mb-3">
-                          Wallet
-                        </div>
-                        <div className="p-2">
-                          <WalletConnect />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </header>
+        <Navbar />
 
         <main className="container mx-auto flex flex-1 flex-col items-center justify-center gap-6 sm:gap-10 p-3 sm:p-4 md:p-8">
           <div className="text-center space-y-6 max-w-2xl relative">
@@ -2025,130 +1630,7 @@ function HoneyPot() {
         </div>
 
         {/* Footer */}
-        <footer className="w-full border-t border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-4 sm:p-6 md:p-8 text-center mt-10">
-          <div className="max-w-6xl mx-auto px-3 sm:px-4">
-            <div className="flex flex-col md:flex-row md:justify-between gap-6 sm:gap-8 py-4">
-              {/* Logo and Brand */}
-              <div className="flex flex-col items-center md:items-start">
-                <div className="flex items-center gap-3 mb-4">
-                  <Image
-                    src="/logo.png"
-                    alt="RugProof Logo"
-                    width={40}
-                    height={40}
-                    className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]"
-                  />
-                  <p
-                    className={`${pixelFont.className} text-2xl sm:text-3xl font-semibold text-[#00ff00]`}
-                  >
-                    RugProof
-                  </p>
-                </div>
-                <p
-                  className={`${pixelMonoFont.className} text-base sm:text-lg text-[#00ffff] mb-4 sm:text-left`}
-                >
-                  RETRO FUTURISM IN DIGITAL FORM
-                </p>
-              </div>
-
-              {/* About */}
-              <div className="flex flex-col items-center md:items-end max-w-md">
-                <p
-                  className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400 sm:text-right leading-relaxed`}
-                >
-                  RugProof helps you identify and protect against crypto scams,
-                  spam tokens, and honeypots across multiple blockchains.
-                </p>
-                <div className="mt-4 flex flex-wrap items-center justify-center md:justify-end gap-3">
-                  <span
-                    className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
-                  >
-                    Built by{" "}
-                    <span className="text-[#00ffff] font-medium">ForgeX</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-[#00ff00]/10 mt-4 pt-4 flex flex-col sm:flex-row justify-between items-center">
-              <p
-                className={`${pixelMonoFont.className} text-base text-gray-500`}
-              >
-                © {new Date().getFullYear()} RugProof. All rights reserved.
-              </p>
-              <div className="flex mt-3 sm:mt-0 gap-4">
-                <Link
-                  href="/"
-                  className={`${pixelMonoFont.className} text-base text-[#00ff00] hover:text-[#00ffff] transition-colors`}
-                >
-                  SPAM DETECTION
-                </Link>
-                <Link
-                  href="/honeypot"
-                  className={`${pixelMonoFont.className} text-base text-[#ffa500] hover:text-[#ffcc00] transition-colors`}
-                >
-                  HONEYPOT CHECKER
-                </Link>
-              </div>
-            </div>
-          </div>
-        </footer>
-
-        <style jsx global>{`
-          @keyframes fadeInUp {
-            from {
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-            }
-            to {
-              opacity: 1;
-            }
-          }
-
-          @keyframes pulseSlow {
-            0%,
-            100% {
-              opacity: 1;
-            }
-            50% {
-              opacity: 0.8;
-            }
-          }
-
-          .animate-pulse-slow {
-            animation: pulseSlow 3s ease-in-out infinite;
-          }
-
-          .animate-fade-in-up {
-            animation: fadeInUp 0.6s ease-out forwards;
-          }
-
-          .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-          }
-
-          .animation-delay-100 {
-            animation-delay: 0.1s;
-          }
-
-          .glow-green-sm {
-            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
-          }
-
-          .glow-red-sm {
-            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
-          }
-        `}</style>
+        <Footer />
       </div>
     </Suspense>
   );

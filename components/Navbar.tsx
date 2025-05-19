@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import WalletConnect from "./WalletConnect";
 import { pixelFont, pixelMonoFont } from "@/lib/font";
 import { useEffect, useState } from "react";
@@ -7,6 +8,91 @@ import { X } from "lucide-react";
 
 function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const navItems = [
+    {
+      href: "/",
+      label: "Spam Detector",
+      color: "text-[#00ff00]",
+      hoverColor: "hover:text-[#00ffff]",
+      borderColor: "border-[#00ff00]",
+      bgHoverColor: "hover:bg-[#00ff00]/10",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+          />
+        </svg>
+      ),
+    },
+    {
+      href: "/honeypot",
+      label: "Honeypot Check",
+      color: "text-[#ffa500]",
+      hoverColor: "hover:text-[#ffcc00]",
+      borderColor: "border-[#ffa500]",
+      bgHoverColor: "hover:bg-[#ffa500]/10",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+          />
+        </svg>
+      ),
+    },
+    {
+      href: "#",
+      label: "AI Agent (Coming Soon)",
+      color: "text-[#00ffff]/60",
+      hoverColor: "hover:text-[#00ffff]",
+      borderColor: "border-[#00ffff]",
+      bgHoverColor: "hover:bg-[#00ffff]/10",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          />
+        </svg>
+      ),
+    },
+    {
+      href: "#",
+      label: "Chrome Extension (Soon)",
+      color: "text-[#00ffff]/60",
+      hoverColor: "hover:text-[#00ffff]",
+      borderColor: "border-[#00ffff]",
+      bgHoverColor: "hover:bg-[#00ffff]/10",
+      icon: null,
+    },
+  ];
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -32,10 +118,10 @@ function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [mobileMenuOpen]);
+
   return (
     <header className="w-full border-b border-[#ffa500]/20 backdrop-blur-md bg-black/50 p-3 sm:p-4 md:p-5 sticky top-0 z-50">
       <div className="container mx-auto px-2 flex items-center justify-between">
-        {/* Left section - Logo */}
         <div className="flex items-center">
           <Link
             href="/"
@@ -59,42 +145,29 @@ function Navbar() {
         {/* Center section - Navigation (Desktop only) */}
         <nav className="hidden md:flex items-center justify-center flex-1">
           <div className="flex items-center space-x-8">
-            <Link
-              href="/"
-              className={`${pixelMonoFont.className} text-lg text-[#00ff00] hover:text-[#00ffff] border-b-2 border-[#00ff00] pb-1 transition-colors`}
-            >
-              Spam Detector
-            </Link>
-            <Link
-              href="/honeypot"
-              className={`${pixelMonoFont.className} text-lg text-[#ffa500] hover:text-[#ffcc00] transition-colors`}
-            >
-              Honeypot Check
-            </Link>
-            <Link
-              // href="/agent"
-              href="#"
-              className={`${pixelMonoFont.className} text-lg text-[#00ffff]/60 hover:text-[#00ffff]  transition-colors`}
-            >
-              AI Agent (Coming Soon)
-            </Link>
-            <Link
-              href="#"
-              className={`${pixelMonoFont.className} text-lg text-[#00ffff]/60 hover:text-[#00ffff] transition-colors`}
-            >
-              Chrome Extension (Soon)
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`${pixelMonoFont.className} text-lg ${item.color} ${
+                  item.hoverColor
+                } transition-colors ${
+                  pathname === item.href
+                    ? `border-b-2 ${item.borderColor} pb-1`
+                    : ""
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
         </nav>
 
-        {/* Right section - Desktop Wallet connect and Mobile Menu */}
         <div className="flex items-center gap-2">
-          {/* Desktop Wallet Connect */}
           <div className="hidden md:block">
             <WalletConnect />
           </div>
 
-          {/* Mobile navigation button */}
           <div className="block md:hidden relative z-50">
             <button
               id="mobile-menu-button"
@@ -117,14 +190,12 @@ function Navbar() {
               </svg>
             </button>
 
-            {/* Mobile Menu Dropdown */}
             {mobileMenuOpen && (
               <div
                 id="mobile-menu-container"
                 className="z-[100] bg-black/95 backdrop-blur-md rounded-xl shadow-[0_0_15px_rgba(0,255,0,0.3)] border border-[#00ff00]/30 fixed top-16 right-2 w-72 overflow-hidden"
               >
                 <div className="flex flex-col p-4 space-y-4 max-h-[80vh] overflow-y-auto">
-                  {/* Close button */}
                   <button
                     onClick={() => setMobileMenuOpen(false)}
                     className="absolute top-2 right-2 text-[#00ff00] hover:text-[#00ffff] p-2"
@@ -132,78 +203,33 @@ function Navbar() {
                     <X className="h-6 w-6" />
                   </button>
 
-                  {/* Mobile Navigation Menu */}
                   <div className="space-y-4 mt-2">
                     <div className="px-2 py-1 text-[#00ffff] text-sm font-semibold uppercase">
                       Navigation
                     </div>
-                    <Link
-                      href="/"
-                      className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#00ff00] hover:text-[#00ffff] hover:bg-[#00ff00]/10 rounded-lg transition-colors`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                    {navItems.map((item) => (
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        className={`${
+                          pixelMonoFont.className
+                        } flex items-center gap-2 px-4 py-3 text-lg ${
+                          item.color
+                        } ${item.hoverColor} ${
+                          item.bgHoverColor
+                        } rounded-lg transition-colors ${
+                          pathname === item.href
+                            ? `bg-opacity-20 ${item.bgHoverColor}`
+                            : ""
+                        }`}
+                        onClick={() => setMobileMenuOpen(false)}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                        />
-                      </svg>
-                      Spam Detector
-                    </Link>
-                    <Link
-                      href="/honeypot"
-                      className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#ffa500] hover:text-[#ffcc00] hover:bg-[#ffa500]/10 rounded-lg transition-colors`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                        />
-                      </svg>
-                      Honeypot Check
-                    </Link>
-                    <Link
-                      // href="/agent"
-                      href="#"
-                      className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#00ffff]/60 hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded-lg transition-colors`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                        />
-                      </svg>
-                      AI Agent (Coming Soon)
-                    </Link>
+                        {item.icon}
+                        {item.label}
+                      </Link>
+                    ))}
                   </div>
 
-                  {/* Mobile Wallet Connect */}
                   <div className="border-t border-[#00ff00]/20 pt-4 mt-2">
                     <div className="px-2 py-1 text-[#00ffff] text-sm font-semibold uppercase mb-3">
                       Wallet
