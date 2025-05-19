@@ -1,8 +1,12 @@
 import { pixelFont, pixelMonoFont } from "@/lib/font";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 function Footer() {
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
+
   return (
     <footer className="w-full border-t border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-4 sm:p-6 md:p-8 text-center mt-10">
       <div className="max-w-6xl mx-auto px-3 sm:px-4">
@@ -37,18 +41,22 @@ function Footer() {
               tokens, and honeypots across multiple blockchains.
             </p>
             <div className="mt-4 flex flex-wrap items-center justify-center md:justify-end gap-3">
-              <span
-                className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
-              >
-                Powered by{" "}
-                <Link
-                  href="https://goldrush.dev/docs/resources/enhanced-spam-lists"
-                  className="text-[#ff00ff] font-medium"
-                >
-                  Covalent
-                </Link>
-              </span>
-              <span className="text-gray-500 mx-1">•</span>
+              {isHomePage && (
+                <>
+                  <span
+                    className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
+                  >
+                    Powered by{" "}
+                    <Link
+                      href="https://goldrush.dev/docs/resources/enhanced-spam-lists"
+                      className="text-[#ff00ff] font-medium"
+                    >
+                      Covalent
+                    </Link>
+                  </span>
+                  <span className="text-gray-500 mx-1">•</span>
+                </>
+              )}
               <span
                 className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
               >
