@@ -1,6 +1,5 @@
 "use client";
 
-import { Press_Start_2P, VT323 } from "next/font/google";
 import { TokenInputForm } from "@/components/token-input-form";
 import GoldRushServices, {
   type GoldRushResponse,
@@ -17,24 +16,14 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-import WalletConnect from "@/components/WalletConnect";
 import Image from "next/image";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { RecentSpamTokens } from "@/components/RecentSpamTokens";
 import Link from "next/link";
+import { pixelFont, pixelMonoFont } from "@/lib/font";
+import Navbar from "@/components/Navbar";
 
-const pixelFont = Press_Start_2P({
-  weight: "400",
-  subsets: ["latin"],
-});
-
-const pixelMonoFont = VT323({
-  weight: "400",
-  subsets: ["latin"],
-});
-
-// Add this component near the top of your file after imports
 const TokenLogo = ({
   src,
   alt,
@@ -46,7 +35,6 @@ const TokenLogo = ({
 }) => {
   const [error, setError] = useState(false);
 
-  // If no src or error occurred, show fallback
   if (!src || error) {
     return (
       <div
@@ -74,7 +62,7 @@ const TokenLogo = ({
         height={size}
         className="object-cover"
         onError={() => setError(true)}
-        unoptimized // This helps with external image sources
+        unoptimized
       />
     </div>
   );
@@ -95,7 +83,6 @@ export default function Home() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [walletTokens, setWalletTokens] = useState<any[]>([]);
   const [isLoadingWalletTokens, setIsLoadingWalletTokens] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // List of supported chains for spam data
   const spamSupportedChainIds = [
@@ -138,31 +125,6 @@ export default function Home() {
       fetchWalletTokens(walletAddress);
     }
   }, [isConnected, walletAddress, activeTab, selectedChain]);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      const mobileMenuElement = document.getElementById(
-        "mobile-menu-container"
-      );
-      if (
-        mobileMenuElement &&
-        !mobileMenuElement.contains(event.target as Node) &&
-        !document
-          .getElementById("mobile-menu-button")
-          ?.contains(event.target as Node)
-      ) {
-        setMobileMenuOpen(false);
-      }
-    }
-
-    if (mobileMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [mobileMenuOpen]);
 
   const fetchWalletTokens = async (address: string) => {
     setIsLoadingWalletTokens(true);
@@ -389,192 +351,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-black text-white">
-      <header className="w-full border-b border-[#ffa500]/20 backdrop-blur-md bg-black/50 p-3 sm:p-4 md:p-5 sticky top-0 z-50">
-        <div className="container mx-auto px-2 flex items-center justify-between">
-          {/* Left section - Logo */}
-          <div className="flex items-center">
-            <Link
-              href="/"
-              className="flex items-center gap-1.5 sm:gap-2 md:gap-3"
-            >
-              <Image
-                src="/logo.png"
-                alt="RugProof Logo"
-                width={40}
-                height={40}
-                className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]"
-              />
-              <h1
-                className={`${pixelFont.className} text-sm sm:text-lg md:text-2xl font-bold bg-gradient-to-r from-[#00ff00] to-[#00ffff] bg-clip-text text-transparent glow-green-sm`}
-              >
-                RugProof
-              </h1>
-            </Link>
-          </div>
-
-          {/* Center section - Navigation (Desktop only) */}
-          <nav className="hidden md:flex items-center justify-center flex-1">
-            <div className="flex items-center space-x-8">
-              <Link
-                href="/"
-                className={`${pixelMonoFont.className} text-lg text-[#00ff00] hover:text-[#00ffff] border-b-2 border-[#00ff00] pb-1 transition-colors`}
-              >
-                Spam Detector
-              </Link>
-              <Link
-                href="/honeypot"
-                className={`${pixelMonoFont.className} text-lg text-[#ffa500] hover:text-[#ffcc00] transition-colors`}
-              >
-                Honeypot Check
-              </Link>
-              <Link
-                // href="/agent"
-                href="#"
-                className={`${pixelMonoFont.className} text-lg text-[#00ffff]/60 hover:text-[#00ffff]  transition-colors`}
-              >
-                AI Agent (Coming Soon)
-              </Link>
-              <Link
-                href="#"
-                className={`${pixelMonoFont.className} text-lg text-[#00ffff]/60 hover:text-[#00ffff] transition-colors`}
-              >
-                Chrome Extension (Soon)
-              </Link>
-            </div>
-          </nav>
-
-          {/* Right section - Desktop Wallet connect and Mobile Menu */}
-          <div className="flex items-center gap-2">
-            {/* Desktop Wallet Connect */}
-            <div className="hidden md:block">
-              <WalletConnect />
-            </div>
-
-            {/* Mobile navigation button */}
-            <div className="block md:hidden relative z-50">
-              <button
-                id="mobile-menu-button"
-                className="btn btn-sm btn-circle bg-[#00ff00]/10 hover:bg-[#00ff00]/20 border border-[#00ff00]/40 text-[#00ff00]"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h7"
-                  />
-                </svg>
-              </button>
-
-              {/* Mobile Menu Dropdown */}
-              {mobileMenuOpen && (
-                <div
-                  id="mobile-menu-container"
-                  className="z-[100] bg-black/95 backdrop-blur-md rounded-xl shadow-[0_0_15px_rgba(0,255,0,0.3)] border border-[#00ff00]/30 fixed top-16 right-2 w-72 overflow-hidden"
-                >
-                  <div className="flex flex-col p-4 space-y-4 max-h-[80vh] overflow-y-auto">
-                    {/* Close button */}
-                    <button
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="absolute top-2 right-2 text-[#00ff00] hover:text-[#00ffff] p-2"
-                    >
-                      <X className="h-6 w-6" />
-                    </button>
-
-                    {/* Mobile Navigation Menu */}
-                    <div className="space-y-4 mt-2">
-                      <div className="px-2 py-1 text-[#00ffff] text-sm font-semibold uppercase">
-                        Navigation
-                      </div>
-                      <Link
-                        href="/"
-                        className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#00ff00] hover:text-[#00ffff] hover:bg-[#00ff00]/10 rounded-lg transition-colors`}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                          />
-                        </svg>
-                        Spam Detector
-                      </Link>
-                      <Link
-                        href="/honeypot"
-                        className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#ffa500] hover:text-[#ffcc00] hover:bg-[#ffa500]/10 rounded-lg transition-colors`}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                          />
-                        </svg>
-                        Honeypot Check
-                      </Link>
-                      <Link
-                        // href="/agent"
-                        href="#"
-                        className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#00ffff]/60 hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded-lg transition-colors`}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                          />
-                        </svg>
-                        AI Agent (Coming Soon)
-                      </Link>
-                    </div>
-
-                    {/* Mobile Wallet Connect */}
-                    <div className="border-t border-[#00ff00]/20 pt-4 mt-2">
-                      <div className="px-2 py-1 text-[#00ffff] text-sm font-semibold uppercase mb-3">
-                        Wallet
-                      </div>
-                      <div className="p-2">
-                        <WalletConnect />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="container mx-auto flex flex-1 flex-col items-center justify-center gap-6 sm:gap-10 p-3 sm:p-4 md:p-8">
         <div className="text-center space-y-6 max-w-2xl relative">
