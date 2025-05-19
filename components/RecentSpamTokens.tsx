@@ -17,7 +17,6 @@ const pixelMonoFont = VT323({
   subsets: ["latin"],
 });
 
-// Network configuration
 const networkMapping: Record<
   string,
   { id: string; name: string; yamlPath: string; nftYamlPath: string }
@@ -89,12 +88,9 @@ interface RecentSpamTokensProps {
   chainId?: string;
 }
 
-// Client-side cache for YAML content
 const yamlCache: Record<string, { SpamContracts?: string[] }> = {};
 
-// Add renderChainNotification function
 const renderChainNotification = (chainId: string | undefined) => {
-  // Only in the recent spam tab, show a message when using unsupported chain
   const supportedChainIds = [
     "eth-mainnet",
     "bsc-mainnet",
@@ -132,7 +128,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     chainId
   );
 
-  // Function to get a random timestamp in the past
   const getRandomTimestamp = useCallback(() => {
     const now = Date.now();
     const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
@@ -142,7 +137,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     );
   }, []);
 
-  // Function to fetch a YAML file with caching
   const fetchYamlWithCache = useCallback(async (path: string) => {
     if (yamlCache[path]) {
       return yamlCache[path];
@@ -168,7 +162,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     }
   }, []);
 
-  // Function to parse spam list entries
   const parseSpamList = useCallback(
     async (networkKey: string, yamlPath: string, limit = 100) => {
       try {
@@ -181,13 +174,10 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
           contractsList.forEach((entry: string) => {
             const parts = entry.split("/");
             if (parts.length >= 2) {
-              // The actual Ethereum address is the second part (index 1)
               const address = parts[1];
-              // Score is the third part if available
               const scoreStr = parts.length > 2 ? parts[2] : "0";
               const score = parseInt(scoreStr, 10) || 0;
 
-              // Skip entries with invalid addresses
               if (!address || !address.startsWith("0x")) {
                 return;
               }
@@ -219,7 +209,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     [getRandomTimestamp, fetchYamlWithCache]
   );
 
-  // Function to fetch recent spam tokens
   const fetchRecentSpamTokens = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -228,7 +217,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
       let tokens: SpamToken[] = [];
 
       if (showRecentFromAll) {
-        // Fetch tokens from all networks
         const defaultNetworks = [
           "ETHEREUM_MAINNET",
           "BSC_MAINNET",
@@ -254,13 +242,11 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
           .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
           .slice(0, 5);
       } else if (selectedChain && chainToNetwork[selectedChain]) {
-        // Fetch tokens for specific chain
         const { networkKey } = chainToNetwork[selectedChain];
         const network = networkMapping[networkKey];
         tokens = await parseSpamList(networkKey, network.yamlPath, 10);
         tokens = tokens.slice(0, 5);
       } else {
-        // Fetch from default networks
         const defaultNetworks = [
           "ETHEREUM_MAINNET",
           "BSC_MAINNET",
@@ -298,7 +284,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     }
   }, [selectedChain, showRecentFromAll, parseSpamList]);
 
-  // Function to fetch recent spam NFTs
   const fetchRecentSpamNFTs = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -307,7 +292,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
       let nfts: SpamToken[] = [];
 
       if (showRecentFromAll) {
-        // Fetch NFTs from all networks
         const defaultNetworks = [
           "ETHEREUM_MAINNET",
           "BSC_MAINNET",
@@ -377,7 +361,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     }
   }, [selectedChain, showRecentFromAll, parseSpamList]);
 
-  // Function to handle token search
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -408,7 +391,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
           return;
         }
 
-        // Search in NFT spam list
         parsed = await fetchYamlWithCache(network.nftYamlPath);
 
         if (
@@ -426,7 +408,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
         }
       }
 
-      // If we get here, the address wasn't found
       setSearchResult({ found: false });
     } catch (err: unknown) {
       console.error("Error searching for contract:", err);

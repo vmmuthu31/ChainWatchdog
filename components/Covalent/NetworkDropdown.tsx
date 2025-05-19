@@ -1,7 +1,7 @@
 import { pixelMonoFont } from "@/lib/font";
 import { CheckCircle, ChevronDown, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import TokenLogo from "./TokenLogo";
+import TokenLogo from "../TokenLogo";
 
 const spamSupportedChainIds = [
   "eth-mainnet",

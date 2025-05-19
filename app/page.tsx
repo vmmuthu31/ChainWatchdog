@@ -22,7 +22,7 @@ import { RecentSpamTokens } from "@/components/RecentSpamTokens";
 import { pixelFont, pixelMonoFont } from "@/lib/font";
 import Navbar from "@/components/Navbar";
 import TokenLogo from "@/components/TokenLogo";
-import NetworkDropdown from "@/components/NetworkDropdown";
+import NetworkDropdown from "@/components/Covalent/NetworkDropdown";
 import Footer from "@/components/Footer";
 import CovalentChainMetrics from "@/components/Covalent/CovalentChainMetrics";
 import CovalentTabSelector from "@/components/Covalent/CovalentTabSelector";
