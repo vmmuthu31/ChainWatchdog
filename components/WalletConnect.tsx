@@ -14,7 +14,6 @@ const pixelMonoFont = VT323({
   subsets: ["latin"],
 });
 
-// Add this component to handle chain icon fallbacks
 const ChainIcon = ({ src, alt }: { src?: string; alt: string }) => {
   const [error, setError] = useState(false);
 
@@ -34,7 +33,7 @@ const ChainIcon = ({ src, alt }: { src?: string; alt: string }) => {
       height={16}
       className="object-cover"
       onError={() => setError(true)}
-      unoptimized // This helps with external images
+      unoptimized
     />
   );
 };
