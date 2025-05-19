@@ -2,12 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import WalletConnect from "./WalletConnect";
+import WaitlistDialog from "./WaitlistDialog";
 import { pixelFont, pixelMonoFont } from "@/lib/font";
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 
 function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
   const pathname = usePathname();
 
   const navItems = [
@@ -60,9 +62,9 @@ function Navbar() {
       ),
     },
     {
-      href: "#",
-      label: "AI Agent (Coming Soon)",
-      color: "text-[#00ffff]/60",
+      onClick: () => setWaitlistOpen(true), // Add onClick handler
+      label: "AI Agent",
+      color: "text-[#00ffff]",
       hoverColor: "hover:text-[#00ffff]",
       borderColor: "border-[#00ffff]",
       bgHoverColor: "hover:bg-[#00ffff]/10",
@@ -82,6 +84,7 @@ function Navbar() {
           />
         </svg>
       ),
+      badge: "Join Waitlist",
     },
     {
       href: "#",
@@ -142,23 +145,44 @@ function Navbar() {
           </Link>
         </div>
 
-        {/* Center section - Navigation (Desktop only) */}
         <nav className="hidden md:flex items-center justify-center flex-1">
           <div className="flex items-center space-x-8">
             {navItems.map((item) => (
-              <Link
+              <div
                 key={item.label}
-                href={item.href}
-                className={`${pixelMonoFont.className} text-lg ${item.color} ${
-                  item.hoverColor
-                } transition-colors ${
-                  pathname === item.href
-                    ? `border-b-2 ${item.borderColor} pb-1`
-                    : ""
-                }`}
+                className="relative group"
+                onClick={item.onClick}
               >
-                {item.label}
-              </Link>
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    className={`${pixelMonoFont.className} text-lg ${
+                      item.color
+                    } ${item.hoverColor} transition-colors ${
+                      pathname === item.href
+                        ? `border-b-2 ${item.borderColor} pb-1`
+                        : ""
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <button
+                    className={`${pixelMonoFont.className} text-lg ${item.color} ${item.hoverColor} transition-colors`}
+                  >
+                    {item.label}
+                  </button>
+                )}
+                {item.badge && (
+                  <span className="ml-2 inline-flex px-2 py-0.5 text-xs font-medium bg-[#00ffff]/10 text-[#00ffff] border border-[#00ffff]/40 rounded-md shadow-[0_0_10px_rgba(0,255,255,0.3)] backdrop-blur-sm animate-pulse transform hover:scale-105 transition-all duration-300">
+                    <span className="relative inline-flex items-center">
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#00ffff] rounded-full animate-ping"></span>
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#00ffff] rounded-full"></span>
+                      <span className="ml-3">{item.badge}</span>
+                    </span>
+                  </span>
+                )}
+              </div>
             ))}
           </div>
         </nav>
@@ -208,25 +232,49 @@ function Navbar() {
                       Navigation
                     </div>
                     {navItems.map((item) => (
-                      <Link
+                      <div
                         key={item.label}
-                        href={item.href}
-                        className={`${
-                          pixelMonoFont.className
-                        } flex items-center gap-2 px-4 py-3 text-lg ${
-                          item.color
-                        } ${item.hoverColor} ${
-                          item.bgHoverColor
-                        } rounded-lg transition-colors ${
-                          pathname === item.href
-                            ? `bg-opacity-20 ${item.bgHoverColor}`
-                            : ""
-                        }`}
-                        onClick={() => setMobileMenuOpen(false)}
+                        className="relative"
+                        onClick={() => {
+                          if (item.onClick) {
+                            item.onClick();
+                            setMobileMenuOpen(false);
+                          }
+                        }}
                       >
-                        {item.icon}
-                        {item.label}
-                      </Link>
+                        {item.href ? (
+                          <Link
+                            href={item.href}
+                            className={`${
+                              pixelMonoFont.className
+                            } flex items-center gap-2 px-4 py-3 text-lg ${
+                              item.color
+                            } ${item.hoverColor} ${
+                              item.bgHoverColor
+                            } rounded-lg transition-colors ${
+                              pathname === item.href
+                                ? `bg-opacity-20 ${item.bgHoverColor}`
+                                : ""
+                            }`}
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {item.icon}
+                            {item.label}
+                          </Link>
+                        ) : (
+                          <button
+                            className={`${pixelMonoFont.className} w-full flex items-center gap-2 px-4 py-3 text-lg ${item.color} ${item.hoverColor} ${item.bgHoverColor} rounded-lg transition-colors`}
+                          >
+                            {item.icon}
+                            {item.label}
+                          </button>
+                        )}
+                        {item.badge && (
+                          <span className="absolute top-0 right-2 px-2 py-0.5 text-xs bg-[#00ffff]/20 text-[#00ffff] border border-[#00ffff]/40 rounded-full animate-pulse">
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
                     ))}
                   </div>
 
@@ -244,6 +292,11 @@ function Navbar() {
           </div>
         </div>
       </div>
+
+      <WaitlistDialog
+        isOpen={waitlistOpen}
+        onClose={() => setWaitlistOpen(false)}
+      />
     </header>
   );
 }
