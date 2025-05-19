@@ -84,7 +84,6 @@ export default function Home() {
   const [walletTokens, setWalletTokens] = useState<any[]>([]);
   const [isLoadingWalletTokens, setIsLoadingWalletTokens] = useState(false);
 
-  // List of supported chains for spam data
   const spamSupportedChainIds = [
     "eth-mainnet",
     "bsc-mainnet",
@@ -183,10 +182,7 @@ export default function Home() {
     return { evmChains, layer2Chains, nonEvmChains, otherChains };
   }, [testnetChains]);
 
-  // Add an effect to handle chain switching for the recent tab
   useEffect(() => {
-    // If in the "recent" tab and currently selected chain is not supported for spam data,
-    // automatically switch to Ethereum
     if (
       activeTab === "recent" &&
       !spamSupportedChainIds.includes(selectedChain)
@@ -195,7 +191,6 @@ export default function Home() {
     }
   }, [activeTab, selectedChain, spamSupportedChainIds]);
 
-  // Update the network dropdown filtering functions
   const filteredMainnetChains = useMemo(() => {
     const results = {
       evmChains: categorizedMainnetChains.evmChains.filter((chain) =>
@@ -212,17 +207,14 @@ export default function Home() {
       ),
     };
 
-    // Special handling for the "recent" tab - only show supported chains
     if (activeTab === "recent") {
       return {
-        // Filter to only include supported chains
         evmChains: results.evmChains.filter((chain) =>
           spamSupportedChainIds.includes(chain.id)
         ),
         layer2Chains: results.layer2Chains.filter((chain) =>
           spamSupportedChainIds.includes(chain.id)
         ),
-        // Hide these categories completely in recent tab
         nonEvmChains: [],
         otherChains: [],
       };
@@ -236,9 +228,7 @@ export default function Home() {
     spamSupportedChainIds,
   ]);
 
-  // Update filteredTestnetChains to hide testnets in recent tab
   const filteredTestnetChains = useMemo(() => {
-    // Hide all testnets in recent tab
     if (activeTab === "recent") {
       return {
         evmChains: [],
