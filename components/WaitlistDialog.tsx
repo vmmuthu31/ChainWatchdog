@@ -68,7 +68,7 @@ function WaitlistDialog({ isOpen, onClose }: WaitlistDialogProps) {
           </DialogDescription>{" "}
         </DialogHeader>{" "}
         {!isSubmitted ? (
-          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <form onSubmit={handleSubmit} className="space-y-4 ">
             {" "}
             <input
               type="email"

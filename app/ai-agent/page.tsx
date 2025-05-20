@@ -15,6 +15,7 @@ import Navbar from "@/components/Navbar";
 import { HoneypotResponse, Message } from "@/lib/types";
 import { pixelFont, pixelMonoFont } from "@/lib/font";
 import Footer from "@/components/Footer";
+import WaitlistDialog from "@/components/WaitlistDialog";
 
 const formSchema = z.object({
   userQuestion: z.string().min(1, {
@@ -55,6 +56,8 @@ const sampleResponses: Record<string, string> = {
 };
 
 export default function AgentPage() {
+  const isBlurred = true;
+  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -806,7 +809,7 @@ export default function AgentPage() {
         totalTokens - nftCount > 0
           ? Math.round((safeCount / (totalTokens - nftCount)) * 100)
           : 0
-      }%)`;
+      })`;
 
       if (locallyDetectedSpamCount > 0) {
         analysisResponse += `\n• Additional suspicious tokens detected in our database: ${locallyDetectedSpamCount}`;
@@ -1329,23 +1332,30 @@ export default function AgentPage() {
 
         {/* Main content */}
         <div className="flex-1 flex flex-col container mx-auto px-4 py-4 max-w-4xl">
-          <div className="flex items-center justify-center mb-4">
-            <div className="text-center">
-              <h1
-                className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl text-[#00ffff] mb-1`}
-              >
-                RugProof AI{" "}
-              </h1>
-              <p
-                className={`${pixelMonoFont.className} text-base text-[#00ff00]/80`}
-              >
-                Advanced token analysis and blockchain security
-              </p>
-            </div>
-          </div>
+          <div className="relative flex-1 flex flex-col bg-black/50 border border-[#00ff00]/30 rounded-lg shadow-[0_0_15px_rgba(0,255,0,0.15)] overflow-hidden h-[550px] max-h-[680px]">
+            {/* Blur overlay */}
+            {isBlurred && (
+              <div className="absolute inset-0 z-50 backdrop-blur-md bg-black/30 flex flex-col items-center justify-center">
+                <h2
+                  className={`${pixelMonoFont.className} text-[#00ffff] text-2xl mb-4`}
+                >
+                  🔒 Early Access Feature
+                </h2>
+                <p
+                  className={`${pixelMonoFont.className} text-[#00ffff]/70 text-center max-w-md mb-6`}
+                >
+                  Our AI Agent is currently in early access. Join the waitlist
+                  to get notified when it&apos;s available!
+                </p>
+                <button
+                  onClick={() => setIsWaitlistOpen(true)}
+                  className={`${pixelMonoFont.className} py-2 px-4 bg-[#00ffff]/10 hover:bg-[#00ffff]/20 border border-[#00ffff]/40 text-[#00ffff] rounded-lg transition-all duration-200 shadow-[0_0_10px_rgba(0,255,255,0.2)] hover:shadow-[0_0_15px_rgba(0,255,255,0.4)]`}
+                >
+                  Join Waitlist
+                </button>
+              </div>
+            )}
 
-          {/* Chat interface with fixed height */}
-          <div className="flex-1 flex flex-col bg-black/50 border border-[#00ff00]/30 rounded-lg shadow-[0_0_15px_rgba(0,255,0,0.15)] overflow-hidden h-[550px] max-h-[680px]">
             {/* Messages area with scrollable content */}
             <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0 max-h-[calc(680px-64px)] scrollbar-custom">
               {messages.map((message) => (
@@ -1815,6 +1825,10 @@ export default function AgentPage() {
         </div>
       </main>
       <Footer />
+      <WaitlistDialog
+        isOpen={isWaitlistOpen}
+        onClose={() => setIsWaitlistOpen(false)}
+      />
     </div>
   );
 }
