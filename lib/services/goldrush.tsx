@@ -1,5 +1,6 @@
 "use client";
 import { Chain, GoldRushClient } from "@covalenthq/client-sdk";
+import { ChainInfo, GoldRushResponse } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let isERC20Spam: any = null;
@@ -14,62 +15,6 @@ if (typeof window === "undefined") {
     .catch((error) => {
       console.error("Failed to import enhanced-spam-lists:", error);
     });
-}
-
-export interface TokenBalance {
-  contract_decimals: number;
-  contract_name: string;
-  contract_ticker_symbol: string;
-  contract_address: string;
-  supports_erc: string[] | null;
-  logo_url: string;
-  contract_display_name: string;
-  logo_urls: {
-    token_logo_url: string;
-    protocol_logo_url: string | null;
-    chain_logo_url: string;
-  };
-  last_transferred_at: string;
-  block_height: number;
-  native_token: boolean;
-  type: string;
-  is_spam: boolean;
-  balance: string;
-  balance_24h: string;
-  quote_rate: number;
-  quote_rate_24h: number;
-  quote: number;
-  pretty_quote: string;
-  quote_24h: number;
-  pretty_quote_24h: string;
-  protocol_metadata: Record<string, unknown>;
-  nft_data: Record<string, unknown>;
-  spamConfidence?: "YES" | "MAYBE" | "NO";
-  spamScore?: string;
-}
-
-export interface GoldRushResponse {
-  data: {
-    address: string;
-    updated_at: string;
-    next_update_at: string;
-    quote_currency: string;
-    chain_id: number;
-    chain_name: string;
-    items: TokenBalance[];
-  };
-  error: boolean;
-  error_message: string | null;
-  error_code: string | null;
-}
-
-export interface ChainInfo {
-  id: string;
-  name: string;
-  explorer: string;
-  type: string;
-  logoUrl?: string;
-  category?: "EVM" | "Layer2" | "Non-EVM" | "Other";
 }
 
 export const supportedChains: ChainInfo[] = [

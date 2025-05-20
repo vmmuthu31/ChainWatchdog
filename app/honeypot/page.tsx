@@ -1,12 +1,7 @@
 import { Suspense } from "react";
 import HoneyPot from "./Components/HoneyPot";
 import { Loader2 } from "lucide-react";
-import { VT323 } from "next/font/google";
-
-const pixelMonoFont = VT323({
-  weight: "400",
-  subsets: ["latin"],
-});
+import { pixelMonoFont } from "@/lib/font";
 
 export default function HoneypotPage() {
   return (

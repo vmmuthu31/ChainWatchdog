@@ -1,27 +1,21 @@
 import { Networks, Confidence } from "@covalenthq/goldrush-enhanced-spam-lists";
+import { YamlData } from "../types";
+import { BASE_COVALENT_SPAM_LIST_GITHUB_URL } from "@/constants/constant";
 
-const BASE_GITHUB_URL =
-  "https://raw.githubusercontent.com/covalenthq/goldrush-enhanced-spam-lists/main/src/lists";
-
-interface YamlData {
-  SpamContracts?: string[];
-  [key: string]: unknown;
-}
-
-// Cache for fetched data
 const dataCache: Record<string, YamlData> = {};
 
 /**
  * Loads YAML data from GitHub
  */
 async function loadYaml(filePath: string, useCache = true): Promise<YamlData> {
-  // Check memory cache first
   if (useCache && dataCache[filePath]) {
     return dataCache[filePath];
   }
 
   try {
-    const response = await fetch(`${BASE_GITHUB_URL}/${filePath}`);
+    const response = await fetch(
+      `${BASE_COVALENT_SPAM_LIST_GITHUB_URL}/${filePath}`
+    );
     if (!response.ok) {
       throw new Error(`Failed to fetch YAML file: ${response.statusText}`);
     }
@@ -45,8 +39,6 @@ async function loadYaml(filePath: string, useCache = true): Promise<YamlData> {
  * Simple YAML parser for browser
  */
 function parseYaml(content: string): YamlData {
-  // Simple YAML parsing for the specific format we need
-  // This is a very simplified implementation that assumes a specific format
   const result: YamlData = {};
   const lines = content.split("\n");
 

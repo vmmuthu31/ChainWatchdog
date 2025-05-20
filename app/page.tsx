@@ -2,7 +2,6 @@
 
 import { TokenInputForm } from "@/components/token-input-form";
 import GoldRushServices, {
-  type GoldRushResponse,
   supportedChains,
   getExplorerUrl,
 } from "@/lib/services/goldrush";
@@ -26,6 +25,7 @@ import NetworkDropdown from "@/components/Covalent/NetworkDropdown";
 import Footer from "@/components/Footer";
 import CovalentChainMetrics from "@/components/Covalent/CovalentChainMetrics";
 import CovalentTabSelector from "@/components/Covalent/CovalentTabSelector";
+import { GoldRushResponse } from "@/lib/types";
 
 export default function Home() {
   const [tokenData, setTokenData] = useState<GoldRushResponse | null>(null);
