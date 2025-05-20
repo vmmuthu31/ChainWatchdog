@@ -524,11 +524,10 @@ function NetworkDropdown({
                               chain.name.charAt(0)
                             )}
                           </span>
-                          ` {chain.name}
+                          {chain.name}
                           {selectedChain === chain.id && (
                             <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
                           )}
-                          `
                         </button>
                       ))}
                     </>
