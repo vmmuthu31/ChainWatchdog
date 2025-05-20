@@ -246,7 +246,7 @@ function Navbar() {
                               item.bgHoverColor
                             } rounded-lg transition-colors ${
                               pathname === item.href
-                                ? `bg-opacity-20 ${item.bgHoverColor}`
+                                ? `border-b-2 ${item.borderColor}`
                                 : ""
                             }`}
                             onClick={() => setMobileMenuOpen(false)}
