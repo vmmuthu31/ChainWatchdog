@@ -263,7 +263,7 @@ function Navbar() {
                           </button>
                         )}
                         {item.badge && (
-                          <span className="absolute top-0 right-2 px-2 py-0.5 text-xs bg-[#00ffff]/20 text-[#00ffff] border border-[#00ffff]/40 rounded-full animate-pulse">
+                          <span className="absolute top-4 right-2 px-2 py-0.5 text-xs bg-[#00ffff]/20 text-[#00ffff] border border-[#00ffff]/40 rounded-full animate-pulse">
                             {item.badge}
                           </span>
                         )}
