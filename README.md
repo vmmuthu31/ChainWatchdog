@@ -2,7 +2,7 @@
 
 RugProof is a blockchain security tool designed to detect spam tokens and security threats across multiple blockchain networks. It helps users identify potentially malicious tokens in their wallets before they can cause harm.
 
-![RugProof](https://placeholder-for-your-screenshot.com/screenshot.png)
+![RugProof](https://github.com/user-attachments/assets/cd09f5c5-a7c8-4140-b40f-ee4653d4bf68)
 
 ## Features
 
