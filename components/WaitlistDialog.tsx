@@ -62,7 +62,7 @@ function WaitlistDialog({ isOpen, onClose }: WaitlistDialogProps) {
             {" "}
             Request Early Access{" "}
           </DialogTitle>{" "}
-          <DialogDescription className="text-gray-400">
+          <DialogDescription className="text-[#00ffff]/70">
             {" "}
             Get First Dibs on Our AI Agent!{" "}
           </DialogDescription>{" "}
@@ -78,14 +78,16 @@ function WaitlistDialog({ isOpen, onClose }: WaitlistDialogProps) {
               required
               className="w-full px-4 py-2 bg-black/50 border border-[#00ffff]/30 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-[#00ffff] transition-colors"
             />{" "}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`w-full px-4 py-2 ${pixelMonoFont.className} bg-[#00ffff]/10 hover:bg-[#00ffff]/20 border border-[#00ffff]/40 text-[#00ffff] rounded-lg transition-colors`}
-            >
-              {" "}
-              {isSubmitting ? "Claiming..." : "Claim My Spot"}{" "}
-            </button>{" "}
+            <div className="flex justify-center">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`px-8 py-2 ${pixelMonoFont.className} bg-[#00ffff]/10 hover:bg-[#00ffff]/20 border border-[#00ffff]/40 text-[#00ffff] rounded-lg transition-colors`}
+              >
+                {" "}
+                {isSubmitting ? "Claiming..." : "Claim My Spot"}{" "}
+              </button>{" "}
+            </div>
           </form>
         ) : (
           <div className="mt-4 text-center text-[#00ffff]">
