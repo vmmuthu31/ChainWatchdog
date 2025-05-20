@@ -60,11 +60,11 @@ function WaitlistDialog({ isOpen, onClose }: WaitlistDialogProps) {
             className={`${pixelMonoFont.className} text-[#00ffff] text-xl`}
           >
             {" "}
-            Join the AI Agent Waitlist{" "}
+            Request Early Access{" "}
           </DialogTitle>{" "}
           <DialogDescription className="text-gray-400">
             {" "}
-            Be the first to know when our AI Agent launches!{" "}
+            Get First Dibs on Our AI Agent!{" "}
           </DialogDescription>{" "}
         </DialogHeader>{" "}
         {!isSubmitted ? (
@@ -84,7 +84,7 @@ function WaitlistDialog({ isOpen, onClose }: WaitlistDialogProps) {
               className={`w-full px-4 py-2 ${pixelMonoFont.className} bg-[#00ffff]/10 hover:bg-[#00ffff]/20 border border-[#00ffff]/40 text-[#00ffff] rounded-lg transition-colors`}
             >
               {" "}
-              {isSubmitting ? "Joining..." : "Join Waitlist"}{" "}
+              {isSubmitting ? "Claiming..." : "Claim My Spot"}{" "}
             </button>{" "}
           </form>
         ) : (
