@@ -1335,7 +1335,7 @@ export default function AgentPage() {
           <div className="relative flex-1 flex flex-col bg-black/50 border border-[#00ff00]/30 rounded-lg shadow-[0_0_15px_rgba(0,255,0,0.15)] overflow-hidden h-[550px] max-h-[680px]">
             {/* Blur overlay */}
             {isBlurred && (
-              <div className="absolute inset-0 z-50 backdrop-blur-md bg-black/30 flex flex-col items-center justify-center">
+              <div className="absolute inset-0 z-40 backdrop-blur-md bg-black/30 flex flex-col items-center justify-center">
                 <h2
                   className={`${pixelMonoFont.className} text-[#00ffff] text-2xl mb-4`}
                 >
