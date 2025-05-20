@@ -428,7 +428,7 @@ function HoneyPot() {
 
           {/* API Endpoint Tabs */}
           <div className="w-full max-w-xl">
-            <div className="flex p-1 bg-black/80 border border-[#ffa500]/50 rounded-lg overflow-hidden mb-4">
+            <div className="grid md:grid-cols-4 grid-cols-2 p-1 bg-black/80 border border-[#ffa500]/50 rounded-lg overflow-hidden mb-4">
               <button
                 className={`flex-1 px-2 py-3 text-sm font-medium cursor-pointer rounded-md transition-colors flex items-center gap-1 ${
                   endpoint === "honeypot"
