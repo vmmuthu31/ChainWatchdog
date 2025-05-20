@@ -79,7 +79,6 @@ export default function AgentPage() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Add a state to track if it's the initial conversation
   const [isInitialConversation, setIsInitialConversation] = useState(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -89,14 +88,12 @@ export default function AgentPage() {
     },
   });
 
-  // Auto-scroll to bottom when messages update
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
-  // Function to detect if text contains a wallet or contract address
   const detectAddress = (
     text: string
   ): { address: string; type: "wallet" | "token" | "contract" } | null => {
@@ -108,13 +105,11 @@ export default function AgentPage() {
     const address = matches[0];
     const lowercaseText = text.toLowerCase();
 
-    // Check for wallet-related keywords
     const isWallet =
       lowercaseText.includes("wallet") ||
       lowercaseText.includes("account") ||
       lowercaseText.includes("holdings");
 
-    // Check for spam-related keywords
     const isSpamCheck =
       lowercaseText.includes("spam") ||
       lowercaseText.includes("scam") ||
@@ -122,7 +117,6 @@ export default function AgentPage() {
         lowercaseText.includes("token") &&
         !lowercaseText.includes("honeypot"));
 
-    // Check for honeypot-related keywords
     const isHoneypotCheck =
       lowercaseText.includes("honeypot") ||
       lowercaseText.includes("honey pot") ||
@@ -130,29 +124,22 @@ export default function AgentPage() {
       lowercaseText.includes("cannot sell") ||
       lowercaseText.includes("unable to sell");
 
-    // If we detect wallet keywords, it's a wallet analysis
     if (isWallet) {
       return {
         address,
         type: "wallet",
       };
-    }
-    // If we detect spam check keywords and not honeypot keywords, it's a token spam check
-    else if (isSpamCheck && !isHoneypotCheck) {
+    } else if (isSpamCheck && !isHoneypotCheck) {
       return {
         address,
         type: "token",
       };
-    }
-    // If we detect honeypot keywords, it's a honeypot check
-    else if (isHoneypotCheck) {
+    } else if (isHoneypotCheck) {
       return {
         address,
         type: "contract",
       };
-    }
-    // Otherwise default to contract (honeypot) check
-    else {
+    } else {
       return {
         address,
         type: "contract",
@@ -160,11 +147,9 @@ export default function AgentPage() {
     }
   };
 
-  // Function to detect if user is asking about a specific chain
   const detectChainRequest = (text: string): string | null => {
     const lowercaseText = text.toLowerCase();
 
-    // Check for main chains
     if (lowercaseText.includes("ethereum") || lowercaseText.includes(" eth ")) {
       return "eth-mainnet";
     } else if (
@@ -199,7 +184,6 @@ export default function AgentPage() {
       return "arbitrum-mainnet";
     }
 
-    // Also check for chain IDs in the text
     if (
       lowercaseText.includes(" chain id 1") ||
       lowercaseText.includes(" chain 1")
@@ -588,7 +572,6 @@ export default function AgentPage() {
         )}\n\nThis token has been identified as SPAM in our database.\n\nRisk Level: HIGH\n\nThis token is listed in our spam token database. It may be used for scams, phishing, or other malicious activities. Do not interact with this token and do not approve any transactions requested by it.`;
       }
 
-      // Not in our local spam lists, check the honeypot API
       try {
         const honeypotData = await fetchHoneypotData(address, apiChainId);
         const chainName = getChainName(apiChainId);
@@ -671,7 +654,6 @@ export default function AgentPage() {
     }
   };
 
-  // Real wallet analysis for spam token detection
   const analyzeWalletAddress = async (
     address: string,
     chainId: string = "eth-mainnet"
@@ -681,7 +663,6 @@ export default function AgentPage() {
     setAnalysisType("wallet");
 
     try {
-      // Network mapping for yaml files
       const networkMapping: Record<
         string,
         { tokensPath: string; nftPath: string }
