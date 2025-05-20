@@ -1,17 +1,20 @@
 # RugProof
 
-RugProof is a blockchain security tool designed to detect spam tokens and security threats across multiple blockchain networks. It helps users identify potentially malicious tokens in their wallets before they can cause harm.
+RugProof is an advanced blockchain security and analytics platform designed to help users identify and protect against crypto scams, spam tokens, and honeypots across multiple blockchains. With a powerful combination of AI and blockchain analytics, it provides real-time scanning and threat detection capabilities.
 
 ![RugProof](https://github.com/user-attachments/assets/cd09f5c5-a7c8-4140-b40f-ee4653d4bf68)
 
 ## Features
 
-- ✅ Detect spam tokens across 70+ supported blockchains
-- ✅ Real-time wallet scanning and analysis
+- ✅ Detect spam tokens and malicious contracts across 100+ blockchains
+- ✅ Advanced Honeypot Detection System
+- ✅ AI-powered contract analysis and recommendations
+- ✅ Real-time wallet scanning and threat detection
 - ✅ Track and display recent spam token activity
-- ✅ Multi-chain support (Ethereum, BSC, Polygon, Optimism, Gnosis, Base, etc.)
+- ✅ Multi-chain support (Ethereum, BSC, Polygon, Optimism, Base, Gnosis, etc.)
 - ✅ Integration with blockchain explorers
-- ✅ Modern cyberpunk/retro pixel UI aesthetic
+- ✅ Modern retro-futuristic UI design
+- ✅ Chrome Extension (Coming Soon)
 
 ## Tech Stack
 
@@ -20,6 +23,7 @@ RugProof is a blockchain security tool designed to detect spam tokens and securi
 - **Blockchain**: Wagmi, RainbowKit for wallet connection
 - **APIs**: Covalent API integration
 - **Data**: Goldrush enhanced spam lists for token detection
+- **AI**: Integration with advanced AI models for contract analysis
 
 ## Getting Started
 
@@ -48,7 +52,7 @@ RugProof is a blockchain security tool designed to detect spam tokens and securi
 3. Set up environment variables:
    Create a `.env` file in the root directory and add your API keys:
 
-   ```
+   ```env
    COVALENT_API_KEY=your_covalent_api_key
    ```
 
@@ -69,15 +73,33 @@ RugProof is a blockchain security tool designed to detect spam tokens and securi
 - `/lib` - Utility functions and services
 - `/public` - Static assets and spam token lists
 
-## API Endpoints
+## Key Features
 
-- `GET /api/spam-tokens` - Retrieve spam tokens based on network or wallet address
+### Spam Token Detection
+
+- Real-time scanning of wallet addresses
+- Support for 100+ blockchain networks
+- Integration with Goldrush enhanced spam lists
+
+### Honeypot Checker
+
+- Advanced contract analysis
+- Liquidity pool verification
+- Token contract security assessment
+
+### AI Agent
+
+- Smart contract vulnerability analysis
+- Personalized security recommendations
+- Natural language interaction for blockchain queries
 
 ## Deployment
 
-The application can be easily deployed on Vercel:
+The application is deployed and available at [https://www.rugproofai.com](https://www.rugproofai.com)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2FRugProof)
+You can also deploy your own instance on Vercel:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvmmuthu31%2FRugProof)
 
 ## License
 
@@ -87,3 +109,4 @@ The application can be easily deployed on Vercel:
 
 - [Covalent](https://www.covalenthq.com/) for blockchain data API
 - [Goldrush](https://github.com/covalenthq/goldrush-enhanced-spam-lists) for spam token lists
+- Built by ForgeX
