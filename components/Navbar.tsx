@@ -62,7 +62,7 @@ function Navbar() {
       ),
     },
     {
-      onClick: () => setWaitlistOpen(true), // Add onClick handler
+      href: "/ai-agent",
       label: "AI Agent",
       color: "text-[#00ffff]",
       hoverColor: "hover:text-[#00ffff]",
@@ -148,11 +148,7 @@ function Navbar() {
         <nav className="hidden md:flex items-center justify-center flex-1">
           <div className="flex items-center space-x-8">
             {navItems.map((item) => (
-              <div
-                key={item.label}
-                className="relative group"
-                onClick={item.onClick}
-              >
+              <div key={item.label} className="relative group">
                 {item.href ? (
                   <Link
                     href={item.href}
@@ -236,10 +232,7 @@ function Navbar() {
                         key={item.label}
                         className="relative"
                         onClick={() => {
-                          if (item.onClick) {
-                            item.onClick();
-                            setMobileMenuOpen(false);
-                          }
+                          setMobileMenuOpen(false);
                         }}
                       >
                         {item.href ? (

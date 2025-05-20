@@ -264,3 +264,28 @@ input:-internal-autofill-selected {
   background-color: rgba(0, 255, 0, 0.4) !important;
   color: #00ffff !important;
 }
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 10px;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 255, 0, 0.3);
+  border-radius: 5px;
+  border: 1px solid rgba(0, 255, 0, 0.5);
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 255, 0, 0.5);
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 0, 0.3) rgba(0, 0, 0, 0.3);
+}

@@ -1,48 +1,27 @@
 "use client";
 
-import { Press_Start_2P, VT323 } from "next/font/google";
-import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, BotMessageSquare, User, X, Copy } from "lucide-react";
+import { Send, Loader2, BotMessageSquare, User, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { toast } from "sonner";
-import WalletConnect from "@/components/WalletConnect";
-import Image from "next/image";
 import { supportedChains } from "@/lib/services/goldrush";
 import GoldRushServices from "@/lib/services/goldrush";
 import * as yaml from "js-yaml";
+import Navbar from "@/components/Navbar";
+import { HoneypotResponse, Message } from "@/lib/types";
+import { pixelFont, pixelMonoFont } from "@/lib/font";
+import Footer from "@/components/Footer";
 
-const pixelFont = Press_Start_2P({
-  weight: "400",
-  subsets: ["latin"],
-});
-
-const pixelMonoFont = VT323({
-  weight: "400",
-  subsets: ["latin"],
-});
-
-// Create a schema for the form
 const formSchema = z.object({
   userQuestion: z.string().min(1, {
     message: "Please enter a question",
   }),
 });
 
-// Define message types for the chat
-type Message = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-  isTokenAnalysis?: boolean;
-};
-
-// Define supported chains for honeypot detection
 const honeypotSupportedChains = [
   { id: "1", name: "Ethereum", shortName: "ETH" },
   { id: "56", name: "BNB Smart Chain", shortName: "BSC" },
@@ -52,7 +31,6 @@ const honeypotSupportedChains = [
   { id: "8453", name: "Base", shortName: "BASE" },
 ];
 
-// Sample responses based on token and wallet information
 const sampleResponses: Record<string, string> = {
   "what is a honeypot token":
     "A honeypot token is a type of cryptocurrency scam where the smart contract is designed to prevent most or all users from selling their tokens. The contract may look legitimate at first glance, but contains hidden code that restricts selling to only certain addresses (usually the creator's). These scams lure investors with promises of huge returns, but once you buy the token, you cannot sell it.",
@@ -75,68 +53,6 @@ const sampleResponses: Record<string, string> = {
   "how to check if a token is safe":
     "To check if a token is safe: 1) Use our honeypot checker to analyze the smart contract, 2) Verify the contract code is open source and audited, 3) Check liquidity is sufficient and locked, 4) Research the team - anonymous teams are higher risk, 5) Look for KYC verification and security audits, 6) Check community size and engagement, 7) Analyze tokenomics for unsustainable models, 8) Review the project roadmap and progress. No investment is risk-free, but these steps can help you avoid obvious scams.",
 };
-
-// Define types for API responses
-interface Token {
-  name: string;
-  symbol: string;
-  decimals: number;
-  address: string;
-  totalHolders: number;
-}
-
-interface Summary {
-  risk: "very_low" | "low" | "medium" | "high" | "very_high";
-  riskLevel: number;
-}
-
-interface HoneypotResult {
-  isHoneypot: boolean;
-  honeypotReason?: string;
-}
-
-interface MaxValues {
-  token: number;
-  tokenWei: string;
-  withToken: number;
-  withTokenWei: string;
-}
-
-interface SimulationResult {
-  maxBuy?: MaxValues;
-  maxSell?: MaxValues;
-  buyTax: number;
-  sellTax: number;
-  transferTax: number;
-  buyGas: string;
-  sellGas: string;
-}
-
-interface ContractCode {
-  openSource: boolean;
-  rootOpenSource: boolean;
-  isProxy: boolean;
-  hasProxyCalls: boolean;
-}
-
-interface Chain {
-  id: string;
-  name: string;
-  shortName: string;
-  currency: string;
-}
-
-interface HoneypotResponse {
-  token: Token;
-  summary: Summary;
-  simulationSuccess: boolean;
-  simulationError?: string;
-  honeypotResult: HoneypotResult;
-  simulationResult: SimulationResult;
-  contractCode?: ContractCode;
-  chain: Chain;
-  flags: string[];
-}
 
 export default function AgentPage() {
   const [messages, setMessages] = useState<Message[]>([
@@ -316,7 +232,6 @@ export default function AgentPage() {
     return null;
   };
 
-  // Function to get explorer URL based on chain
   const getChainExplorerUrl = (chainId: string, address: string): string => {
     switch (chainId) {
       case "1":
@@ -340,12 +255,10 @@ export default function AgentPage() {
     }
   };
 
-  // Function to convert chain format between GoldRush and Honeypot
   const convertChainFormat = (
     chainIdOrFormat: string,
     targetFormat: "goldrush" | "honeypot"
   ): string => {
-    // If already in the right format, return as is
     if (targetFormat === "goldrush" && chainIdOrFormat.includes("-")) {
       return chainIdOrFormat;
     }
@@ -353,7 +266,6 @@ export default function AgentPage() {
       return chainIdOrFormat;
     }
 
-    // Convert from honeypot format (ID) to goldrush format (chain-network)
     if (targetFormat === "goldrush") {
       switch (chainIdOrFormat) {
         case "1":
@@ -373,7 +285,6 @@ export default function AgentPage() {
       }
     }
 
-    // Convert from goldrush format (chain-network) to honeypot format (ID)
     if (targetFormat === "honeypot") {
       if (chainIdOrFormat === "eth-mainnet") return "1";
       if (chainIdOrFormat === "bsc-mainnet") return "56";
@@ -387,20 +298,16 @@ export default function AgentPage() {
     return chainIdOrFormat;
   };
 
-  // Function to get chain name for display
   const getChainName = (chainIdOrFormat: string): string => {
-    // Check if it's in GoldRush format
     if (chainIdOrFormat.includes("-")) {
       const chain = supportedChains.find((c) => c.id === chainIdOrFormat);
       return chain ? chain.name : "Ethereum";
     }
 
-    // Must be in honeypot format (ID)
     const chain = honeypotSupportedChains.find((c) => c.id === chainIdOrFormat);
     return chain ? chain.name : "Ethereum";
   };
 
-  // Function to fetch honeypot data from the API (like in honeypot/page.tsx)
   const fetchHoneypotData = async (
     address: string,
     chainId: string
@@ -422,7 +329,6 @@ export default function AgentPage() {
     }
   };
 
-  // Function to fetch wallet data using GoldRush (like in app/page.tsx)
   const fetchWalletData = async (
     address: string,
     chainId: string = "eth-mainnet"
@@ -436,11 +342,9 @@ export default function AgentPage() {
     }
   };
 
-  // Add chain detection functionality from honeypot/page.tsx
   const detectChain = async (address: string): Promise<string | null> => {
     if (!address || address.length < 42) return null;
 
-    // Set detecting state if needed
     setIsProcessing(true);
 
     const chainsToCheck = [
@@ -483,10 +387,8 @@ export default function AgentPage() {
     ];
 
     try {
-      // Try block explorers directly - the most reliable method
       for (const chainObj of chainsToCheck) {
         try {
-          // Special case for Avalanche - using Glacier API
           if (chainObj.id === "43114") {
             try {
               const response = await fetch(
@@ -501,27 +403,22 @@ export default function AgentPage() {
               if (response.ok) {
                 const data = await response.json();
                 if (data && data.address) {
-                  console.log(
-                    `Contract found on ${chainObj.name} via Glacier API`
-                  );
                   setSelectedChainId(chainObj.id);
                   return chainObj.id;
                 }
               }
             } catch (error) {
-              console.log(`Error checking Glacier API for Avalanche:`, error);
+              console.error(`Error checking Glacier API for Avalanche:`, error);
             }
             continue;
           }
 
-          // Standard approach for all other chains
           const explorerResponse = await fetch(
             `${chainObj.explorer}/api?module=contract&action=getabi&address=${address}&apikey=${chainObj.apikey}`
           );
 
           if (explorerResponse.ok) {
             const explorerData = await explorerResponse.json();
-            // Different explorers may have slightly different response formats
             if (
               explorerData.status === "1" ||
               (explorerData.result &&
@@ -529,23 +426,19 @@ export default function AgentPage() {
                 explorerData.result !== "" &&
                 explorerData.result !== null)
             ) {
-              console.log(`Contract found on ${chainObj.name} via explorer`);
               setSelectedChainId(chainObj.id);
               return chainObj.id;
             }
           }
         } catch (error) {
-          console.log(
+          console.error(
             `Error checking explorer for chain ${chainObj.id} (${chainObj.name}):`,
             error
           );
         }
       }
-
-      // Secondary approach: Just check if the address exists (not necessarily as a contract)
       for (const chainObj of chainsToCheck) {
         try {
-          // Skip Avalanche here as we've already checked with Glacier API
           if (chainObj.id === "43114") continue;
 
           const response = await fetch(
@@ -555,44 +448,34 @@ export default function AgentPage() {
           if (response.ok) {
             const data = await response.json();
             if (data.status === "1") {
-              console.log(
-                `Address found on ${chainObj.name} with balance ${data.result}`
-              );
-              // Even if it's just an EOA, at least we know the address exists on this chain
               setSelectedChainId(chainObj.id);
               return chainObj.id;
             }
           }
         } catch (error) {
-          console.log(
+          console.error(
             `Error checking account balance for chain ${chainObj.id}:`,
             error
           );
         }
       }
 
-      // If we couldn't detect the chain, default to Ethereum
-      console.log("Couldn't detect chain, defaulting to null");
       return null;
     } catch (error) {
       console.error("Error in chain detection:", error);
       return null;
     } finally {
-      // Reset detecting state if needed
       setIsProcessing(false);
     }
   };
 
-  // Function to check if a token is in our local spam lists
   const checkLocalSpamList = async (
     address: string,
     chainId: string
   ): Promise<boolean> => {
     try {
-      // Normalize addresses for comparison
       const normalizedAddress = address.toLowerCase();
 
-      // Get the correct chain mapping
       const networkMapping: Record<
         string,
         { tokensPath: string; nftPath: string }
@@ -629,13 +512,11 @@ export default function AgentPage() {
         },
       };
 
-      // Check if we have mapping for this chain
       if (!networkMapping[chainId]) {
-        console.log(`No spam list mapping found for chain ${chainId}`);
+        console.error(`No spam list mapping found for chain ${chainId}`);
         return false;
       }
 
-      // Load and parse the YAML files for tokens and NFTs
       try {
         const tokenResponse = await fetch(networkMapping[chainId].tokensPath);
         const nftResponse = await fetch(networkMapping[chainId].nftPath);
@@ -647,11 +528,9 @@ export default function AgentPage() {
 
         const tokenYaml = await tokenResponse.text();
         const nftYaml = await nftResponse.text();
-        // Parse YAML content
         const tokenList = yaml.load(tokenYaml) as string[];
         const nftList = yaml.load(nftYaml) as string[];
 
-        // Check if address exists in either list
         const isSpamToken = tokenList.some(
           (addr) => addr.toLowerCase() === normalizedAddress
         );
@@ -670,7 +549,6 @@ export default function AgentPage() {
     }
   };
 
-  // Real token analysis for honeypot detection
   const analyzeTokenAddress = async (
     address: string,
     chainId: string | null = null
@@ -679,45 +557,25 @@ export default function AgentPage() {
     setAnalysisType("honeypot");
 
     try {
-      // First detect the chain if not specified or if we need to verify
       let finalChainId = chainId;
-
-      // If "auto" is passed or no chain is specified, do auto-detection
-      // This should be the default behavior for token analysis
       if (!finalChainId || finalChainId === "auto") {
-        // Always try to auto-detect for token analysis
-        console.log("Auto-detecting chain for token analysis");
         const detectedChain = await detectChain(address);
         if (detectedChain) {
           finalChainId = detectedChain;
           setSelectedChainId(detectedChain);
-          // Update the GoldRush format chain as well for consistency
           setSelectedChain(convertChainFormat(detectedChain, "goldrush"));
-          console.log(
-            `Chain detected: ${detectedChain} (${getChainName(detectedChain)})`
-          );
         } else {
-          // If couldn't detect, default to Ethereum
           finalChainId = "1";
           setSelectedChainId(finalChainId);
           setSelectedChain("eth-mainnet");
-          console.log("Chain detection failed, defaulting to Ethereum");
         }
       } else {
-        // User specifically requested a chain, use it
-        console.log(
-          `Using specified chain: ${finalChainId} (${getChainName(
-            finalChainId
-          )})`
-        );
         setSelectedChainId(finalChainId);
         setSelectedChain(convertChainFormat(finalChainId, "goldrush"));
       }
 
-      // Make sure we have a string value for chainId before API call
       const apiChainId = finalChainId || "1";
 
-      // First check our local spam lists
       const goldrushChainId = convertChainFormat(apiChainId, "goldrush");
       const isLocalSpam = await checkLocalSpamList(address, goldrushChainId);
 
@@ -857,23 +715,15 @@ export default function AgentPage() {
         },
       };
 
-      // First fetch wallet data using GoldRush service API
       const walletData = await fetchWalletData(address, chainId);
       const chainName = getChainName(chainId);
 
-      // Check if the current chain has local spam lists
       const hasLocalSpamLists = networkMapping[chainId] !== undefined;
-
-      // Process API tokens response
       const totalTokens = walletData.data.items.length;
-
-      // Filter for spam tokens and NFTs
       const spamTokens = walletData.data.items.filter(
         (t: { is_spam: boolean; type: string }) =>
           t.is_spam && t.type === "cryptocurrency"
       );
-
-      // Count spam NFTs separately
       const nfts = walletData.data.items.filter(
         (t: { type: string }) => t.type === "nft"
       );
@@ -885,17 +735,13 @@ export default function AgentPage() {
       const nftCount = nfts.length;
       const spamNftCount = spamNfts.length;
 
-      // Check each token against local spam lists for enhanced detection
       let locallyDetectedSpamCount = 0;
       if (hasLocalSpamLists) {
-        // In a real implementation, we would check each token against the yaml files
-        // For the demo, we'll simulate finding additional spam
         locallyDetectedSpamCount = Math.floor(
           walletData.data.items.filter((t) => !t.is_spam).length * 0.05
         );
       }
 
-      // Generate detailed token lists
       let spamTokenList = "";
       if (spamCount > 0) {
         spamTokenList = "\n\nSuspicious tokens:";
@@ -924,7 +770,6 @@ export default function AgentPage() {
         }
       }
 
-      // Generate NFT list if there are spam NFTs
       let spamNftList = "";
       if (spamNftCount > 0) {
         spamNftList = "\n\nSuspicious NFTs:";
@@ -950,7 +795,6 @@ export default function AgentPage() {
         }
       }
 
-      // Create a complete analysis response
       let analysisResponse = `✅ WALLET ANALYSIS COMPLETE\n\nAddress: ${address}\nChain: ${chainName}\n\nWallet contains:
 • Total Tokens: ${totalTokens - nftCount}
 • Spam Tokens: ${spamCount} (${
@@ -964,12 +808,10 @@ export default function AgentPage() {
           : 0
       }%)`;
 
-      // Add local scan info
       if (locallyDetectedSpamCount > 0) {
         analysisResponse += `\n• Additional suspicious tokens detected in our database: ${locallyDetectedSpamCount}`;
       }
 
-      // Add NFT info if there are any
       if (nftCount > 0) {
         analysisResponse += `\n\nNFT Collections:
 • Total NFTs: ${nftCount}
@@ -981,11 +823,9 @@ export default function AgentPage() {
         )}%)`;
       }
 
-      // Add risk assessment
       if (spamCount + locallyDetectedSpamCount === 0 && spamNftCount === 0) {
         analysisResponse += `\n\nYour wallet appears clean with no detected spam tokens or NFTs. Great job keeping your wallet secure!`;
       } else if (spamCount + locallyDetectedSpamCount > 0 || spamNftCount > 0) {
-        // Calculate overall risk level based on spam percentages
         const tokenRiskPercentage =
           totalTokens - nftCount > 0
             ? (spamCount + locallyDetectedSpamCount) / (totalTokens - nftCount)
@@ -1007,7 +847,6 @@ export default function AgentPage() {
 3. Consider using a separate wallet for future transactions`;
       }
 
-      // Add detailed token lists
       if (spamCount > 0) {
         analysisResponse += spamTokenList;
       }
@@ -1016,7 +855,6 @@ export default function AgentPage() {
         analysisResponse += spamNftList;
       }
 
-      // Add verification method info
       analysisResponse += `\n\nOur analysis combines Covalent GoldRush API results with our own database of ${
         networkMapping[chainId] ? "over 7 million" : "thousands of"
       } known spam tokens to provide comprehensive protection.`;
@@ -1030,16 +868,12 @@ export default function AgentPage() {
     }
   };
 
-  // Function to fetch and display the token balances for a wallet
   const getTokenBalances = async (
     address: string,
     chainId: string = "eth-mainnet"
   ): Promise<string> => {
     try {
-      // Store the chain selection for future requests
       setSelectedChain(chainId);
-      // Only set selectedChainId for balance-related queries, not for token analysis
-      // This ensures chain detection for honeypot still works
       setSelectedChainId(convertChainFormat(chainId, "honeypot"));
 
       const walletData = await fetchWalletData(address, chainId);
@@ -1053,34 +887,28 @@ export default function AgentPage() {
         return `No tokens found in this wallet on ${chainName}. Try checking another blockchain.`;
       }
 
-      // Separate tokens from NFTs
       const tokens = walletData.data.items.filter(
         (t) => t.type === "cryptocurrency"
       );
       const nfts = walletData.data.items.filter((t) => t.type === "nft");
 
-      // Format the token balances
       let response = `💰 WALLET BALANCES - ${chainName}\n\nAddress: ${address}\n\n`;
 
-      // Sort by value (if available)
       const sortedTokens = [...tokens].sort((a, b) => {
         const valueA = parseFloat(String(a.quote || "0"));
         const valueB = parseFloat(String(b.quote || "0"));
-        return valueB - valueA; // Sort descending by value
+        return valueB - valueA;
       });
 
-      // Check for local spam tokens as well
       const spamChecks = await Promise.all(
         sortedTokens.map(async (token) => {
           if (!token.is_spam) {
-            // Only check tokens not already flagged by GoldRush
             return await checkLocalSpamList(token.contract_address, chainId);
           }
           return false;
         })
       );
 
-      // Add token balances
       if (sortedTokens.length > 0) {
         response += `TOKENS (${sortedTokens.length}):\n`;
 
@@ -1088,7 +916,6 @@ export default function AgentPage() {
           const balance =
             parseFloat(token.balance) / Math.pow(10, token.contract_decimals);
 
-          // Format balance with proper decimal places based on size
           let formattedBalance;
           if (balance < 0.000001) {
             formattedBalance = balance.toExponential(4);
@@ -1102,7 +929,6 @@ export default function AgentPage() {
             });
           }
 
-          // Markup for spam tokens (either from GoldRush API or our local database)
           const isSpam = token.is_spam || spamChecks[index];
           const spamWarning = isSpam ? " ⚠️" : "";
 
@@ -1111,8 +937,6 @@ export default function AgentPage() {
           })${spamWarning}: ${formattedBalance} ${
             token.contract_ticker_symbol
           }`;
-
-          // Add value if available
           if (token.pretty_quote) {
             response += ` (${token.pretty_quote})`;
           }
@@ -1120,7 +944,6 @@ export default function AgentPage() {
           response += "\n";
         });
 
-        // If there are more tokens than we displayed
         if (sortedTokens.length > 15) {
           response += `...and ${sortedTokens.length - 15} more tokens\n`;
         }
@@ -1128,7 +951,6 @@ export default function AgentPage() {
         response += "No regular tokens found in this wallet.\n";
       }
 
-      // Add NFT information if any
       if (nfts.length > 0) {
         response += `\nNFT COLLECTIONS (${nfts.length}):\n`;
 
@@ -1146,8 +968,6 @@ export default function AgentPage() {
           response += `...and ${nfts.length - 10} more NFT collections\n`;
         }
       }
-
-      // Add a security note
       response +=
         "\nNote: Items marked with ⚠️ are potentially spam or unsafe tokens. Exercise caution.";
 
@@ -1160,7 +980,6 @@ export default function AgentPage() {
     }
   };
 
-  // Add a new function specifically for token spam detection (focused on YAML lists)
   const analyzeTokenForSpam = async (
     address: string,
     chainId: string
@@ -1169,7 +988,6 @@ export default function AgentPage() {
     setAnalysisType("spam");
 
     try {
-      // Check our local spam lists
       const isLocalSpam = await checkLocalSpamList(address, chainId);
       const honeypotChainId = convertChainFormat(chainId, "honeypot");
       const chainName = getChainName(honeypotChainId);
@@ -1178,7 +996,6 @@ export default function AgentPage() {
         return `⚠️ SPAM TOKEN DETECTED ⚠️\n\nAddress: ${address}\nChain: ${chainName}\n\nThis token has been identified as SPAM in our database.\n\nRisk Level: HIGH\n\nThis token is listed in our spam token database. It may be used for scams, phishing, or other malicious activities. Do not interact with this token and do not approve any transactions requested by it.`;
       }
 
-      // Not in our local spam lists, return a more neutral response
       return `✅ TOKEN NOT IN SPAM DATABASE\n\nAddress: ${address}\nChain: ${chainName}\n\nThis token was not found in our spam database. However, this is only a basic check.\n\nFor a more thorough analysis including honeypot detection and smart contract risk assessment, ask me to 'check this token for honeypot' instead.\n\nAlways conduct your own research before investing.`;
     } catch (error) {
       console.error("Error analyzing token for spam:", error);
@@ -1188,9 +1005,7 @@ export default function AgentPage() {
     }
   };
 
-  // Handle message submission
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // When the user sends their first message, it's no longer the initial conversation
     if (isInitialConversation) {
       setIsInitialConversation(false);
     }
@@ -1202,26 +1017,20 @@ export default function AgentPage() {
       timestamp: new Date(),
     };
 
-    // Add user message to the chat
     setMessages((prev) => [...prev, userMessage]);
     setIsProcessing(true);
     form.reset();
 
     try {
-      // Default response
       let response: string =
         "I don't have specific information about that yet. As development continues, I'll be able to provide more detailed answers.";
 
-      // Check for address patterns
       const addressResult = detectAddress(values.userQuestion);
       const requestedChain = detectChainRequest(values.userQuestion);
 
-      // Update chain if mentioned in the question
       if (requestedChain) {
-        console.log(`Chain requested in query: ${requestedChain}`);
         setSelectedChain(requestedChain);
 
-        // Only set this for balance or wallet queries, not for token analysis
         const isTokenAnalysisQuery =
           !values.userQuestion.toLowerCase().includes("balance") &&
           !values.userQuestion.toLowerCase().includes("holdings") &&
@@ -1231,16 +1040,9 @@ export default function AgentPage() {
 
         if (!isTokenAnalysisQuery) {
           setSelectedChainId(convertChainFormat(requestedChain, "honeypot"));
-          console.log(
-            `Setting selected chain ID for wallet/balance query: ${convertChainFormat(
-              requestedChain,
-              "honeypot"
-            )}`
-          );
         }
       }
 
-      // Check for balance queries
       const isBalanceQuery =
         values.userQuestion.toLowerCase().includes("balance") ||
         values.userQuestion.toLowerCase().includes("holdings") ||
@@ -1250,48 +1052,33 @@ export default function AgentPage() {
         values.userQuestion.toLowerCase().includes("what do i hodl") ||
         values.userQuestion.toLowerCase().includes("what tokens");
 
-      // Handle different types of requests
       if (addressResult) {
         try {
           if (isBalanceQuery) {
-            // User is asking about token balances
             const chainToUse = requestedChain || selectedChain;
-            console.log(`Getting token balances on chain: ${chainToUse}`);
             response = await getTokenBalances(
               addressResult.address,
               chainToUse
             );
           } else if (addressResult.type === "wallet") {
-            // Analyze wallet for spam tokens
             const chainToUse = requestedChain || selectedChain;
-            console.log(`Analyzing wallet on chain: ${chainToUse}`);
             response = await analyzeWalletAddress(
               addressResult.address,
               chainToUse
             );
           } else if (addressResult.type === "token") {
-            // Check token against spam lists using our dedicated function
             const chainToUse = requestedChain || selectedChain;
-            console.log(`Checking token spam status on chain: ${chainToUse}`);
             response = await analyzeTokenForSpam(
               addressResult.address,
               chainToUse
             );
           } else {
-            // Analyze contract for honeypot (default behavior)
-            // For tokens, always prefer auto-detection unless specifically requested
             let chainToUse: string | null = null;
 
             if (requestedChain) {
-              // User specifically mentioned a chain in the query
               chainToUse = convertChainFormat(requestedChain, "honeypot");
-              console.log(
-                `Using requested chain for honeypot check: ${chainToUse}`
-              );
             } else {
-              // Always auto-detect the chain for token analysis
               chainToUse = "auto";
-              console.log("Auto-detecting chain for honeypot check");
             }
 
             response = await analyzeTokenAddress(
@@ -1306,18 +1093,15 @@ export default function AgentPage() {
           }`;
         }
       } else if (isBalanceQuery && walletAddress) {
-        // User is asking about their connected wallet's token balances
         const chainToUse = requestedChain || selectedChain;
         response = await getTokenBalances(walletAddress, chainToUse);
       } else if (
         values.userQuestion.toLowerCase().includes("check my wallet") ||
         values.userQuestion.toLowerCase().includes("analyze my wallet")
       ) {
-        // Prompt for wallet address
         response =
           "I'd be happy to analyze your wallet for spam tokens. Please provide your wallet address and specify which blockchain you'd like me to check (e.g., Ethereum, BSC, Polygon, etc.).";
       } else if (isBalanceQuery && !walletAddress) {
-        // User is asking about balances but no wallet is provided
         response =
           "I'd be happy to show you your token balances. Please provide your wallet address and specify which blockchain you'd like me to check (e.g., Ethereum, BSC, Polygon, etc.).";
       } else if (
@@ -1325,14 +1109,12 @@ export default function AgentPage() {
         values.userQuestion.toLowerCase().includes("check this token") ||
         values.userQuestion.toLowerCase().includes("honeypot check")
       ) {
-        // Prompt for token address
         response =
           "I'd be happy to analyze a token for honeypot risks. Please provide the token's contract address and specify which blockchain it's on (Ethereum, BSC, Polygon, Optimism, Gnosis, or Base).";
       } else if (
         values.userQuestion.toLowerCase().includes("chain") &&
         values.userQuestion.toLowerCase().includes("support")
       ) {
-        // Provide information about supported chains
         response = `For spam token detection, I support the following chains:\n\n${supportedChains
           .filter((c) => c.type === "Mainnet")
           .map((c) => `• ${c.name}`)
@@ -1342,7 +1124,6 @@ export default function AgentPage() {
           .map((c) => `• ${c.name} (${c.shortName})`)
           .join("\n")}`;
       } else {
-        // Check for known questions in our sample responses
         const normalizedQuestion = values.userQuestion.toLowerCase().trim();
 
         for (const [keyword, res] of Object.entries(sampleResponses)) {
@@ -1352,7 +1133,6 @@ export default function AgentPage() {
           }
         }
 
-        // Check for specific keywords to provide more targeted responses
         if (
           normalizedQuestion.includes("scam") ||
           normalizedQuestion.includes("fraud")
@@ -1368,7 +1148,6 @@ export default function AgentPage() {
         }
       }
 
-      // Create assistant message with the final response string
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -1376,14 +1155,12 @@ export default function AgentPage() {
         timestamp: new Date(),
       };
 
-      // Update messages state with the assistant's response
       setMessages((prevMessages) => [...prevMessages, assistantMessage]);
     } catch (error) {
       console.error("Error processing request:", error);
       const errorMessage =
         error instanceof Error ? error.message : "An unknown error occurred";
 
-      // Create error message
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -1391,20 +1168,17 @@ export default function AgentPage() {
         timestamp: new Date(),
       };
 
-      // Update messages state with the error response
       setMessages((prevMessages) => [...prevMessages, assistantMessage]);
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Copy message to clipboard
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard");
   };
 
-  // Handle mobile menu click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const mobileMenuElement = document.getElementById(
@@ -1430,7 +1204,6 @@ export default function AgentPage() {
     };
   }, [mobileMenuOpen]);
 
-  // Components for suggested questions
   const SuggestedQuestions = () => (
     <div className="mb-6 mt-2">
       <h3
@@ -1496,7 +1269,6 @@ export default function AgentPage() {
     </div>
   );
 
-  // Components for sample tokens and wallets
   const SampleTokens = () => (
     <div className="mb-2">
       <h3
@@ -1553,192 +1325,7 @@ export default function AgentPage() {
     <div className="flex min-h-screen flex-col bg-[#000000] text-white">
       <main>
         {/* Header */}
-        <header className="w-full border-b border-[#ffa500]/20 backdrop-blur-md bg-black/50 p-3 sm:p-4 md:p-5 sticky top-0 z-50">
-          <div className="container mx-auto px-2 flex items-center justify-between">
-            {/* Left section - Logo */}
-            <div className="flex items-center">
-              <Link
-                href="/"
-                className="flex items-center gap-1.5 sm:gap-2 md:gap-3"
-              >
-                <Image
-                  src="/logo.png"
-                  alt="RugProof Logo"
-                  width={40}
-                  height={40}
-                  className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]"
-                />
-                <h1
-                  className={`${pixelFont.className} text-sm sm:text-lg md:text-2xl font-bold bg-gradient-to-r from-[#00ff00] to-[#00ffff] bg-clip-text text-transparent glow-green-sm`}
-                >
-                  RugProof
-                </h1>
-              </Link>
-            </div>
-
-            {/* Center section - Navigation (Desktop only) */}
-            <nav className="hidden md:flex items-center justify-center flex-1">
-              <div className="flex items-center space-x-8">
-                <Link
-                  href="/"
-                  className={`${pixelMonoFont.className} text-lg text-[#00ff00] hover:text-[#00ffff] transition-colors`}
-                >
-                  Spam Detector
-                </Link>
-                <Link
-                  href="/honeypot"
-                  className={`${pixelMonoFont.className} text-lg text-[#ffa500] hover:text-[#ffcc00] transition-colors`}
-                >
-                  Honeypot Check
-                </Link>
-                <Link
-                  // href="/agent"
-                  href="#"
-                  className={`${pixelMonoFont.className} text-lg text-[#00ffff]/60 hover:text-[#00ffff] border-b-2 border-[#00ffff] pb-1 transition-colors`}
-                >
-                  AI Agent (Coming Soon)
-                </Link>
-                <Link
-                  href="#"
-                  className={`${pixelMonoFont.className} text-lg text-[#00ffff]/60 hover:text-[#00ffff] transition-colors`}
-                >
-                  Chrome Extension (Soon)
-                </Link>
-              </div>
-            </nav>
-
-            {/* Right section - Desktop Wallet connect and Mobile Menu */}
-            <div className="flex items-center gap-2">
-              {/* Desktop Wallet Connect */}
-              <div className="hidden md:block">
-                <WalletConnect />
-              </div>
-
-              {/* Mobile navigation button */}
-              <div className="block md:hidden relative z-50">
-                <button
-                  id="mobile-menu-button"
-                  className="btn btn-sm btn-circle bg-[#ffa500]/10 hover:bg-[#ffa500]/20 border border-[#ffa500]/40 text-[#ffa500]"
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 6h16M4 12h16M4 18h7"
-                    />
-                  </svg>
-                </button>
-
-                {/* Mobile Menu Dropdown */}
-                {mobileMenuOpen && (
-                  <div
-                    id="mobile-menu-container"
-                    className="z-[100] bg-black/95 backdrop-blur-md rounded-xl shadow-[0_0_15px_rgba(255,165,0,0.3)] border border-[#ffa500]/30 fixed top-16 right-2 w-72 overflow-hidden"
-                  >
-                    <div className="flex flex-col p-4 space-y-4 max-h-[80vh] overflow-y-auto">
-                      {/* Close button */}
-                      <button
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="absolute top-2 right-2 text-[#ffa500] hover:text-[#ffcc00] p-2"
-                      >
-                        <X className="h-6 w-6" />
-                      </button>
-
-                      {/* Mobile Navigation Menu */}
-                      <div className="space-y-4 mt-2">
-                        <div className="px-2 py-1 text-[#00ffff] text-sm font-semibold uppercase">
-                          Navigation
-                        </div>
-                        <Link
-                          href="/"
-                          className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#00ff00] hover:text-[#00ffff] hover:bg-[#00ff00]/10 rounded-lg transition-colors`}
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                            />
-                          </svg>
-                          Spam Detector
-                        </Link>
-                        <Link
-                          href="/honeypot"
-                          className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#ffa500] hover:text-[#ffcc00] bg-[#ffa500]/10 rounded-lg transition-colors`}
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                            />
-                          </svg>
-                          Honeypot Check
-                        </Link>
-                        <Link
-                          // href="/agent"
-                          href="#"
-                          className={`${pixelMonoFont.className} flex items-center gap-2 px-4 py-3 text-lg text-[#00ffff]/60 hover:text-[#00ffff] border-b-2 border-[#00ffff] hover:bg-[#00ffff]/10 rounded-lg transition-colors bg-[#00ffff]/10`}
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                            />
-                          </svg>
-                          AI Agent (Coming Soon)
-                        </Link>
-                      </div>
-
-                      {/* Mobile Wallet Connect */}
-                      <div className="border-t border-[#ffa500]/20 pt-4 mt-2">
-                        <div className="px-2 py-1 text-[#00ffff] text-sm font-semibold uppercase mb-3">
-                          Wallet
-                        </div>
-                        <div className="p-2">
-                          <WalletConnect />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </header>
+        <Navbar />
 
         {/* Main content */}
         <div className="flex-1 flex flex-col container mx-auto px-4 py-4 max-w-4xl">
@@ -1761,36 +1348,6 @@ export default function AgentPage() {
           <div className="flex-1 flex flex-col bg-black/50 border border-[#00ff00]/30 rounded-lg shadow-[0_0_15px_rgba(0,255,0,0.15)] overflow-hidden h-[550px] max-h-[680px]">
             {/* Messages area with scrollable content */}
             <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0 max-h-[calc(680px-64px)] scrollbar-custom">
-              {/* Add a style block for custom scrollbar */}
-              <style jsx global>{`
-                /* Custom scrollbar styling */
-                .scrollbar-custom::-webkit-scrollbar {
-                  width: 10px;
-                  background-color: rgba(0, 0, 0, 0.3);
-                }
-
-                .scrollbar-custom::-webkit-scrollbar-thumb {
-                  background-color: rgba(0, 255, 0, 0.3);
-                  border-radius: 5px;
-                  border: 1px solid rgba(0, 255, 0, 0.5);
-                }
-
-                .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-                  background-color: rgba(0, 255, 0, 0.5);
-                }
-
-                .scrollbar-custom::-webkit-scrollbar-track {
-                  background-color: rgba(0, 0, 0, 0.3);
-                  border-radius: 5px;
-                }
-
-                /* Firefox scrollbar */
-                .scrollbar-custom {
-                  scrollbar-width: thin;
-                  scrollbar-color: rgba(0, 255, 0, 0.3) rgba(0, 0, 0, 0.3);
-                }
-              `}</style>
-
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -1997,7 +1554,6 @@ export default function AgentPage() {
                                                             tokenAddress,
                                                             chain.id
                                                           );
-                                                        // Only update state after promise resolves
                                                         setMessages((prev) => [
                                                           ...prev.slice(0, -1),
                                                           {
@@ -2053,7 +1609,6 @@ export default function AgentPage() {
                                                             walletAddress,
                                                             chain.id
                                                           );
-                                                        // Only update state after promise resolves
                                                         setMessages((prev) => [
                                                           ...prev.slice(0, -1),
                                                           {
@@ -2248,7 +1803,6 @@ export default function AgentPage() {
             </div>
           </div>
 
-          {/* Footer with disclaimer */}
           <div className="mt-4 border-t border-[#00ff00]/20 pt-3">
             <p
               className={`${pixelMonoFont.className} text-center text-[#00ff00]/70 text-xs`}
@@ -2260,72 +1814,7 @@ export default function AgentPage() {
           </div>
         </div>
       </main>
-      <footer className="w-full border-t border-[#00ff00]/20 backdrop-blur-md bg-black/50 p-4 sm:p-6 md:p-8 text-center mt-10">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4">
-          <div className="flex flex-col md:flex-row md:justify-between gap-6 sm:gap-8 py-4">
-            {/* Logo and Brand */}
-            <div className="flex flex-col items-center md:items-start">
-              <div className="flex items-center gap-3 mb-4">
-                <Image
-                  src="/logo.png"
-                  alt="RugProof Logo"
-                  width={40}
-                  height={40}
-                  className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px]"
-                />
-                <p
-                  className={`${pixelFont.className} text-2xl sm:text-3xl font-semibold text-[#00ff00]`}
-                >
-                  RugProof
-                </p>
-              </div>
-              <p
-                className={`${pixelMonoFont.className} text-base sm:text-lg text-[#00ffff] mb-4 sm:text-left`}
-              >
-                RETRO FUTURISM IN DIGITAL FORM
-              </p>
-            </div>
-
-            {/* About */}
-            <div className="flex flex-col items-center md:items-end max-w-md">
-              <p
-                className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400 sm:text-right leading-relaxed`}
-              >
-                RugProof helps you identify and protect against crypto scams,
-                spam tokens, and honeypots across multiple blockchains.
-              </p>
-              <div className="mt-4 flex flex-wrap items-center justify-center md:justify-end gap-3">
-                <span
-                  className={`${pixelMonoFont.className} text-base sm:text-lg text-gray-400`}
-                >
-                  Built by{" "}
-                  <span className="text-[#00ffff] font-medium">ForgeX</span>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-[#00ff00]/10 mt-4 pt-4 flex flex-col sm:flex-row justify-between items-center">
-            <p className={`${pixelMonoFont.className} text-base text-gray-500`}>
-              © {new Date().getFullYear()} RugProof. All rights reserved.
-            </p>
-            <div className="flex mt-3 sm:mt-0 gap-4">
-              <Link
-                href="/"
-                className={`${pixelMonoFont.className} text-base text-[#00ff00] hover:text-[#00ffff] transition-colors`}
-              >
-                SPAM DETECTION
-              </Link>
-              <Link
-                href="/honeypot"
-                className={`${pixelMonoFont.className} text-base text-[#ffa500] hover:text-[#ffcc00] transition-colors`}
-              >
-                HONEYPOT CHECKER
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

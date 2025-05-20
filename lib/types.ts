@@ -149,3 +149,11 @@ export interface TopHoldersResponse {
 }
 
 export type EndpointType = "honeypot" | "contract" | "pairs" | "holders";
+
+export type Message = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+  isTokenAnalysis?: boolean;
+};
