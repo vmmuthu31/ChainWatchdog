@@ -1,5 +1,4 @@
 import { AlertTriangle, Search, ShieldCheck } from "lucide-react";
-import React from "react";
 
 function CovalentTabSelector({
   activeTab,

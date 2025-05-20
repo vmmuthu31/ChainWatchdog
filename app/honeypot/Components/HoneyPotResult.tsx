@@ -1,7 +1,6 @@
 import { pixelFont, pixelMonoFont } from "@/lib/font";
 import { getExplorerUrl } from "@/lib/utils/getExplorerUrl";
 import { AlertTriangle, CheckCircle, ExternalLink, Info } from "lucide-react";
-import React from "react";
 
 function HoneyPotResult({
   honeypotResult,

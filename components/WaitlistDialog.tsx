@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { pixelMonoFont } from "@/lib/font";
 import { toast } from "sonner";
 interface WaitlistDialogProps {
@@ -18,7 +18,7 @@ function WaitlistDialog({ isOpen, onClose }: WaitlistDialogProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const formID = process.env.NEXT_PUBLIC_FORMSPREE_ID;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     if (!formID) {

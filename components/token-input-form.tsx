@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Loader2, Search, ShieldCheck } from "lucide-react";
 import { pixelFont, pixelMonoFont } from "@/lib/font";
+import { useEffect, useRef } from "react";
 
 const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
 
@@ -42,9 +42,9 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
     onSubmit(values);
   }
 
-  const inputElementRef = React.useRef<HTMLInputElement | null>(null);
+  const inputElementRef = useRef<HTMLInputElement | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const applyInputStyles = () => {
       if (inputElementRef.current) {
         inputElementRef.current.style.backgroundColor = "rgba(0, 0, 0, 0.8)";

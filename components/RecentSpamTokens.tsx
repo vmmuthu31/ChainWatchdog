@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, FormEvent } from "react";
 import { AlertTriangle, ExternalLink, Search } from "lucide-react";
 import { getExplorerUrl } from "@/lib/services/goldrush";
 import yaml from "js-yaml";
@@ -349,7 +349,7 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     }
   }, [selectedChain, showRecentFromAll, parseSpamList]);
 
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!searchTerm.trim()) return;

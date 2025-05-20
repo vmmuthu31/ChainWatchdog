@@ -1,6 +1,5 @@
 import { pixelFont, pixelMonoFont } from "@/lib/font";
 import { AlertTriangle, CheckCircle, Info } from "lucide-react";
-import React from "react";
 
 function ContractVertification({
   contractResult,

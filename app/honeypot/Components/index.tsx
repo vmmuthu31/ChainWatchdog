@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Loader2,
@@ -219,7 +219,7 @@ function HoneyPot() {
     }
   };
 
-  const handleCheck = async (e: React.FormEvent) => {
+  const handleCheck = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!contractAddress) {
