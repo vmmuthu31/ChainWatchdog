@@ -263,7 +263,6 @@ export const analyzeTokenAddress = async (
         }\n\nRecommendation: Standard precautions advised. While initial checks show no major issues, always conduct your own research before investing.`;
       }
     } catch (error) {
-      // Even if the honeypot API fails, we might have found it in local lists
       if (isLocalSpam) {
         return `⚠️ SPAM TOKEN DETECTED ⚠️\n\nAddress: ${address}\nChain: ${getChainName(
           apiChainId

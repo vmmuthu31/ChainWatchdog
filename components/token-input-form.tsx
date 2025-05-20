@@ -78,7 +78,6 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
       inputElement.addEventListener("blur", handleBlur);
       inputElement.addEventListener("input", handleInput);
 
-      // Clean up
       return () => {
         inputElement.removeEventListener("focus", handleFocus);
         inputElement.removeEventListener("blur", handleBlur);
@@ -155,7 +154,6 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
                           e.target.style.webkitTextFillColor = "#00ffff";
                         }}
                         onAnimationStart={(e) => {
-                          // Handle autofill animation events
                           const input = e.target as HTMLInputElement;
                           input.style.color = "#00ffff";
                           input.style.webkitTextFillColor = "#00ffff";

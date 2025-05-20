@@ -133,7 +133,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     }
 
     try {
-      console.log(`Fetching YAML file: ${path}`);
       const response = await fetch(path);
 
       if (!response.ok) {
@@ -262,8 +261,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
           .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
           .slice(0, 5);
       }
-
-      console.log(`Received ${tokens.length} tokens`);
       setRecentSpamTokens(tokens);
     } catch (err: unknown) {
       console.error("Error fetching recent spam tokens:", err);
@@ -337,8 +334,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
           .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
           .slice(0, 5);
       }
-
-      console.log(`Received ${nfts.length} NFTs`);
       setRecentSpamNFTs(nfts);
     } catch (err: unknown) {
       console.error("Error fetching recent spam NFTs:", err);
@@ -359,7 +354,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
 
     try {
       const searchAddress = searchTerm.trim().toLowerCase();
-      console.log(`Searching for contract: ${searchAddress}`);
 
       for (const [, network] of Object.entries(networkMapping)) {
         let parsed = await fetchYamlWithCache(network.yamlPath);

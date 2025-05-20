@@ -2,20 +2,16 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-// Custom styled input that enforces dark theme
 const Input = React.forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement>
 >(({ className, type, ...props }, ref) => {
-  // Use an effect to ensure the input styling is maintained
   const innerRef = React.useRef<HTMLInputElement | null>(null);
 
-  // Handle the ref forwarding
   React.useImperativeHandle(ref, () => innerRef.current as HTMLInputElement);
 
   React.useEffect(() => {
     if (innerRef.current) {
-      // Force dark styling
       innerRef.current.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
       innerRef.current.style.color = "#00ffff";
     }

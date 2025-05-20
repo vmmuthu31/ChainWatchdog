@@ -21,7 +21,6 @@ async function loadYaml(filePath: string, useCache = true): Promise<YamlData> {
     }
 
     const content = await response.text();
-    // Parse YAML
     const data = parseYaml(content);
 
     if (useCache) {
@@ -181,5 +180,4 @@ export function getSpamScore(entry: string): string {
   return entry.split("/")[2];
 }
 
-// Re-export the types for easier usage
 export { Networks, Confidence };

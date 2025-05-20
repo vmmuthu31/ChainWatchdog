@@ -110,7 +110,6 @@ export const supportedChains: ChainInfo[] = [
     type: "Testnet",
     category: "EVM",
   },
-  // Frontier Chains
   {
     id: "btc-mainnet",
     name: "Bitcoin",
@@ -328,7 +327,6 @@ export const supportedChains: ChainInfo[] = [
     type: "Mainnet",
     category: "Layer2",
   },
-  // Community Chains
   {
     id: "aurora-mainnet",
     name: "Aurora",

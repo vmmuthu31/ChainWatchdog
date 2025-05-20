@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 export function middleware() {
   const response = NextResponse.next();
 
-  // Add CORS headers to all responses
   response.headers.set("Access-Control-Allow-Origin", "*");
   response.headers.set(
     "Access-Control-Allow-Methods",
