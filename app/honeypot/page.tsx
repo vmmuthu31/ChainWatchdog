@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import HoneyPot from "./Components/HoneyPot";
+import HoneyPot from "./Components";
 import { Loader2 } from "lucide-react";
 import { pixelMonoFont } from "@/lib/font";
 
