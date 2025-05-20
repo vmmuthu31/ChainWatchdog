@@ -17,6 +17,27 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "RugProof - Protect Your Crypto Assets",
   description: "Detect and protect against crypto spam, honeypots, and scams",
+  openGraph: {
+    title: "RugProof - Protect Your Crypto Assets",
+    description: "Detect and protect against crypto spam, honeypots, and scams",
+    url: "https://rugproofai.com",
+    siteName: "RugProof",
+    images: [
+      {
+        url: "/banner.png",
+        width: 1200,
+        height: 630,
+        alt: "RugProof Banner",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RugProof - Protect Your Crypto Assets",
+    description: "Detect and protect against crypto spam, honeypots, and scams",
+    images: ["/banner.png"],
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +49,26 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="stylesheet" href="/fix-selection.css" />
-        {/* Inline critical CSS to fix selection colors immediately */}
+        <meta
+          property="og:title"
+          content="RugProof - Protect Your Crypto Assets"
+        />
+        <meta
+          property="og:description"
+          content="Detect and protect against crypto spam, honeypots, and scams"
+        />
+        <meta property="og:image" content="/banner.png" />
+        <meta property="og:url" content="https://rugproofai.com" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="RugProof - Protect Your Crypto Assets"
+        />
+        <meta
+          name="twitter:description"
+          content="Detect and protect against crypto spam, honeypots, and scams"
+        />
+        <meta name="twitter:image" content="/banner.png" />
         <style
           dangerouslySetInnerHTML={{
             __html: `
