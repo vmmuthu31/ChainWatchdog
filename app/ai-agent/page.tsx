@@ -1339,13 +1339,13 @@ export default function AgentPage() {
                 <h2
                   className={`${pixelMonoFont.className} text-[#00ffff] text-2xl mb-4`}
                 >
-                  🔒 Early Access Feature
+                  🔒 Exclusive Early Access{" "}
                 </h2>
                 <p
                   className={`${pixelMonoFont.className} text-[#00ffff]/70 text-center max-w-md mb-6`}
                 >
-                  Our AI Agent is currently in early access. Join the waitlist
-                  to get notified when it&apos;s available!
+                  Be among the first to put RugProof’s AI Agent on your side
+                  before you trade.
                 </p>
                 <button
                   onClick={() => setIsWaitlistOpen(true)}
