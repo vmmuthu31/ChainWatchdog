@@ -2,20 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { AlertTriangle, ExternalLink, Search } from "lucide-react";
-import { Press_Start_2P, VT323 } from "next/font/google";
 import { getExplorerUrl } from "@/lib/services/goldrush";
 import yaml from "js-yaml";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-
-const pixelFont = Press_Start_2P({
-  weight: "400",
-  subsets: ["latin"],
-});
-
-const pixelMonoFont = VT323({
-  weight: "400",
-  subsets: ["latin"],
-});
+import { pixelFont, pixelMonoFont } from "@/lib/font";
 
 const networkMapping: Record<
   string,
@@ -317,13 +307,11 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
           .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
           .slice(0, 5);
       } else if (selectedChain && chainToNetwork[selectedChain]) {
-        // Fetch NFTs for specific chain
         const { networkKey } = chainToNetwork[selectedChain];
         const network = networkMapping[networkKey];
         nfts = await parseSpamList(networkKey, network.nftYamlPath, 10);
         nfts = nfts.slice(0, 5);
       } else {
-        // Fetch from default networks
         const defaultNetworks = [
           "ETHEREUM_MAINNET",
           "BSC_MAINNET",
@@ -374,7 +362,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
       console.log(`Searching for contract: ${searchAddress}`);
 
       for (const [, network] of Object.entries(networkMapping)) {
-        // Search in token spam list
         let parsed = await fetchYamlWithCache(network.yamlPath);
 
         if (
@@ -420,7 +407,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
 
   useEffect(() => {
     if (chainId) {
-      // Check if chainId is in our supported list for spam tokens
       const supportedChainIds = [
         "eth-mainnet",
         "bsc-mainnet",
@@ -433,7 +419,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
       if (supportedChainIds.includes(chainId)) {
         setSelectedChain(chainId);
       } else {
-        // Default to Ethereum for unsupported chains
         setSelectedChain("eth-mainnet");
       }
     }
@@ -453,7 +438,6 @@ export function RecentSpamTokens({ chainId }: RecentSpamTokensProps) {
     ? "Show chain specific tokens"
     : "Show most recent from all chains";
 
-  // Search UI
   const renderSearchSection = () => (
     <div className="mb-6 pt-3">
       <form onSubmit={handleSearch} className="flex gap-2">

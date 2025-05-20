@@ -14,17 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader2, Search, ShieldCheck } from "lucide-react";
-import { Press_Start_2P, VT323 } from "next/font/google";
-
-const pixelFont = Press_Start_2P({
-  weight: "400",
-  subsets: ["latin"],
-});
-
-const pixelMonoFont = VT323({
-  weight: "400",
-  subsets: ["latin"],
-});
+import { pixelFont, pixelMonoFont } from "@/lib/font";
 
 const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
 
@@ -40,49 +30,6 @@ type TokenInputFormProps = {
   isLoading: boolean;
 };
 
-// Add a more comprehensive style fix to address autofill and selection issues
-const AutofillStyleFix = () => (
-  <style jsx global>{`
-    /* Force text color for all states */
-    input {
-      color: #00ffff !important;
-      -webkit-text-fill-color: #00ffff !important;
-      background-color: black !important;
-      caret-color: #00ff00 !important;
-    }
-
-    /* Handle autofill */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus,
-    input:-webkit-autofill:active {
-      -webkit-box-shadow: 0 0 0 30px black inset !important;
-      -webkit-text-fill-color: #00ffff !important;
-      transition: background-color 5000s ease-in-out 0s;
-      color: #00ffff !important;
-    }
-
-    /* Override browser styles for autofill suggestions */
-    input:-internal-autofill-selected {
-      -webkit-text-fill-color: #00ffff !important;
-      color: #00ffff !important;
-      background-color: black !important;
-    }
-
-    /* Customize text selection colors */
-    ::selection {
-      background-color: rgba(0, 255, 0, 0.4) !important;
-      color: #00ffff !important;
-      -webkit-text-fill-color: #00ffff !important;
-    }
-
-    ::-moz-selection {
-      background-color: rgba(0, 255, 0, 0.4) !important;
-      color: #00ffff !important;
-    }
-  `}</style>
-);
-
 export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -95,10 +42,8 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
     onSubmit(values);
   }
 
-  // Track the input element for styling
   const inputElementRef = React.useRef<HTMLInputElement | null>(null);
 
-  // Apply styling directly after component mounts
   React.useEffect(() => {
     const applyInputStyles = () => {
       if (inputElementRef.current) {
@@ -108,10 +53,8 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
       }
     };
 
-    // Apply initially
     applyInputStyles();
 
-    // Apply styles on focus and blur events to maintain styling
     const inputElement = inputElementRef.current;
     if (inputElement) {
       const handleFocus = () => {
@@ -146,7 +89,6 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
 
   return (
     <Form {...form}>
-      <AutofillStyleFix />
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
         className="w-full max-w-lg space-y-6 sm:space-y-8"
@@ -156,17 +98,13 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
             control={form.control}
             name="tokenAddress"
             render={({ field }) => {
-              // Use a callback ref to apply styling when the element is created
               const inputRef = (element: HTMLInputElement) => {
-                // Call the original ref from field
                 if (typeof field.ref === "function") {
                   field.ref(element);
                 }
 
-                // Store the element in our ref
                 inputElementRef.current = element;
 
-                // Apply our custom styling
                 if (element) {
                   element.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
                   element.style.color = "#00ffff";

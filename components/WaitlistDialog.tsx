@@ -12,10 +12,7 @@ interface WaitlistDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
-export default function WaitlistDialog({
-  isOpen,
-  onClose,
-}: WaitlistDialogProps) {
+function WaitlistDialog({ isOpen, onClose }: WaitlistDialogProps) {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -100,3 +97,5 @@ export default function WaitlistDialog({
     </Dialog>
   );
 }
+
+export default WaitlistDialog;

@@ -1,18 +1,8 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { Press_Start_2P, VT323 } from "next/font/google";
 import { useState } from "react";
-
-const pixelFont = Press_Start_2P({
-  weight: "400",
-  subsets: ["latin"],
-});
-
-const pixelMonoFont = VT323({
-  weight: "400",
-  subsets: ["latin"],
-});
+import { pixelFont, pixelMonoFont } from "@/lib/font";
 
 const ChainIcon = ({ src, alt }: { src?: string; alt: string }) => {
   const [error, setError] = useState(false);

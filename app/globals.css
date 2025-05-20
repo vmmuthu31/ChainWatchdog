@@ -230,3 +230,37 @@ body {
     linear-gradient(90deg, rgba(0, 255, 0, 0.05) 1px, transparent 1px);
   background-size: 30px 30px;
 }
+
+input {
+  color: #00ffff !important;
+  -webkit-text-fill-color: #00ffff !important;
+  background-color: black !important;
+  caret-color: #00ff00 !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px black inset !important;
+  -webkit-text-fill-color: #00ffff !important;
+  transition: background-color 5000s ease-in-out 0s;
+  color: #00ffff !important;
+}
+
+input:-internal-autofill-selected {
+  -webkit-text-fill-color: #00ffff !important;
+  color: #00ffff !important;
+  background-color: black !important;
+}
+
+::selection {
+  background-color: rgba(0, 255, 0, 0.4) !important;
+  color: #00ffff !important;
+  -webkit-text-fill-color: #00ffff !important;
+}
+
+::-moz-selection {
+  background-color: rgba(0, 255, 0, 0.4) !important;
+  color: #00ffff !important;
+}
