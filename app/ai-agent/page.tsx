@@ -1796,7 +1796,7 @@ export default function AgentPage() {
 
           <div className="mt-4 border-t border-[#00ff00]/20 pt-3">
             <p
-              className={`${pixelMonoFont.className} text-center text-[#00ff00]/70 text-xs`}
+              className={`${pixelMonoFont.className} text-center text-[#00ff00]/70 text-sm`}
             >
               This AI assistant provides general information and is not
               financial advice. Always DYOR (Do Your Own Research) before making
