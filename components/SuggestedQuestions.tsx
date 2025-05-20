@@ -1,21 +1,5 @@
 import { pixelMonoFont } from "@/lib/font";
-import { BaseSyntheticEvent } from "react";
-
-import * as z from "zod";
-
-type FormData = {
-  userQuestion: string;
-};
-
-type SuggestedQuestionsProps = {
-  form: {
-    setValue: (field: keyof FormData, value: string) => void;
-    handleSubmit: (
-      callback: (data: FormData) => void | Promise<void>
-    ) => (e?: BaseSyntheticEvent) => void;
-  };
-  onSubmit: (data: FormData) => void | Promise<void>;
-};
+import { SuggestedQuestionsProps } from "@/lib/types";
 
 function SuggestedQuestions({ form, onSubmit }: SuggestedQuestionsProps) {
   return (

@@ -1,3 +1,5 @@
+import { BaseSyntheticEvent } from "react";
+
 export interface Token {
   name: string;
   symbol: string;
@@ -218,3 +220,17 @@ export interface ChainInfo {
   logoUrl?: string;
   category?: "EVM" | "Layer2" | "Non-EVM" | "Other";
 }
+
+type FormData = {
+  userQuestion: string;
+};
+
+export type SuggestedQuestionsProps = {
+  form: {
+    setValue: (field: keyof FormData, value: string) => void;
+    handleSubmit: (
+      callback: (data: FormData) => void | Promise<void>
+    ) => (e?: BaseSyntheticEvent) => void;
+  };
+  onSubmit: (data: FormData) => void | Promise<void>;
+};
