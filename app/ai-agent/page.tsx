@@ -1332,7 +1332,7 @@ export default function AgentPage() {
 
         {/* Main content */}
         <div className="flex-1 flex flex-col container mx-auto px-4 py-4 max-w-4xl">
-          <div className="relative flex-1 flex flex-col bg-black/50 border border-[#00ff00]/30 rounded-lg shadow-[0_0_15px_rgba(0,255,0,0.15)] overflow-hidden h-[550px] max-h-[680px]">
+          <div className="relative flex-1 flex flex-col bg-black/50 border border-[#00ff00]/30 rounded-lg shadow-[0_0_15px_rgba(0,255,0,0.15)] overflow-hidden min-h-[550px] max-h-[680px]">
             {/* Blur overlay */}
             {isBlurred && (
               <div className="absolute inset-0 z-40 backdrop-blur-md bg-black/30 flex flex-col items-center justify-center">
