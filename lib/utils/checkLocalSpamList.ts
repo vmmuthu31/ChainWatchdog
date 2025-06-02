@@ -1,5 +1,9 @@
 import * as yaml from "js-yaml";
 
+interface SpamList {
+  SpamContracts: string[];
+}
+
 export const checkLocalSpamList = async (
   address: string,
   chainId: string
@@ -59,15 +63,18 @@ export const checkLocalSpamList = async (
 
       const tokenYaml = await tokenResponse.text();
       const nftYaml = await nftResponse.text();
-      const tokenList = yaml.load(tokenYaml) as string[];
-      const nftList = yaml.load(nftYaml) as string[];
+      const tokenList = (yaml.load(tokenYaml) as SpamList).SpamContracts;
+      const nftList = (yaml.load(nftYaml) as SpamList).SpamContracts;
 
-      const isSpamToken = tokenList.some(
-        (addr) => addr.toLowerCase() === normalizedAddress
-      );
-      const isSpamNft = nftList.some(
-        (addr) => addr.toLowerCase() === normalizedAddress
-      );
+      const isSpamToken = tokenList.some((entry) => {
+        const contractAddress = entry.split("/")[1].toLowerCase();
+        return contractAddress === normalizedAddress;
+      });
+
+      const isSpamNft = nftList.some((entry) => {
+        const contractAddress = entry.split("/")[1].toLowerCase();
+        return contractAddress === normalizedAddress;
+      });
 
       return isSpamToken || isSpamNft;
     } catch (yamlError) {
