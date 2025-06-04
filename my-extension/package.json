@@ -5,13 +5,17 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build-extension": "next build && cp -r public/* dist/ && cp manifest.json dist/",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@covalenthq/client-sdk": "^2.2.6",
+    "lucide-react": "^0.513.0",
+    "next": "15.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.3.3"
+    "sonner": "^2.0.5"
   },
   "devDependencies": {
     "typescript": "^5",
