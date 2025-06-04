@@ -48,6 +48,8 @@ export default function Popup() {
         throw new Error("Please enter a wallet address.");
       }
 
+      console.log("Checking wallet:", tokenAddress, "on chain:", selectedChain);
+
       const result = await GoldRushServices(tokenAddress, selectedChain);
       setTokenData(result);
     } catch (err) {
