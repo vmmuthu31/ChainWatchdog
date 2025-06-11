@@ -127,7 +127,7 @@ export function TokenInputForm({ onSubmit, isLoading }: TokenInputFormProps) {
                       <input
                         {...field}
                         ref={inputRef}
-                        placeholder="Enter a wallet address (0x...)"
+                        placeholder="Enter a wallet address (0x... for ETH or base58 for SOL)"
                         disabled={isLoading}
                         aria-label="Wallet Address Input"
                         className={`${pixelMonoFont.className} w-full pl-10 pr-3 py-4 sm:py-5 rounded-md bg-[#111] border border-[#00ff00]/50 text-[#00ffff] focus:ring-[#00ff00] focus:border-[#00ff00] focus:outline-none focus:ring-2 text-base sm:text-lg md:text-xl placeholder:text-[#00ffaa]/50`}
