@@ -2,12 +2,28 @@ export const detectAgentAddress = (
   text: string
 ): { address: string; type: "wallet" | "token" | "contract" } | null => {
   const ethAddressRegex = /0x[a-fA-F0-9]{40}/g;
-  const matches = text.match(ethAddressRegex);
+  const solanaAddressRegex = /[1-9A-HJ-NP-Za-km-z]{32,44}/g;
+
+  let matches = text.match(ethAddressRegex);
+  let isSolana = false;
+
+  if (!matches || matches.length === 0) {
+    matches = text.match(solanaAddressRegex);
+    isSolana = true;
+  }
 
   if (!matches || matches.length === 0) return null;
 
   const address = matches[0];
   const lowercaseText = text.toLowerCase();
+
+  // For Solana addresses, default to wallet type since we don't have full Solana token support yet
+  if (isSolana) {
+    return {
+      address,
+      type: "wallet",
+    };
+  }
 
   const isWallet =
     lowercaseText.includes("wallet") ||

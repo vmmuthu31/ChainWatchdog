@@ -657,6 +657,9 @@ export const getExplorerUrl = (
 ): string => {
   const chain = supportedChains.find((c) => c.id === chainId);
   if (!chain) return `https://etherscan.io/token/${tokenAddress}`;
+  if (chain.category === "Non-EVM") {
+    return `https://explorer.solana.com/address/${tokenAddress}`;
+  }
   return `${chain.explorer}/token/${tokenAddress}`;
 };
 
