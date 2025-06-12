@@ -49,109 +49,129 @@ function HoneyPot() {
   );
   const [error, setError] = useState<string | null>(null);
   const [initialQueryHandled, setInitialQueryHandled] = useState(false);
-  const detectChain = async (address: string) => {
-    if (!address) return null;
+  const detectChain = useCallback(
+    async (address: string) => {
+      if (!address) return null;
 
-    const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-    if (solanaRegex.test(address)) {
-      await fetchSolanaTokenInfo(address);
-      return "solana-mainnet";
-    }
+      // Reset detection state
+      setIsDetectingChain(true);
+      setDetectedChain(null);
 
-    if (address.length < 42) return null;
+      try {
+        // Enhanced Solana address validation and detection
+        const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+        if (solanaRegex.test(address)) {
+          try {
+            // Validate Solana address by attempting to fetch token info
+            await fetchSolanaTokenInfo(address);
+            setDetectedChain("solana-mainnet");
+            setSelectedChain("solana-mainnet");
+            setIsDetectingChain(false);
+            return "solana-mainnet";
+          } catch (error) {
+            console.error("Invalid Solana address:", error);
+            // Continue to EVM detection if Solana validation fails
+          }
+        }
 
-    setIsDetectingChain(true);
-    setDetectedChain(null);
+        // EVM address validation
+        const evmAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+        if (!evmAddressRegex.test(address)) {
+          setIsDetectingChain(false);
+          return null;
+        }
 
-    try {
-      for (const chainObj of chainsToCheck) {
-        try {
-          if (chainObj.id === "43114") {
-            try {
-              const response = await fetch(
-                `${chainObj.explorer}/v1/chains/${chainObj.id}/addresses/${address}`,
-                {
-                  headers: {
-                    "x-glacier-api-key": chainObj.apikey || "",
-                  },
-                }
-              );
+        // Optimized EVM chain detection - check contract verification first
+        for (const chainObj of chainsToCheck) {
+          try {
+            let apiUrl: string;
+            let headers: Record<string, string> = {};
 
-              if (response.ok) {
-                const data = await response.json();
-                if (data && data.address) {
-                  setDetectedChain(chainObj.id);
-                  setSelectedChain(chainObj.id);
-                  setIsDetectingChain(false);
-                  return chainObj.id;
-                }
+            // Handle Avalanche's different API structure
+            if (chainObj.id === "43114") {
+              apiUrl = `${chainObj.explorer}/v1/chains/${chainObj.id}/addresses/${address}`;
+              headers = {
+                "x-glacier-api-key": chainObj.apikey || "",
+              };
+            } else {
+              apiUrl = `${chainObj.explorer}/api?module=contract&action=getabi&address=${address}&apikey=${chainObj.apikey}`;
+            }
+
+            const response = await fetch(apiUrl, {
+              headers,
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+
+              // Chain-specific validation logic
+              let isValidContract = false;
+
+              if (chainObj.id === "43114") {
+                isValidContract = data && data.address;
+              } else {
+                isValidContract =
+                  data.status === "1" ||
+                  (data.result &&
+                    data.result !== "Contract source code not verified" &&
+                    data.result !== "" &&
+                    data.result !== null);
               }
-            } catch (error) {
-              console.error(`Error checking Glacier API for Avalanche:`, error);
-            }
-            continue;
-          }
 
-          const explorerResponse = await fetch(
-            `${chainObj.explorer}/api?module=contract&action=getabi&address=${address}&apikey=${chainObj.apikey}`
-          );
-
-          if (explorerResponse.ok) {
-            const explorerData = await explorerResponse.json();
-            if (
-              explorerData.status === "1" ||
-              (explorerData.result &&
-                explorerData.result !== "Contract source code not verified" &&
-                explorerData.result !== "" &&
-                explorerData.result !== null)
-            ) {
-              setDetectedChain(chainObj.id);
-              setSelectedChain(chainObj.id);
-              setIsDetectingChain(false);
-              return chainObj.id;
+              if (isValidContract) {
+                setDetectedChain(chainObj.id);
+                setSelectedChain(chainObj.id);
+                setIsDetectingChain(false);
+                return chainObj.id;
+              }
             }
+          } catch (error) {
+            console.error(
+              `Error checking chain ${chainObj.id} (${chainObj.name}):`,
+              error
+            );
+            // Continue checking other chains
           }
-        } catch (error) {
-          console.error(
-            `Error checking explorer for chain ${chainObj.id} (${chainObj.name}):`,
-            error
-          );
         }
-      }
 
-      for (const chainObj of chainsToCheck) {
-        try {
-          if (chainObj.id === "43114") continue;
+        // Fallback: Check account balance for chains that didn't have contract verification
+        for (const chainObj of chainsToCheck) {
+          try {
+            if (chainObj.id === "43114") continue; // Skip Avalanche for balance check
 
-          const response = await fetch(
-            `${chainObj.explorer}/api?module=account&action=balance&address=${address}&apikey=${chainObj.apikey}`
-          );
+            const response = await fetch(
+              `${chainObj.explorer}/api?module=account&action=balance&address=${address}&apikey=${chainObj.apikey}`
+            );
 
-          if (response.ok) {
-            const data = await response.json();
-            if (data.status === "1") {
-              setDetectedChain(chainObj.id);
-              setSelectedChain(chainObj.id);
-              setIsDetectingChain(false);
-              return chainObj.id;
+            if (response.ok) {
+              const data = await response.json();
+              if (data.status === "1") {
+                setDetectedChain(chainObj.id);
+                setSelectedChain(chainObj.id);
+                setIsDetectingChain(false);
+                return chainObj.id;
+              }
             }
+          } catch (error) {
+            console.error(
+              `Error checking balance for chain ${chainObj.id}:`,
+              error
+            );
+            // Continue checking other chains
           }
-        } catch (error) {
-          console.error(
-            `Error checking account balance for chain ${chainObj.id}:`,
-            error
-          );
         }
-      }
 
-      setIsDetectingChain(false);
-      return null;
-    } catch (error) {
-      console.error("Error in chain detection:", error);
-      setIsDetectingChain(false);
-      return null;
-    }
-  };
+        // No chain detected
+        setIsDetectingChain(false);
+        return null;
+      } catch (error) {
+        console.error("Error in chain detection:", error);
+        setIsDetectingChain(false);
+        return null;
+      }
+    },
+    [setIsDetectingChain, setDetectedChain, setSelectedChain]
+  );
 
   const fetchHoneypotData = useCallback(
     async (address: string, chainId: string) => {
@@ -340,6 +360,13 @@ function HoneyPot() {
     setHoldersResult(null);
 
     try {
+      console.log(
+        `Checking contract: ${contractAddress} on chain: ${selectedChain}`
+      );
+      console.log(
+        `Using endpoint: ${endpoint}, autoDetectChain: ${autoDetectChain}, detectedChain: ${detectedChain}`
+      );
+
       if (autoDetectChain && !detectedChain && !isDetectingChain) {
         const chainId = await detectChain(contractAddress);
         if (chainId) {
