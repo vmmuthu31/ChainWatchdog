@@ -18,6 +18,13 @@ export const chainsToCheck = [
     apikey: process.env.NEXT_PUBLIC_POLYGONSCAN_API_KEY,
   },
   {
+    id: "solana-mainnet",
+    name: "Solana",
+    explorer: "https://api.solscan.io",
+    apikey: process.env.NEXT_PUBLIC_SOLANA_API_KEY,
+    isSolana: true,
+  },
+  {
     id: "43114",
     name: "Avalanche",
     explorer: "https://glacier-api.avax.network",

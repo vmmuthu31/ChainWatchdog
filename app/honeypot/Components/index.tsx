@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect, Suspense, FormEvent } from "react";
+import { useState, useEffect, Suspense, FormEvent, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Loader2,
@@ -25,6 +26,7 @@ import PairResult from "./PairResult";
 import ContractVertification from "./ContractVertification";
 import HoneyPotResult from "./HoneyPotResult";
 import { chainsToCheck } from "@/lib/utils/chainsToCheck";
+import { fetchSolanaTokenInfo } from "@/lib/services/solanaScan";
 
 function HoneyPot() {
   const searchParams = useSearchParams();
@@ -47,9 +49,16 @@ function HoneyPot() {
   );
   const [error, setError] = useState<string | null>(null);
   const [initialQueryHandled, setInitialQueryHandled] = useState(false);
-
   const detectChain = async (address: string) => {
-    if (!address || address.length < 42) return null;
+    if (!address) return null;
+
+    const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+    if (solanaRegex.test(address)) {
+      await fetchSolanaTokenInfo(address);
+      return "solana-mainnet";
+    }
+
+    if (address.length < 42) return null;
 
     setIsDetectingChain(true);
     setDetectedChain(null);
@@ -144,23 +153,92 @@ function HoneyPot() {
     }
   };
 
-  const fetchHoneypotData = async (address: string, chainId: string) => {
-    try {
-      const response = await fetch(
-        `https://api.honeypot.is/v2/IsHoneypot?address=${address}&chainID=${chainId}`
-      );
+  const fetchHoneypotData = useCallback(
+    async (address: string, chainId: string) => {
+      try {
+        // If Solana, use our custom Solana service
+        if (
+          chainId === "solana-mainnet" ||
+          /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)
+        ) {
+          // Dynamically import the Solana service
+          const { solanaScanService } = await import(
+            "@/lib/services/solanaScan"
+          );
+          const data = await solanaScanService(address);
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
+          // Patch token type to ensure decimals property exists
+          if (
+            data &&
+            data.token &&
+            typeof (data.token as any).decimals === "undefined"
+          ) {
+            // Default to 9 decimals for Solana tokens if not provided
+            (data.token as any).decimals = 9;
+          }
+
+          // Patch summary to ensure riskLevel property exists
+          if (
+            data &&
+            data.summary &&
+            typeof (data.summary as any).riskLevel === "undefined"
+          ) {
+            (data.summary as any).riskLevel = 2;
+          }
+
+          return {
+            ...data,
+            chain: "solana-mainnet",
+            token: {
+              ...data.token,
+              decimals:
+                typeof (data.token as any).decimals === "number"
+                  ? (data.token as any).decimals
+                  : 9,
+            },
+            summary: {
+              risk:
+                typeof (data.summary as any)?.risk === "string"
+                  ? (data.summary as any).risk
+                  : "medium",
+              riskLevel:
+                typeof (data.summary as any)?.riskLevel === "number"
+                  ? (data.summary as any).riskLevel
+                  : 2,
+            },
+            simulationResult: {
+              ...data.simulationResult,
+              buyGas: String((data.simulationResult as any)?.buyGas ?? ""),
+              sellGas: String((data.simulationResult as any)?.sellGas ?? ""),
+            },
+            flags: Array.isArray(data.flags)
+              ? data.flags
+              : typeof data.flags === "object" && data.flags !== null
+              ? Object.keys(data.flags).filter(
+                  (key) => !!(data.flags as any)[key]
+                )
+              : [],
+          } as unknown as HoneypotResponse;
+        }
+
+        // For EVM chains, use the original API
+        const response = await fetch(
+          `https://api.honeypot.is/v2/IsHoneypot?address=${address}&chainID=${chainId}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data as HoneypotResponse;
+      } catch (error) {
+        console.error("Error fetching honeypot data:", error);
+        throw error;
       }
-
-      const data = await response.json();
-      return data as HoneypotResponse;
-    } catch (error) {
-      console.error("Error fetching honeypot data:", error);
-      throw error;
-    }
-  };
+    },
+    []
+  );
 
   const fetchContractVerification = async (
     address: string,
@@ -219,11 +297,38 @@ function HoneyPot() {
     }
   };
 
+  const validateAddress = (address: string): boolean => {
+    const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+    const solanaAddressRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+
+    // Check if the address matches either Ethereum or Solana format
+    const isValid =
+      ethAddressRegex.test(address) || solanaAddressRegex.test(address);
+
+    // If it's a Solana address and the selected chain isn't Solana, auto-select Solana
+    if (
+      solanaAddressRegex.test(address) &&
+      selectedChain !== "solana-mainnet"
+    ) {
+      setSelectedChain("solana-mainnet");
+      setDetectedChain("solana-mainnet");
+    }
+
+    return isValid;
+  };
+
   const handleCheck = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!contractAddress) {
       setError("Please enter a contract address");
+      return;
+    }
+
+    if (!validateAddress(contractAddress)) {
+      setError(
+        "Invalid address format. Please enter a valid Ethereum (0x...) or Solana address"
+      );
       return;
     }
 
@@ -320,14 +425,15 @@ function HoneyPot() {
 
       runInitialCheck();
     }
-  }, [searchParams, initialQueryHandled]);
+  }, [searchParams, initialQueryHandled, selectedChain, fetchHoneypotData]);
 
   useEffect(() => {
     if (initialQueryHandled) {
       const timer = setTimeout(() => {
         if (
           contractAddress &&
-          contractAddress.length >= 42 &&
+          ((contractAddress.length >= 42 && contractAddress.startsWith("0x")) ||
+            /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(contractAddress)) &&
           autoDetectChain
         ) {
           detectChain(contractAddress);
@@ -336,7 +442,7 @@ function HoneyPot() {
 
       return () => clearTimeout(timer);
     }
-  }, [contractAddress, autoDetectChain, initialQueryHandled]);
+  }, [contractAddress, autoDetectChain, initialQueryHandled, detectChain]);
 
   return (
     <Suspense>
@@ -438,7 +544,7 @@ function HoneyPot() {
                 <div className="relative w-full">
                   <input
                     type="text"
-                    placeholder="Enter a contract address (0x...)"
+                    placeholder="Enter a contract address (0x... for EVM or base58 for Solana)"
                     value={contractAddress}
                     onChange={(e) => setContractAddress(e.target.value)}
                     disabled={isLoading}
@@ -508,6 +614,7 @@ function HoneyPot() {
                     <option value="43114">Avalanche</option>
                     <option value="42161">Arbitrum</option>
                     <option value="10">Optimism</option>
+                    <option value="solana-mainnet">Solana</option>
                   </select>
 
                   {/* Show loading indicator when detecting */}
@@ -581,12 +688,17 @@ function HoneyPot() {
           {honeypotResult && !isLoading && endpoint === "honeypot" && (
             <HoneyPotResult
               honeypotResult={{
-                ...honeypotResult,
+                token: honeypotResult.token,
                 simulationResult: {
-                  ...honeypotResult.simulationResult,
+                  buyTax: honeypotResult.simulationResult.buyTax,
+                  sellTax: honeypotResult.simulationResult.sellTax,
+                  transferTax: honeypotResult.simulationResult.transferTax,
                   buyGas: Number(honeypotResult.simulationResult.buyGas),
                   sellGas: Number(honeypotResult.simulationResult.sellGas),
                 },
+                contractCode: honeypotResult.contractCode,
+                summary: honeypotResult.summary,
+                honeypotResult: honeypotResult.honeypotResult,
               }}
               detectedChain={detectedChain}
             />
@@ -648,7 +760,7 @@ function HoneyPot() {
               <div
                 className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
               >
-                6 Chains
+                7 Chains
               </div>
               <div
                 className={`${pixelMonoFont.className} text-xs sm:text-sm text-[#ffa500]/80 mt-1`}

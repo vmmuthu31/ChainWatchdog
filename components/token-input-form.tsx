@@ -20,13 +20,15 @@ const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
 const solanaAddressRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
 const formSchema = z.object({
-  tokenAddress: z.string().refine(
-    (value) => ethAddressRegex.test(value) || solanaAddressRegex.test(value),
-    {
-      message:
-        "Invalid wallet address format. Address must be either:\n- Ethereum: Start with '0x' followed by 40 hexadecimal characters\n- Solana: 32-44 characters long containing alphanumeric characters (base58)",
-    }
-  ),
+  tokenAddress: z
+    .string()
+    .refine(
+      (value) => ethAddressRegex.test(value) || solanaAddressRegex.test(value),
+      {
+        message:
+          "Invalid wallet address format. Address must be either:\n- Ethereum: Start with '0x' followed by 40 hexadecimal characters\n- Solana: 32-44 characters long containing alphanumeric characters (base58)",
+      }
+    ),
 });
 
 type TokenInputFormProps = {

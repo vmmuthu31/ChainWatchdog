@@ -12,6 +12,8 @@ export const getChainName = (chainId: string) => {
       return "Arbitrum";
     case "10":
       return "Optimism";
+    case "solana-mainnet":
+      return "Solana";
     default:
       return "Unknown Chain";
   }

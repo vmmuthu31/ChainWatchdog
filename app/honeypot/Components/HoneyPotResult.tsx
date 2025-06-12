@@ -33,9 +33,27 @@ function HoneyPotResult({
       isHoneypot?: boolean;
       honeypotReason?: string;
     };
+    flags?:
+      | {
+          isHoneypot: boolean;
+          isSellable: boolean;
+          isOpen: boolean;
+          isAntiWhale: boolean;
+          hasAntiBot: boolean;
+          staysLiquid: boolean;
+          routerOkForOps: boolean;
+          hasForeignCalls: boolean;
+          hasPermissions: boolean;
+        }
+      | string[];
+    chain?: string;
   };
   detectedChain?: string | null;
 }) {
+  const isSolana =
+    detectedChain === "solana-mainnet" ||
+    honeypotResult?.chain === "solana-mainnet";
+
   return (
     <div className="w-full max-w-2xl mt-6 animate-fade-in">
       {/* Token Summary Card */}
@@ -50,6 +68,7 @@ function HoneyPotResult({
             className={`${pixelFont.className} text-xl sm:text-2xl md:text-3xl font-bold text-[#ffa500]`}
           >
             HONEYPOT ANALYSIS
+            {isSolana && <span className="ml-2 text-sm">• SOLANA</span>}
           </h3>
         </div>
 
@@ -68,9 +87,10 @@ function HoneyPotResult({
                   {honeypotResult.token.address}
                 </span>
                 <a
-                  href={`${getExplorerUrl(detectedChain || "1")}/address/${
+                  href={getExplorerUrl(
+                    detectedChain || "1",
                     honeypotResult.token.address
-                  }`}
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-black/50 text-[#ffa500] hover:bg-black/70 hover:text-[#ffcc00] transition-colors border border-[#ffa500]/30"
@@ -350,9 +370,23 @@ function HoneyPotResult({
               <h4
                 className={`${pixelMonoFont.className} text-lg sm:text-xl font-medium text-[#ffa500] mb-3`}
               >
-                CONTRACT VERIFICATION
+                {isSolana ? "PROGRAM VERIFICATION" : "CONTRACT VERIFICATION"}
               </h4>
               <div className="space-y-3">
+                {isSolana && (
+                  <div className="flex justify-between items-center p-3 sm:p-4 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                    <span
+                      className={`${pixelMonoFont.className} text-base sm:text-lg text-[#ffa500]`}
+                    >
+                      SPL Token:
+                    </span>
+                    <span
+                      className={`${pixelMonoFont.className} text-base sm:text-lg text-[#00ff00]`}
+                    >
+                      YES
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center p-3 sm:p-4 bg-black/50 rounded-lg border border-[#ffa500]/10">
                   <span
                     className={`${pixelMonoFont.className} text-base sm:text-lg text-[#ffa500]`}
@@ -425,6 +459,115 @@ function HoneyPotResult({
                     }`}
                   >
                     {honeypotResult?.contractCode?.hasProxyCalls ? "YES" : "NO"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Solana-specific Analysis Section */}
+          {isSolana && (
+            <div className="p-4 sm:p-5 bg-black/70 rounded-xl border border-[#ffa500]/20 mb-5">
+              <h4
+                className={`${pixelMonoFont.className} text-lg sm:text-xl font-medium text-[#ffa500] mb-3`}
+              >
+                SOLANA TOKEN ANALYSIS
+              </h4>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 sm:p-4 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                  <span
+                    className={`${pixelMonoFont.className} text-base sm:text-lg text-[#ffa500]`}
+                  >
+                    Authority Check:
+                  </span>
+                  <span
+                    className={`${
+                      pixelMonoFont.className
+                    } text-base sm:text-lg ${
+                      honeypotResult?.honeypotResult?.isHoneypot
+                        ? "text-[#ff0000]"
+                        : honeypotResult?.summary?.risk === "medium"
+                        ? "text-[#ffaa00]"
+                        : "text-[#00ff00]"
+                    }`}
+                  >
+                    {honeypotResult?.honeypotResult?.isHoneypot
+                      ? "FAILED"
+                      : honeypotResult?.summary?.risk === "medium"
+                      ? "WARNING"
+                      : "PASSED"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 sm:p-4 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                  <span
+                    className={`${pixelMonoFont.className} text-base sm:text-lg text-[#ffa500]`}
+                  >
+                    Freezable:
+                  </span>
+                  <span
+                    className={`${
+                      pixelMonoFont.className
+                    } text-base sm:text-lg ${
+                      typeof honeypotResult?.flags === "object" &&
+                      !Array.isArray(honeypotResult.flags) &&
+                      honeypotResult.flags.isAntiWhale
+                        ? "text-[#ff5500]"
+                        : "text-[#00ff00]"
+                    }`}
+                  >
+                    {typeof honeypotResult?.flags === "object" &&
+                    !Array.isArray(honeypotResult.flags) &&
+                    honeypotResult.flags.isAntiWhale
+                      ? "YES"
+                      : "NO"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 sm:p-4 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                  <span
+                    className={`${pixelMonoFont.className} text-base sm:text-lg text-[#ffa500]`}
+                  >
+                    Mintable:
+                  </span>
+                  <span
+                    className={`${
+                      pixelMonoFont.className
+                    } text-base sm:text-lg ${
+                      typeof honeypotResult?.flags === "object" &&
+                      !Array.isArray(honeypotResult.flags) &&
+                      !honeypotResult.flags.staysLiquid
+                        ? "text-[#ff5500]"
+                        : "text-[#00ff00]"
+                    }`}
+                  >
+                    {typeof honeypotResult?.flags === "object" &&
+                    !Array.isArray(honeypotResult.flags) &&
+                    !honeypotResult.flags.staysLiquid
+                      ? "YES"
+                      : "NO"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 sm:p-4 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                  <span
+                    className={`${pixelMonoFont.className} text-base sm:text-lg text-[#ffa500]`}
+                  >
+                    Sufficient Liquidity:
+                  </span>
+                  <span
+                    className={`${
+                      pixelMonoFont.className
+                    } text-base sm:text-lg ${
+                      typeof honeypotResult?.flags === "object" &&
+                      !Array.isArray(honeypotResult.flags) &&
+                      honeypotResult.flags.staysLiquid
+                        ? "text-[#00ff00]"
+                        : "text-[#ff0000]"
+                    }`}
+                  >
+                    {typeof honeypotResult?.flags === "object" &&
+                    !Array.isArray(honeypotResult.flags) &&
+                    honeypotResult.flags.staysLiquid
+                      ? "YES"
+                      : "NO"}
                   </span>
                 </div>
               </div>

@@ -5,4 +5,5 @@ export const honeypotSupportedChains = [
   { id: "10", name: "Optimism", shortName: "OP" },
   { id: "100", name: "Gnosis", shortName: "GNOSIS" },
   { id: "8453", name: "Base", shortName: "BASE" },
+  { id: "solana-mainnet", name: "Solana", shortName: "SOL", isSolana: true },
 ];
