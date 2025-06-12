@@ -336,26 +336,22 @@ export async function analyzeSolanaTokenForHoneypot(
           hasLiquidity = false;
         }
 
-        // Additional check: get assets by creator to see if there are other tokens
-        // This is a simplified liquidity check
-        const liquidityCheck = await fetch(
-          `${HELIUS_API_URL}/mintlist-by-collection-or-creator?api-key=${HELIUS_API_KEY}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+        const liquidity = fetch(`${SOLANA_RPC_URL}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: "1",
+            method: "getAssetsByCreator",
+            params: {
+              creatorAddress: tokenAddress,
             },
-            body: JSON.stringify({
-              query: {
-                creatorAddress: tokenAddress,
-              },
-              options: {
-                limit: 5,
-              },
-            }),
-          }
-        );
+          }),
+        });
 
+        const liquidityCheck = await liquidity;
         if (liquidityCheck.ok) {
           const liquidityData = await liquidityCheck.json();
           // If there are multiple tokens by same creator, might be suspicious

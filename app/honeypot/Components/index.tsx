@@ -614,7 +614,13 @@ function HoneyPot() {
                     <option value="43114">Avalanche</option>
                     <option value="42161">Arbitrum</option>
                     <option value="10">Optimism</option>
-                    <option value="solana-mainnet">Solana</option>
+                    {/* show only for honeypot check */}
+                    {endpoint === "honeypot" && (
+                      <>
+                        <option value="solana-mainnet">Solana</option>
+                      </>
+                    )}
+                    {/* Always show Solana */}
                   </select>
 
                   {/* Show loading indicator when detecting */}
