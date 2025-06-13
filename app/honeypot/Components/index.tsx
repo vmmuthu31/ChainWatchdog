@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect, Suspense, FormEvent, useCallback } from "react";
+import { useCallback, useEffect, useState, FormEvent, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { chainsToCheck } from "@/lib/utils/chainsToCheck";
+import { fetchSolanaTokenInfo } from "@/lib/services/solanaScan";
 import {
   Loader2,
   Search,
@@ -25,8 +27,6 @@ import TopHolders from "./TopHolders";
 import PairResult from "./PairResult";
 import ContractVertification from "./ContractVertification";
 import HoneyPotResult from "./HoneyPotResult";
-import { chainsToCheck } from "@/lib/utils/chainsToCheck";
-import { fetchSolanaTokenInfo } from "@/lib/services/solanaScan";
 
 function HoneyPot() {
   const searchParams = useSearchParams();
@@ -53,16 +53,13 @@ function HoneyPot() {
     async (address: string) => {
       if (!address) return null;
 
-      // Reset detection state
       setIsDetectingChain(true);
       setDetectedChain(null);
 
       try {
-        // Enhanced Solana address validation and detection
         const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
         if (solanaRegex.test(address)) {
           try {
-            // Validate Solana address by attempting to fetch token info
             await fetchSolanaTokenInfo(address);
             setDetectedChain("solana-mainnet");
             setSelectedChain("solana-mainnet");
@@ -70,24 +67,20 @@ function HoneyPot() {
             return "solana-mainnet";
           } catch (error) {
             console.error("Invalid Solana address:", error);
-            // Continue to EVM detection if Solana validation fails
           }
         }
 
-        // EVM address validation
         const evmAddressRegex = /^0x[a-fA-F0-9]{40}$/;
         if (!evmAddressRegex.test(address)) {
           setIsDetectingChain(false);
           return null;
         }
 
-        // Optimized EVM chain detection - check contract verification first
         for (const chainObj of chainsToCheck) {
           try {
             let apiUrl: string;
             let headers: Record<string, string> = {};
 
-            // Handle Avalanche's different API structure
             if (chainObj.id === "43114") {
               apiUrl = `${chainObj.explorer}/v1/chains/${chainObj.id}/addresses/${address}`;
               headers = {
@@ -104,7 +97,6 @@ function HoneyPot() {
             if (response.ok) {
               const data = await response.json();
 
-              // Chain-specific validation logic
               let isValidContract = false;
 
               if (chainObj.id === "43114") {
@@ -130,14 +122,12 @@ function HoneyPot() {
               `Error checking chain ${chainObj.id} (${chainObj.name}):`,
               error
             );
-            // Continue checking other chains
           }
         }
 
-        // Fallback: Check account balance for chains that didn't have contract verification
         for (const chainObj of chainsToCheck) {
           try {
-            if (chainObj.id === "43114") continue; // Skip Avalanche for balance check
+            if (chainObj.id === "43114") continue;
 
             const response = await fetch(
               `${chainObj.explorer}/api?module=account&action=balance&address=${address}&apikey=${chainObj.apikey}`
@@ -157,11 +147,9 @@ function HoneyPot() {
               `Error checking balance for chain ${chainObj.id}:`,
               error
             );
-            // Continue checking other chains
           }
         }
 
-        // No chain detected
         setIsDetectingChain(false);
         return null;
       } catch (error) {
@@ -176,34 +164,31 @@ function HoneyPot() {
   const fetchHoneypotData = useCallback(
     async (address: string, chainId: string) => {
       try {
-        // If Solana, use our custom Solana service
         if (
           chainId === "solana-mainnet" ||
           /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)
         ) {
-          // Dynamically import the Solana service
-          const { solanaScanService } = await import(
-            "@/lib/services/solanaScan"
+          const { getSolanaTokenHoneypotAnalysis } = await import(
+            "@/lib/services/rugCheckService"
           );
-          const data = await solanaScanService(address);
+          const data = await getSolanaTokenHoneypotAnalysis(address);
 
-          // Patch token type to ensure decimals property exists
           if (
             data &&
             data.token &&
             typeof (data.token as any).decimals === "undefined"
           ) {
-            // Default to 9 decimals for Solana tokens if not provided
-            (data.token as any).decimals = 9;
+            (data.token as any).decimals = 6;
           }
 
-          // Patch summary to ensure riskLevel property exists
           if (
             data &&
             data.summary &&
             typeof (data.summary as any).riskLevel === "undefined"
           ) {
-            (data.summary as any).riskLevel = 2;
+            const score = data.score_normalised || 0;
+            (data.summary as any).riskLevel =
+              score > 70 ? 3 : score > 40 ? 2 : 1;
           }
 
           return {
@@ -241,7 +226,6 @@ function HoneyPot() {
           } as unknown as HoneypotResponse;
         }
 
-        // For EVM chains, use the original API
         const response = await fetch(
           `https://api.honeypot.is/v2/IsHoneypot?address=${address}&chainID=${chainId}`
         );
@@ -265,6 +249,16 @@ function HoneyPot() {
     chainId: string
   ) => {
     try {
+      if (
+        chainId === "solana-mainnet" ||
+        /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)
+      ) {
+        const { getSolanaTokenContractVerification } = await import(
+          "@/lib/services/rugCheckService"
+        );
+        return await getSolanaTokenContractVerification(address);
+      }
+
       const response = await fetch(
         `https://api.honeypot.is/v2/GetContractVerification?address=${address}&chainID=${chainId}`
       );
@@ -283,6 +277,16 @@ function HoneyPot() {
 
   const fetchPairs = async (address: string, chainId: string) => {
     try {
+      if (
+        chainId === "solana-mainnet" ||
+        /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)
+      ) {
+        const { getSolanaTokenPairs } = await import(
+          "@/lib/services/rugCheckService"
+        );
+        return await getSolanaTokenPairs(address);
+      }
+
       const response = await fetch(
         `https://api.honeypot.is/v1/GetPairs?address=${address}&chainID=${chainId}`
       );
@@ -301,6 +305,16 @@ function HoneyPot() {
 
   const fetchTopHolders = async (address: string, chainId: string) => {
     try {
+      if (
+        chainId === "solana-mainnet" ||
+        /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)
+      ) {
+        const { getSolanaTokenHolders } = await import(
+          "@/lib/services/rugCheckService"
+        );
+        return await getSolanaTokenHolders(address);
+      }
+
       const response = await fetch(
         `https://api.honeypot.is/v1/TopHolders?address=${address}&chainID=${chainId}`
       );
@@ -321,11 +335,9 @@ function HoneyPot() {
     const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
     const solanaAddressRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
-    // Check if the address matches either Ethereum or Solana format
     const isValid =
       ethAddressRegex.test(address) || solanaAddressRegex.test(address);
 
-    // If it's a Solana address and the selected chain isn't Solana, auto-select Solana
     if (
       solanaAddressRegex.test(address) &&
       selectedChain !== "solana-mainnet"
@@ -393,7 +405,14 @@ function HoneyPot() {
 
         case "pairs":
           const pairsData = await fetchPairs(contractAddress, selectedChain);
-          setPairsResult(pairsData);
+          const normalizedPairsData = Array.isArray(pairsData)
+            ? pairsData.map((pair: any) => ({
+                ...pair,
+                Reserves: pair.Reserves ?? {},
+                Router: pair.Router ?? "",
+              }))
+            : [];
+          setPairsResult(normalizedPairsData);
           break;
 
         case "holders":
@@ -739,17 +758,26 @@ function HoneyPot() {
 
           {/* Contract Verification Results */}
           {contractResult && !isLoading && endpoint === "contract" && (
-            <ContractVertification contractResult={contractResult} />
+            <ContractVertification
+              contractResult={contractResult}
+              detectedChain={detectedChain}
+            />
           )}
 
           {/* Pairs Results */}
           {pairsResult && !isLoading && endpoint === "pairs" && (
-            <PairResult pairsResult={pairsResult} />
+            <PairResult
+              pairsResult={pairsResult}
+              detectedChain={detectedChain}
+            />
           )}
 
           {/* Top Holders Results */}
           {holdersResult && !isLoading && endpoint === "holders" && (
-            <TopHolders holdersResult={holdersResult} />
+            <TopHolders
+              holdersResult={holdersResult}
+              detectedChain={detectedChain}
+            />
           )}
         </main>
         <div className="w-full max-w-5xl bg-black/40 backdrop-blur-md p-4 sm:p-6 rounded-xl border border-[#ffa500]/20 animate-fade-in animation-delay-200">

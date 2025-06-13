@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle, Info } from "lucide-react";
 
 function ContractVertification({
   contractResult,
+  detectedChain,
 }: {
   contractResult: {
     isContract: boolean;
@@ -11,10 +12,34 @@ function ContractVertification({
     summary?: {
       isOpenSource: boolean;
       hasProxyCalls: boolean;
+      tokenProgram?: string;
     };
     contractsOpenSource?: Record<string, boolean>;
+    solanaSpecific?: {
+      tokenProgram?: string;
+      mintAuthority?: string | null;
+      freezeAuthority?: string | null;
+      creator?: string;
+      updateAuthority?: string;
+      mutable?: boolean;
+      tokenSupply?: number;
+      tokenDecimals?: number;
+      transferFee?: {
+        pct: number;
+        maxAmount: number;
+        authority: string;
+      };
+    };
+    securityRisks?: {
+      hasMintAuthority: boolean;
+      hasFreezeAuthority: boolean;
+      isMutable: boolean;
+      hasTransferFee: boolean;
+    };
   };
+  detectedChain?: string | null;
 }) {
+  const isSolana = detectedChain === "solana-mainnet";
   return (
     <div className="w-full max-w-2xl mt-6 animate-fade-in">
       <div className="p-4 sm:p-6 backdrop-blur-lg bg-black/50 rounded-2xl border border-[#ffa500]/30 shadow-[0_0_15px_rgba(255,165,0,0.2)] overflow-hidden relative">
@@ -28,6 +53,7 @@ function ContractVertification({
             className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
           >
             CONTRACT VERIFICATION
+            {isSolana && <span className="ml-2 text-sm">• SOLANA</span>}
           </h3>
         </div>
 
@@ -76,6 +102,33 @@ function ContractVertification({
                   </span>
                 </div>
               </div>
+              {isSolana && contractResult?.solanaSpecific?.tokenProgram && (
+                <div className="p-2 sm:p-3 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                  <div className="flex justify-between">
+                    <span
+                      className={`${pixelMonoFont.className} text-sm text-[#ffa500]`}
+                    >
+                      Token Program:
+                    </span>
+                    <span
+                      className={`${pixelMonoFont.className} text-sm text-[#00ffff]`}
+                    >
+                      {contractResult.solanaSpecific.tokenProgram ===
+                      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                        ? "SPL Token"
+                        : contractResult.solanaSpecific.tokenProgram.substring(
+                            0,
+                            6
+                          ) +
+                          "..." +
+                          contractResult.solanaSpecific.tokenProgram.substring(
+                            contractResult.solanaSpecific.tokenProgram.length -
+                              4
+                          )}
+                    </span>
+                  </div>
+                </div>
+              )}
               {contractResult?.fullCheckPerformed &&
                 contractResult?.summary && (
                   <>
@@ -122,8 +175,179 @@ function ContractVertification({
             </div>
           </div>
 
+          {/* Solana-specific security risks */}
+          {isSolana && contractResult?.securityRisks && (
+            <div className="p-3 sm:p-4 bg-black/70 rounded-xl border border-[#ffa500]/20">
+              <h4
+                className={`${pixelMonoFont.className} text-base sm:text-lg font-medium text-[#ffa500] mb-2`}
+              >
+                SOLANA TOKEN SECURITY RISKS
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                <div className="p-2 sm:p-3 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                  <div className="flex justify-between">
+                    <span
+                      className={`${pixelMonoFont.className} text-sm text-[#ffa500]`}
+                    >
+                      Has Mint Authority:
+                    </span>
+                    <span
+                      className={`${pixelMonoFont.className} text-sm ${
+                        contractResult.securityRisks.hasMintAuthority
+                          ? "text-[#ff0000]"
+                          : "text-[#00ff00]"
+                      }`}
+                    >
+                      {contractResult.securityRisks.hasMintAuthority
+                        ? "YES"
+                        : "NO"}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-2 sm:p-3 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                  <div className="flex justify-between">
+                    <span
+                      className={`${pixelMonoFont.className} text-sm text-[#ffa500]`}
+                    >
+                      Has Freeze Authority:
+                    </span>
+                    <span
+                      className={`${pixelMonoFont.className} text-sm ${
+                        contractResult.securityRisks.hasFreezeAuthority
+                          ? "text-[#ff0000]"
+                          : "text-[#00ff00]"
+                      }`}
+                    >
+                      {contractResult.securityRisks.hasFreezeAuthority
+                        ? "YES"
+                        : "NO"}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-2 sm:p-3 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                  <div className="flex justify-between">
+                    <span
+                      className={`${pixelMonoFont.className} text-sm text-[#ffa500]`}
+                    >
+                      Metadata Mutable:
+                    </span>
+                    <span
+                      className={`${pixelMonoFont.className} text-sm ${
+                        contractResult.securityRisks.isMutable
+                          ? "text-[#ff5500]"
+                          : "text-[#00ff00]"
+                      }`}
+                    >
+                      {contractResult.securityRisks.isMutable ? "YES" : "NO"}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-2 sm:p-3 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                  <div className="flex justify-between">
+                    <span
+                      className={`${pixelMonoFont.className} text-sm text-[#ffa500]`}
+                    >
+                      Has Transfer Fee:
+                    </span>
+                    <span
+                      className={`${pixelMonoFont.className} text-sm ${
+                        contractResult.securityRisks.hasTransferFee
+                          ? "text-[#ff5500]"
+                          : "text-[#00ff00]"
+                      }`}
+                    >
+                      {contractResult.securityRisks.hasTransferFee
+                        ? "YES"
+                        : "NO"}
+                    </span>
+                  </div>
+                </div>
+                {contractResult.solanaSpecific?.transferFee &&
+                  contractResult.solanaSpecific.transferFee.pct > 0 && (
+                    <div className="p-2 sm:p-3 bg-black/50 rounded-lg border border-[#ffa500]/10 sm:col-span-2">
+                      <div className="flex justify-between">
+                        <span
+                          className={`${pixelMonoFont.className} text-sm text-[#ffa500]`}
+                        >
+                          Transfer Fee:
+                        </span>
+                        <span
+                          className={`${pixelMonoFont.className} text-sm text-[#ff5500]`}
+                        >
+                          {contractResult.solanaSpecific?.transferFee?.pct}%
+                        </span>
+                      </div>
+                    </div>
+                  )}
+              </div>
+            </div>
+          )}
+
+          {/* Solana token details */}
+          {isSolana && contractResult?.solanaSpecific && (
+            <div className="p-3 sm:p-4 bg-black/70 rounded-xl border border-[#ffa500]/20">
+              <h4
+                className={`${pixelMonoFont.className} text-base sm:text-lg font-medium text-[#ffa500] mb-2`}
+              >
+                TOKEN DETAILS
+              </h4>
+              <div className="grid grid-cols-1 gap-2">
+                {contractResult.solanaSpecific.creator && (
+                  <div className="p-2 sm:p-3 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                    <div className="flex justify-between">
+                      <span
+                        className={`${pixelMonoFont.className} text-sm text-[#ffa500]`}
+                      >
+                        Creator:
+                      </span>
+                      <span
+                        className={`${pixelMonoFont.className} text-sm text-[#00ffff]`}
+                      >
+                        {contractResult.solanaSpecific.creator.substring(0, 6)}
+                        ...
+                        {contractResult.solanaSpecific.creator.substring(
+                          contractResult.solanaSpecific.creator.length - 4
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <div className="p-2 sm:p-3 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                  <div className="flex justify-between">
+                    <span
+                      className={`${pixelMonoFont.className} text-sm text-[#ffa500]`}
+                    >
+                      Supply:
+                    </span>
+                    <span
+                      className={`${pixelMonoFont.className} text-sm text-[#00ffff]`}
+                    >
+                      {contractResult.solanaSpecific.tokenSupply?.toLocaleString()}{" "}
+                      tokens
+                    </span>
+                  </div>
+                </div>
+                <div className="p-2 sm:p-3 bg-black/50 rounded-lg border border-[#ffa500]/10">
+                  <div className="flex justify-between">
+                    <span
+                      className={`${pixelMonoFont.className} text-sm text-[#ffa500]`}
+                    >
+                      Decimals:
+                    </span>
+                    <span
+                      className={`${pixelMonoFont.className} text-sm text-[#00ffff]`}
+                    >
+                      {contractResult.solanaSpecific.tokenDecimals}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Contracts Open Source */}
-          {contractResult?.contractsOpenSource &&
+          {!isSolana &&
+            contractResult?.contractsOpenSource &&
             Object.keys(contractResult?.contractsOpenSource).length > 0 && (
               <div className="p-3 sm:p-4 bg-black/70 rounded-xl border border-[#ffa500]/20">
                 <h4

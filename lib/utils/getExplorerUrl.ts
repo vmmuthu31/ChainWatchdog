@@ -24,16 +24,14 @@ export const getExplorerUrl = (chainId: string, address?: string) => {
       baseUrl = "https://gnosisscan.io";
       break;
     case "solana-mainnet":
-      // For Solana addresses, provide the Solana Explorer URL
       if (address) {
         return `https://explorer.solana.com/address/${address}`;
       }
       return "https://explorer.solana.com";
     default:
-      return "https://etherscan.io"; // Default to Ethereum
+      return "https://etherscan.io";
   }
 
-  // If an address is provided and it's not a Solana address, append it to the URL
   if (address) {
     return `${baseUrl}/address/${address}`;
   }

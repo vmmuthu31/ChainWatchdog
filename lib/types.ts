@@ -117,6 +117,7 @@ export interface ContractVerificationResponse {
   summary?: {
     isOpenSource: boolean;
     hasProxyCalls: boolean;
+    tokenProgram?: string;
   };
   contractsOpenSource?: Record<string, boolean>;
   contractCalls?: Array<{
@@ -124,6 +125,27 @@ export interface ContractVerificationResponse {
     callee: string;
     type: string;
   }>;
+  solanaSpecific?: {
+    tokenProgram?: string;
+    mintAuthority?: string | null;
+    freezeAuthority?: string | null;
+    creator?: string;
+    updateAuthority?: string;
+    mutable?: boolean;
+    tokenSupply?: number;
+    tokenDecimals?: number;
+    transferFee?: {
+      pct: number;
+      maxAmount: number;
+      authority: string;
+    };
+  };
+  securityRisks?: {
+    hasMintAuthority: boolean;
+    hasFreezeAuthority: boolean;
+    isMutable: boolean;
+    hasTransferFee: boolean;
+  };
 }
 
 export interface PairResponse {
@@ -143,6 +165,10 @@ interface Holder {
   balance: string;
   alias: string;
   isContract: boolean;
+  percentage?: string;
+  isInsider?: boolean;
+  uiAmount?: number;
+  uiAmountString?: string;
 }
 
 export interface TopHoldersResponse {

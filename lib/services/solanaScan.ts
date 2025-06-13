@@ -2,14 +2,12 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
-// Helius API setup
 const HELIUS_API_KEY =
   process.env.NEXT_PUBLIC_HELIUS_API_KEY ||
-  "b477781a-99e7-41be-972e-1942d84d0669"; // Default key for development
+  "b477781a-99e7-41be-972e-1942d84d0669";
 const HELIUS_API_URL = `https://api.helius.xyz/v0`;
 const SOLANA_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
 
-// Match the interface expected by the HoneyPotResponse type
 interface SolanaTokenHoneypotResult {
   token: {
     address: string;
@@ -37,7 +35,6 @@ interface SolanaTokenHoneypotResult {
     isHoneypot?: boolean;
     honeypotReason?: string;
   };
-  // Additional fields required by HoneypotResponse
   simulationSuccess: boolean;
   flags: {
     isHoneypot: boolean;
@@ -65,7 +62,6 @@ interface SolanaTokenHoneypotResult {
  */
 export async function fetchSolanaTokenInfo(tokenAddress: string): Promise<any> {
   try {
-    // Using Helius to fetch token metadata
     const response = await fetch(
       `${HELIUS_API_URL}/token-metadata?api-key=${HELIUS_API_KEY}`,
       {
@@ -86,7 +82,7 @@ export async function fetchSolanaTokenInfo(tokenAddress: string): Promise<any> {
     }
 
     const data = await response.json();
-    return data[0] || null; // Returns first token info from the array
+    return data[0] || null;
   } catch (error) {
     console.error("Error fetching Solana token info from Helius:", error);
     return null;
@@ -95,18 +91,13 @@ export async function fetchSolanaTokenInfo(tokenAddress: string): Promise<any> {
 
 async function fetchSolanaTokenHolders(tokenAddress: string): Promise<number> {
   try {
-    // Since Helius doesn't have a direct holders count endpoint,
-    // we'll use the RPC connection to estimate holders
     const connection = new Connection(SOLANA_RPC_URL, "confirmed");
 
-    // Get token accounts by mint
     const tokenAccounts = await connection.getTokenLargestAccounts(
       new PublicKey(tokenAddress)
     );
 
-    // This is a rough estimate as we can only get largest accounts
-    // and can't easily get the total count without pagination
-    return tokenAccounts.value.length * 10; // Multiplier to estimate total holders
+    return tokenAccounts.value.length * 10;
   } catch (error) {
     console.error("Error estimating Solana token holders:", error);
     return 0;
@@ -117,7 +108,6 @@ export async function analyzeSolanaTokenForHoneypot(
   tokenAddress: string
 ): Promise<SolanaTokenHoneypotResult> {
   try {
-    // Initialize results with default values
     const result: SolanaTokenHoneypotResult = {
       token: {
         address: tokenAddress,
@@ -130,10 +120,10 @@ export async function analyzeSolanaTokenForHoneypot(
         sellTax: 0,
         transferTax: 0,
         buyGas: 0,
-        sellGas: 0, // Gas equivalents in Solana would be transaction costs
+        sellGas: 0,
       },
       contractCode: {
-        openSource: true, // Solana programs are usually open source
+        openSource: true,
         rootOpenSource: true,
         isProxy: false,
         hasProxyCalls: false,
@@ -145,7 +135,6 @@ export async function analyzeSolanaTokenForHoneypot(
         isHoneypot: false,
         honeypotReason: "",
       },
-      // Additional fields required for HoneypotResponse compatibility
       simulationSuccess: true,
       flags: {
         isHoneypot: false,
@@ -161,20 +150,17 @@ export async function analyzeSolanaTokenForHoneypot(
       chain: "solana-mainnet",
     };
 
-    // Fetch token data from Helius API
     const tokenInfo = await fetchSolanaTokenInfo(tokenAddress);
     if (
       tokenInfo &&
       tokenInfo.onChainMetadata &&
       tokenInfo.onChainMetadata.metadata
     ) {
-      // Extract token metadata from Helius response
       result.token.name =
         tokenInfo.onChainMetadata.metadata.data.name || "Unknown";
       result.token.symbol =
         tokenInfo.onChainMetadata.metadata.data.symbol || "UNKNOWN";
 
-      // Get token supply from onChainAccountInfo if available
       if (
         tokenInfo.onChainAccountInfo &&
         tokenInfo.onChainAccountInfo.accountInfo &&
@@ -182,12 +168,10 @@ export async function analyzeSolanaTokenForHoneypot(
         tokenInfo.onChainAccountInfo.accountInfo.data.parsed &&
         tokenInfo.onChainAccountInfo.accountInfo.data.parsed.info
       ) {
-        // Use the supply value to estimate holders (very rough estimate)
         const supply = Number(
           tokenInfo.onChainAccountInfo.accountInfo.data.parsed.info.supply
         );
         if (supply > 0) {
-          // More sophisticated logic could be implemented here
           result.token.totalHolders = Math.min(
             Math.floor(supply / 1000000),
             10000
@@ -195,19 +179,16 @@ export async function analyzeSolanaTokenForHoneypot(
         }
       }
 
-      // If we couldn't estimate from supply, try to fetch holders count
       if (result.token.totalHolders === 0) {
         result.token.totalHolders = await fetchSolanaTokenHolders(tokenAddress);
       }
     }
 
-    // Connect to Solana
     const connection = new Connection(SOLANA_RPC_URL, "confirmed");
 
     try {
       const tokenPublicKey = new PublicKey(tokenAddress);
 
-      // 1. Check if token exists
       const tokenAccountInfo = await connection.getAccountInfo(tokenPublicKey);
       if (!tokenAccountInfo) {
         result.honeypotResult = {
@@ -218,15 +199,12 @@ export async function analyzeSolanaTokenForHoneypot(
         return result;
       }
 
-      // 2. Analyze token metadata (owner, mint authority, etc.)
-      // Fetch token info including minting data
       let hasFreezingAbility = false;
       let hasMintingAbility = false;
       let isVerifiedProgram = false;
       let hasLiquidity = false;
 
       try {
-        // Attempt to fetch more token data from Helius
         const tokenMetaResponse = await fetch(
           `${HELIUS_API_URL}/token-metadata?api-key=${HELIUS_API_KEY}`,
           {
@@ -244,7 +222,6 @@ export async function analyzeSolanaTokenForHoneypot(
 
         if (tokenMetaResponse.ok) {
           const tokenMetaData = await tokenMetaResponse.json();
-          // Helius returns an array of token data
           if (
             tokenMetaData &&
             tokenMetaData[0] &&
@@ -257,45 +234,36 @@ export async function analyzeSolanaTokenForHoneypot(
               tokenData.data.parsed &&
               tokenData.data.parsed.info
             ) {
-              // Check for mint authority - if present, someone can mint more tokens
               hasMintingAbility =
                 tokenData.data.parsed.info.mintAuthority !== "";
 
-              // Check for freeze authority - if present, someone can freeze token transfers
               hasFreezingAbility =
                 tokenData.data.parsed.info.freezeAuthority !== "";
 
-              // Check if the token was created by a verified program
               const programId = tokenAccountInfo.owner.toString();
               isVerifiedProgram = programId === TOKEN_PROGRAM_ID.toString();
 
-              // Determine liquidity based on supply
               const supply = Number(tokenData.data.parsed.info.supply);
-              hasLiquidity = supply > 1000000; // Simple heuristic
+              hasLiquidity = supply > 1000000;
             }
           }
         }
       } catch (err) {
         console.error("Error fetching additional token metadata:", err);
 
-        // Fallback to basic checks
         const programId = tokenAccountInfo.owner.toString();
         isVerifiedProgram = programId === TOKEN_PROGRAM_ID.toString();
 
-        // Use simulated values if API call fails
         hasFreezingAbility = Math.random() > 0.7;
         hasMintingAbility = Math.random() > 0.8;
         hasLiquidity = Math.random() > 0.4;
       }
 
-      // Determine if token is a honeypot based on collected data
       let isHoneypot = false;
       let honeypotReason = "";
       let riskLevel = "low";
 
-      // Additional checks using Helius API
       try {
-        // Check for suspicious transaction patterns using Helius
         const txnResponse = await fetch(
           `${HELIUS_API_URL}/addresses/${tokenAddress}/transactions?api-key=${HELIUS_API_KEY}`,
           {
@@ -309,7 +277,6 @@ export async function analyzeSolanaTokenForHoneypot(
         if (txnResponse.ok) {
           const txnData = await txnResponse.json();
 
-          // Check transaction count - very low count might be suspicious
           if (txnData && txnData.length < 3) {
             if (riskLevel === "low") {
               riskLevel = "medium";
@@ -322,17 +289,13 @@ export async function analyzeSolanaTokenForHoneypot(
         console.error("Error checking token transaction history:", err);
       }
 
-      // Check balances and activity via Helius
       try {
-        // Use DAS API to get liquidity information
         const connection = new Connection(SOLANA_RPC_URL);
         const balance = await connection.getBalance(
           new PublicKey(tokenAddress)
         );
 
-        // Check if token has minimal SOL balance (might indicate low activity)
         if (balance < 10000000) {
-          // 0.01 SOL in lamports
           hasLiquidity = false;
         }
 
@@ -354,7 +317,6 @@ export async function analyzeSolanaTokenForHoneypot(
         const liquidityCheck = await liquidity;
         if (liquidityCheck.ok) {
           const liquidityData = await liquidityCheck.json();
-          // If there are multiple tokens by same creator, might be suspicious
           if (
             liquidityData &&
             liquidityData.result &&
@@ -372,7 +334,6 @@ export async function analyzeSolanaTokenForHoneypot(
         console.error("Error checking token liquidity data:", err);
       }
 
-      // Risk assessment logic for Solana tokens
       if (!isVerifiedProgram) {
         riskLevel = "high";
         isHoneypot = true;
@@ -397,27 +358,24 @@ export async function analyzeSolanaTokenForHoneypot(
         honeypotReason = "Token has limited liquidity on major DEXes";
       }
 
-      // Update result with findings
       result.summary = { risk: riskLevel };
       result.honeypotResult = {
         isHoneypot,
         honeypotReason,
       };
 
-      // Update flags based on our findings
       result.flags.isHoneypot = isHoneypot;
       result.flags.isSellable = !isHoneypot;
       result.flags.isOpen = !isHoneypot;
       result.flags.isAntiWhale = hasFreezingAbility;
       result.flags.staysLiquid = hasLiquidity;
 
-      // Set appropriate tax values based on our findings
       result.simulationResult = {
         buyTax: isHoneypot ? 100 : riskLevel === "medium" ? 5 : 1,
         sellTax: isHoneypot ? 100 : riskLevel === "medium" ? 7 : 1,
         transferTax: isHoneypot ? 50 : 0,
-        buyGas: 5000, // Lamports equivalent
-        sellGas: 5000, // Lamports equivalent
+        buyGas: 5000,
+        sellGas: 5000,
       };
 
       return result;
@@ -436,12 +394,10 @@ export async function analyzeSolanaTokenForHoneypot(
   }
 }
 
-// This function acts as a wrapper that matches the expected interface
 export async function solanaScanService(tokenAddress: string) {
   try {
     const result = await analyzeSolanaTokenForHoneypot(tokenAddress);
 
-    // Ensure the result conforms to expected interface, forcing types if needed
     return {
       ...result,
       chain: "solana-mainnet" as string,
@@ -460,7 +416,6 @@ export async function solanaScanService(tokenAddress: string) {
     };
   } catch (error) {
     console.error("Error in solanaScanService:", error);
-    // Return a basic error response that matches the expected interface
     return {
       token: {
         address: tokenAddress,

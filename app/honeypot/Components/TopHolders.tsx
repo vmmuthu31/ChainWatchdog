@@ -3,6 +3,7 @@ import { AlertTriangle, ExternalLink, Info } from "lucide-react";
 
 function TopHolders({
   holdersResult,
+  detectedChain,
 }: {
   holdersResult: {
     holders: {
@@ -10,10 +11,17 @@ function TopHolders({
       balance: string;
       alias: string;
       isContract: boolean;
+      percentage?: string;
+      isInsider?: boolean;
+      uiAmount?: number;
+      uiAmountString?: string;
     }[];
     totalSupply: string;
   };
+  detectedChain?: string | null;
 }) {
+  const isSolana = detectedChain === "solana-mainnet";
+
   return (
     <div className="w-full max-w-2xl mt-6 animate-fade-in">
       <div className="p-4 sm:p-6 backdrop-blur-lg bg-black/50 rounded-2xl border border-[#ffa500]/30 shadow-[0_0_15px_rgba(255,165,0,0.2)] overflow-hidden relative">
@@ -27,6 +35,7 @@ function TopHolders({
             className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
           >
             TOP TOKEN HOLDERS
+            {isSolana && <span className="ml-2 text-sm">• SOLANA</span>}
           </h3>
         </div>
 
@@ -41,7 +50,10 @@ function TopHolders({
               <span
                 className={`${pixelMonoFont.className} text-sm text-[#00ffff]`}
               >
-                {BigInt(holdersResult.totalSupply).toLocaleString()} tokens
+                {isSolana
+                  ? Number(holdersResult.totalSupply).toLocaleString()
+                  : BigInt(holdersResult.totalSupply).toLocaleString()}{" "}
+                tokens
               </span>
             </div>
           </div>
@@ -78,22 +90,40 @@ function TopHolders({
                       Balance
                     </th>
                     <th
-                      className={`${pixelMonoFont.className} text-center p-3 text-[#ffa500] text-base sm:text-lg`}
+                      className={`${pixelMonoFont.className} text-right p-3 text-[#ffa500] text-base sm:text-lg`}
                     >
-                      Type
+                      %
                     </th>
+                    {isSolana ? (
+                      <th
+                        className={`${pixelMonoFont.className} text-center p-3 text-[#ffa500] text-base sm:text-lg`}
+                      >
+                        Insider
+                      </th>
+                    ) : (
+                      <th
+                        className={`${pixelMonoFont.className} text-center p-3 text-[#ffa500] text-base sm:text-lg`}
+                      >
+                        Type
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
                   {holdersResult.holders.map((holder, index) => {
-                    const holderBalance = BigInt(holder.balance);
-                    const totalSupply = BigInt(holdersResult.totalSupply);
-                    const percentage =
-                      totalSupply > 0
-                        ? Number(
-                            (holderBalance * BigInt(10000)) / totalSupply
-                          ) / 100
-                        : 0;
+                    let percentage = 0;
+                    if (isSolana && holder.percentage) {
+                      percentage = parseFloat(holder.percentage);
+                    } else {
+                      const holderBalance = BigInt(holder.balance);
+                      const totalSupply = BigInt(holdersResult.totalSupply);
+                      percentage =
+                        totalSupply > 0
+                          ? Number(
+                              (holderBalance * BigInt(10000)) / totalSupply
+                            ) / 100
+                          : 0;
+                    }
 
                     return (
                       <tr
@@ -123,15 +153,31 @@ function TopHolders({
                         <td
                           className={`${pixelMonoFont.className} p-3 text-right text-[#00ffff] text-base`}
                         >
-                          <div>{holderBalance.toLocaleString()}</div>
-                          <div className="text-sm text-[#00ffaa]">
-                            {percentage.toFixed(2)}%
+                          <div>
+                            {isSolana && holder.uiAmountString
+                              ? holder.uiAmountString
+                              : BigInt(holder.balance).toLocaleString()}
                           </div>
+                        </td>
+                        <td
+                          className={`${pixelMonoFont.className} p-3 text-right text-[#00ffaa] text-base`}
+                        >
+                          {percentage.toFixed(2)}%
                         </td>
                         <td
                           className={`${pixelMonoFont.className} p-3 text-center`}
                         >
-                          {holder.isContract ? (
+                          {isSolana ? (
+                            holder.isInsider ? (
+                              <span className="px-3 py-1 bg-[#ff0000]/10 text-[#ff0000] rounded-full text-sm">
+                                Insider
+                              </span>
+                            ) : (
+                              <span className="px-3 py-1 bg-[#00ff00]/10 text-[#00ff00] rounded-full text-sm">
+                                Normal
+                              </span>
+                            )
+                          ) : holder.isContract ? (
                             <span className="px-3 py-1 bg-[#ff00ff]/10 text-[#ff00ff] rounded-full text-sm">
                               Contract
                             </span>

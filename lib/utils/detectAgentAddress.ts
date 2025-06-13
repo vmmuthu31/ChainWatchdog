@@ -17,7 +17,6 @@ export const detectAgentAddress = (
   const address = matches[0];
   const lowercaseText = text.toLowerCase();
 
-  // For Solana addresses, default to wallet type since we don't have full Solana token support yet
   if (isSolana) {
     return {
       address,

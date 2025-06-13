@@ -3,6 +3,7 @@ import { AlertTriangle, ExternalLink, Info, Search } from "lucide-react";
 
 function PairResult({
   pairsResult,
+  detectedChain,
 }: {
   pairsResult: {
     Pair: {
@@ -12,7 +13,9 @@ function PairResult({
     ChainID: number;
     Liquidity: number;
   }[];
+  detectedChain?: string | null;
 }) {
+  const isSolana = detectedChain === "solana-mainnet";
   return (
     <div className="w-full max-w-2xl mt-6 animate-fade-in">
       <div className="p-4 sm:p-6 backdrop-blur-lg bg-black/50 rounded-2xl border border-[#ffa500]/30 shadow-[0_0_15px_rgba(255,165,0,0.2)] overflow-hidden relative">
@@ -26,6 +29,7 @@ function PairResult({
             className={`${pixelFont.className} text-lg sm:text-xl md:text-2xl font-bold text-[#ffa500]`}
           >
             TOKEN PAIRS
+            {isSolana && <span className="ml-2 text-sm">• SOLANA</span>}
           </h3>
         </div>
 
@@ -96,7 +100,9 @@ function PairResult({
                       <td
                         className={`${pixelMonoFont.className} p-3 text-right text-[#00ffff] text-base`}
                       >
-                        {pair.ChainID === 1
+                        {pair.ChainID === -1
+                          ? "Solana"
+                          : pair.ChainID === 1
                           ? "Ethereum"
                           : pair.ChainID === 56
                           ? "BSC"
