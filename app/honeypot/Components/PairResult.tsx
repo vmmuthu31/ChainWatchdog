@@ -1,5 +1,6 @@
 import { pixelFont, pixelMonoFont } from "@/lib/font";
 import { AlertTriangle, ExternalLink, Info, Search } from "lucide-react";
+import { getExplorerUrl } from "@/lib/utils/getExplorerUrl";
 
 function PairResult({
   pairsResult,
@@ -84,7 +85,10 @@ function PairResult({
                         <div className="flex flex-col">
                           <span>{pair.Pair.Name}</span>
                           <a
-                            href={`https://etherscan.io/address/${pair.Pair.Address}`}
+                            href={getExplorerUrl(
+                              detectedChain || "1",
+                              pair.Pair.Address
+                            )}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-[#00ffaa] hover:text-[#00ffff] flex items-center gap-1"
@@ -100,7 +104,8 @@ function PairResult({
                       <td
                         className={`${pixelMonoFont.className} p-3 text-right text-[#00ffff] text-base`}
                       >
-                        {pair.ChainID === -1
+                        {pair.ChainID === -1 ||
+                        detectedChain === "solana-mainnet"
                           ? "Solana"
                           : pair.ChainID === 1
                           ? "Ethereum"

@@ -1,5 +1,6 @@
 import { pixelFont, pixelMonoFont } from "@/lib/font";
 import { AlertTriangle, ExternalLink, Info } from "lucide-react";
+import { getExplorerUrl } from "@/lib/utils/getExplorerUrl";
 
 function TopHolders({
   holdersResult,
@@ -136,7 +137,10 @@ function TopHolders({
                           className={`${pixelMonoFont.className} p-3 text-[#00ffff] text-base`}
                         >
                           <a
-                            href={`https://etherscan.io/address/${holder.address}`}
+                            href={getExplorerUrl(
+                              detectedChain || "1",
+                              holder.address
+                            )}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="hover:text-[#00ffff] flex items-center gap-1"

@@ -60,9 +60,14 @@ function HoneyPot() {
         const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
         if (solanaRegex.test(address)) {
           try {
+            console.log("Detected potential Solana address:", address);
             await fetchSolanaTokenInfo(address);
+            console.log("Valid Solana token address confirmed");
+
             setDetectedChain("solana-mainnet");
             setSelectedChain("solana-mainnet");
+            console.log("Setting chain to solana-mainnet");
+
             setIsDetectingChain(false);
             return "solana-mainnet";
           } catch (error) {
@@ -253,6 +258,7 @@ function HoneyPot() {
         chainId === "solana-mainnet" ||
         /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)
       ) {
+        console.log("Fetching Solana contract verification for:", address);
         const { getSolanaTokenContractVerification } = await import(
           "@/lib/services/rugCheckService"
         );
@@ -281,6 +287,7 @@ function HoneyPot() {
         chainId === "solana-mainnet" ||
         /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)
       ) {
+        console.log("Fetching Solana pairs for:", address);
         const { getSolanaTokenPairs } = await import(
           "@/lib/services/rugCheckService"
         );
@@ -309,6 +316,7 @@ function HoneyPot() {
         chainId === "solana-mainnet" ||
         /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)
       ) {
+        console.log("Fetching Solana top holders for:", address);
         const { getSolanaTokenHolders } = await import(
           "@/lib/services/rugCheckService"
         );
@@ -379,7 +387,16 @@ function HoneyPot() {
         `Using endpoint: ${endpoint}, autoDetectChain: ${autoDetectChain}, detectedChain: ${detectedChain}`
       );
 
-      if (autoDetectChain && !detectedChain && !isDetectingChain) {
+      // Check if it's a Solana address
+      const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+      const isSolanaAddress = solanaRegex.test(contractAddress);
+
+      if (isSolanaAddress) {
+        // For Solana addresses, always use solana-mainnet
+        console.log("Using solana-mainnet for Solana address in handleCheck");
+        setSelectedChain("solana-mainnet");
+        setDetectedChain("solana-mainnet");
+      } else if (autoDetectChain && !detectedChain && !isDetectingChain) {
         const chainId = await detectChain(contractAddress);
         if (chainId) {
           setSelectedChain(chainId);
@@ -439,10 +456,22 @@ function HoneyPot() {
     const address = searchParams.get("address");
     const chainId = searchParams.get("chainId");
 
+    console.log("Search params:", { address, chainId });
     if (address && !initialQueryHandled) {
       setContractAddress(address);
 
-      if (chainId) {
+      // Check if this is a Solana address
+      const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+      const isSolanaAddress = solanaRegex.test(address);
+      console.log("Is Solana address:", isSolanaAddress);
+
+      if (isSolanaAddress) {
+        // Force Solana chain for Solana addresses
+        console.log("Setting chain to solana-mainnet for Solana address");
+        setSelectedChain("solana-mainnet");
+        setAutoDetectChain(true);
+        setDetectedChain("solana-mainnet");
+      } else if (chainId) {
         setSelectedChain(chainId);
         setAutoDetectChain(false);
         setDetectedChain(chainId);
@@ -453,7 +482,21 @@ function HoneyPot() {
         setError(null);
 
         try {
-          const chainToUse = chainId || selectedChain;
+          // Check if Solana address first
+          const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+          const isSolanaAddress = solanaRegex.test(address);
+
+          // Use solana-mainnet for Solana addresses, otherwise use provided chain or selected chain
+          const chainToUse = isSolanaAddress
+            ? "solana-mainnet"
+            : chainId || selectedChain;
+          console.log(
+            "Using chain for analysis:",
+            chainToUse,
+            "for address:",
+            address
+          );
+
           const honeypotData = await fetchHoneypotData(address, chainToUse);
           setHoneypotResult(honeypotData);
         } catch (err) {
@@ -482,7 +525,17 @@ function HoneyPot() {
             /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(contractAddress)) &&
           autoDetectChain
         ) {
-          detectChain(contractAddress);
+          // Check if it's a Solana address first
+          const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+          if (solanaRegex.test(contractAddress)) {
+            // For Solana addresses, directly set the chain
+            console.log("Directly setting Solana chain for Solana address");
+            setDetectedChain("solana-mainnet");
+            setSelectedChain("solana-mainnet");
+          } else {
+            // For other addresses, use the regular detection logic
+            detectChain(contractAddress);
+          }
         }
       }, 500);
 
@@ -628,7 +681,18 @@ function HoneyPot() {
                       <input
                         type="checkbox"
                         checked={autoDetectChain}
-                        onChange={() => setAutoDetectChain(!autoDetectChain)}
+                        onChange={() => {
+                          const newAutoDetect = !autoDetectChain;
+                          setAutoDetectChain(newAutoDetect);
+
+                          if (!newAutoDetect && detectedChain) {
+                            console.log(
+                              "Setting selected chain to match detected chain:",
+                              detectedChain
+                            );
+                            setSelectedChain(detectedChain);
+                          }
+                        }}
                         className="sr-only peer"
                       />
                       <div className="w-9 h-5 bg-[#222] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#ffa500] after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#005500]"></div>
@@ -639,7 +703,13 @@ function HoneyPot() {
                 <div className="relative">
                   <select
                     value={selectedChain}
-                    onChange={(e) => setSelectedChain(e.target.value)}
+                    onChange={(e) => {
+                      console.log("Chain selected:", e.target.value);
+                      setSelectedChain(e.target.value);
+                      if (!autoDetectChain) {
+                        setDetectedChain(e.target.value);
+                      }
+                    }}
                     disabled={
                       isLoading || (autoDetectChain && isDetectingChain)
                     }
@@ -660,13 +730,8 @@ function HoneyPot() {
                     <option value="43114">Avalanche</option>
                     <option value="42161">Arbitrum</option>
                     <option value="10">Optimism</option>
-                    {/* show only for honeypot check */}
-                    {endpoint === "honeypot" && (
-                      <>
-                        <option value="solana-mainnet">Solana</option>
-                      </>
-                    )}
-                    {/* Always show Solana */}
+                    <option value="solana-mainnet">Solana</option>
+                    {/* Solana is now shown for all endpoints */}
                   </select>
 
                   {/* Show loading indicator when detecting */}

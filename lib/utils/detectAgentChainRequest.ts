@@ -33,6 +33,11 @@ export const detectAgentChainRequest = (text: string): string | null => {
     return "avalanche-mainnet";
   } else if (lowercaseText.includes("arbitrum")) {
     return "arbitrum-mainnet";
+  } else if (
+    lowercaseText.includes("solana") ||
+    lowercaseText.includes("sol ")
+  ) {
+    return "solana-mainnet";
   }
 
   if (
