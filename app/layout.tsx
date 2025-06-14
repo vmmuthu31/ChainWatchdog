@@ -49,6 +49,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="stylesheet" href="/fix-selection.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           property="og:title"
           content="RugProof - Protect Your Crypto Assets"
@@ -59,10 +60,17 @@ export default function RootLayout({
         />
         <meta
           property="og:image"
-          content="https://rugproofai.com/newbanner.png?v=3&t=20250614"
+          content={
+            "https://rugproofai.com/newbanner.png?v=4&t=20250614_" +
+            Date.now()
+          }
         />
         <meta property="og:url" content="https://rugproofai.com" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="RugProof" />
+
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@rugproofai" />
         <meta
           name="twitter:title"
           content="RugProof - Protect Your Crypto Assets"
@@ -73,8 +81,31 @@ export default function RootLayout({
         />
         <meta
           name="twitter:image"
-          content="https://rugproofai.com/newbanner.png?v=3&t=20250614"
+          content={
+            "https://rugproofai.com/newbanner.png?v=4&t=20250614_" +
+            Date.now()
+          }
         />
+        <meta name="twitter:image:alt" content="RugProof Banner" />
+
+        {/* Telegram specific meta tags */}
+        <meta property="telegram:channel" content="@rugproofai" />
+        <meta
+          property="telegram:image"
+          content={
+            "https://rugproofai.com/newbanner.png?v=4&t=20250614_" +
+            Date.now()
+          }
+        />
+
+        {/* Force cache refresh */}
+        <meta
+          http-equiv="Cache-Control"
+          content="no-cache, no-store, must-revalidate"
+        />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+
         <style
           dangerouslySetInnerHTML={{
             __html: `
