@@ -15,13 +15,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RugProof.AI - Advanced Crypto Security & Token Analysis Platform",
+  title: "RugProofAI | AI-Powered Wallet & Token Scan in Seconds",
   description:
     "Protect your crypto investments with AI-powered security tools. Detect spam tokens, honeypots, and scams across multiple blockchains. Real-time analysis and automated protection for DeFi traders.",
   keywords:
     "crypto security, token scanner, honeypot detector, defi protection, blockchain security, crypto scam prevention, smart contract analysis, rugpull detection",
   openGraph: {
-    title: "RugProof.AI - Advanced Crypto Security & Token Analysis Platform",
+    title: "RugProofAI | AI-Powered Wallet & Token Scan in Seconds",
     description:
       "Protect your crypto investments with AI-powered security tools. Detect spam tokens, honeypots, and scams across multiple blockchains. Real-time analysis and automated protection for DeFi traders.",
     url: "https://rugproofai.com",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
         url: "https://rugproofai.com/newbanner.png?v=5&t=" + Date.now(),
         width: 1200,
         height: 630,
-        alt: "RugProof.AI - Advanced Crypto Security Platform",
+        alt: "RugProofAI | AI-Powered Wallet & Token Scan in Seconds",
       },
     ],
     type: "website",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "RugProof.AI - Advanced Crypto Security & Token Analysis Platform",
+    title: "RugProofAI | AI-Powered Wallet & Token Scan in Seconds",
     description:
       "Protect your crypto investments with AI-powered security tools. Detect spam tokens, honeypots, and scams across multiple blockchains. Real-time analysis and automated protection for DeFi traders.",
     site: "@rugproofai",

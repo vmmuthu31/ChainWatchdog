@@ -297,7 +297,8 @@ function TokenomicsPage() {
               <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> DAO Governance
             </Badge>
             <Badge className="py-1.5 sm:py-2 px-3 sm:px-4 text-xs sm:text-sm md:text-base bg-[#ff00ff]/20 text-[#ff00ff] border border-[#ff00ff]/30 hover:bg-[#ff00ff]/30">
-              <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> Stake-to-Use Model
+              <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />{" "}
+              Stake-to-Use Model
             </Badge>
           </motion.div>
         </div>
@@ -311,7 +312,9 @@ function TokenomicsPage() {
         >
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[#00ff00]/10 via-transparent to-transparent"></div>
 
-          <h2 className={`${pixelFont.className} text-xl sm:text-2xl text-[#00ffff] mb-4 sm:mb-6`}>
+          <h2
+            className={`${pixelFont.className} text-xl sm:text-2xl text-[#00ffff] mb-4 sm:mb-6`}
+          >
             KEY PRINCIPLES
           </h2>
 
@@ -354,7 +357,10 @@ function TokenomicsPage() {
         </motion.div>
 
         {/* Roadmap Section */}
-        <div ref={roadmapRef} className="w-full max-w-4xl py-8 md:py-12 relative">
+        <div
+          ref={roadmapRef}
+          className="w-full max-w-4xl py-8 md:py-12 relative"
+        >
           <h2
             className={`${pixelFont.className} text-2xl sm:text-3xl text-center text-[#00ffff] mb-10 md:mb-16`}
           >
@@ -368,7 +374,10 @@ function TokenomicsPage() {
           {/* Mobile timeline line - only visible on mobile */}
           <div className="md:hidden absolute left-6 top-28 bottom-20 w-1 bg-gradient-to-b from-[#00ff00] via-[#00ffff] to-[#ff00ff] z-0"></div>
 
-          <div ref={timelineRef} className="relative z-10 space-y-12 md:space-y-24">
+          <div
+            ref={timelineRef}
+            className="relative z-10 space-y-12 md:space-y-24"
+          >
             {roadmapItems.map((item, index) => (
               <motion.div
                 key={index}
@@ -416,14 +425,14 @@ function TokenomicsPage() {
 
                 {/* Content card */}
                 <div
-                  className={`ml-10 md:ml-0 w-full md:w-5/12 bg-black/60 p-4 sm:p-6 rounded-2xl border 
+                  className={`ml-10 md:ml-0 w-80 md:w-5/12 bg-black/60 p-4 sm:p-6 rounded-2xl border 
                   ${
                     activeMonth === index
                       ? "border-[#00ff00]/70 shadow-[0_0_30px_-12px_rgba(0,255,0,0.5)]"
                       : "border-gray-800"
                   }`}
                 >
-                  <div className="flex items-center gap-3 mb-3 md:mb-4">
+                  <div className="flex  items-center gap-3 mb-3 md:mb-4">
                     <Badge
                       className={`py-0.5 sm:py-1 px-2 sm:px-3 text-xs sm:text-sm 
                       ${
@@ -447,7 +456,9 @@ function TokenomicsPage() {
                     {item.features.map((feature, fIndex) => (
                       <li key={fIndex} className="flex gap-2 items-start">
                         <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-[#00ff00] flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-300 text-sm sm:text-base">{feature}</span>
+                        <span className="text-gray-300 text-sm sm:text-base">
+                          {feature}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -561,13 +572,20 @@ function TokenomicsPage() {
                   </h3>
                 </div>
 
-                <p className="text-gray-300 text-sm sm:text-base mb-3 sm:mb-4">{product.description}</p>
+                <p className="text-gray-300 text-sm sm:text-base mb-3 sm:mb-4">
+                  {product.description}
+                </p>
 
                 <div className="space-y-1 mb-3 sm:mb-4">
                   {product.actions.map((action, aIndex) => (
-                    <div key={aIndex} className="flex items-start sm:items-center gap-1.5 sm:gap-2">
+                    <div
+                      key={aIndex}
+                      className="flex items-start sm:items-center gap-1.5 sm:gap-2"
+                    >
                       <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 text-[#00ff00] mt-0.5 sm:mt-0 flex-shrink-0" />
-                      <span className="text-gray-400 text-xs sm:text-sm">{action}</span>
+                      <span className="text-gray-400 text-xs sm:text-sm">
+                        {action}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -594,7 +612,9 @@ function TokenomicsPage() {
         >
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#ff00ff]/10 via-transparent to-transparent"></div>
 
-          <h2 className={`${pixelFont.className} text-xl sm:text-2xl text-[#ff00ff] mb-4 sm:mb-6`}>
+          <h2
+            className={`${pixelFont.className} text-xl sm:text-2xl text-[#ff00ff] mb-4 sm:mb-6`}
+          >
             METRICS TO WATCH
           </h2>
 
@@ -605,7 +625,9 @@ function TokenomicsPage() {
               >
                 North-star
               </h3>
-              <p className="text-gray-300 text-sm sm:text-base">Monthly active protected wallets</p>
+              <p className="text-gray-300 text-sm sm:text-base">
+                Monthly active protected wallets
+              </p>
             </div>
 
             <div className="bg-black/70 p-4 sm:p-5 rounded-xl border border-[#00ffff]/20 transform transition-all hover:scale-105">
