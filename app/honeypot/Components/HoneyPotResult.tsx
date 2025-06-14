@@ -66,7 +66,7 @@ function HoneyPotResult({
     const isHoneypot = honeypotResult?.honeypotResult?.isHoneypot;
     const riskLevel = honeypotResult?.summary?.risk || "unknown";
 
-    const tweetText = `🤖 RUGPROOF.AI SCAN COMPLETE 🔍\n\n${tokenName} ($${tokenSymbol})\n\n${
+    const tweetText = `🤖 RUGPROOF.AI SCAN COMPLETE 🔍\n\n${tokenName} (${tokenSymbol})\n\n${
       isHoneypot
         ? "🚨 CRITICAL: HONEYPOT DETECTED!\n⚠️ High probability of malicious intent detected. Avoid at all costs."
         : `Risk Level: ${riskLevel.toUpperCase()}\n${
@@ -74,7 +74,7 @@ function HoneyPotResult({
               ? "✅ SECURE: Token passed security checks\n💫 Always verify before investing"
               : "⚠️ CAUTION: Potential risks detected\n🔐 Enhanced vigilance recommended"
           }`
-    }\n\n🌐 Verify your tokens at https://rugproofai.com/honeypot #CryptoSecurity #RugProofAI`;
+    }\n\n🌐 Verify your tokens at:\nhttps://rugproofai.com/honeypot\n\n#CryptoSecurity #RugProofAI #web3 #web3security`;
 
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`,
