@@ -276,10 +276,50 @@ function NetworkDropdown({
                     Mainnet
                   </div>
 
+                  {/* Non-EVM chains first */}
+                  {filteredMainnetChains.nonEvmChains.length > 0 &&
+                    activeTab !== "recent" && (
+                      <>
+                        <div className="px-3 py-1 text-xs text-gray-500">
+                          Non-EVM Chains
+                        </div>
+                        {filteredMainnetChains.nonEvmChains.map((chain) => (
+                          <button
+                            key={chain.id}
+                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
+                              selectedChain === chain.id
+                                ? "bg-[#00ff00]/20 text-[#00ff00]"
+                                : "hover:bg-black/80"
+                            }`}
+                            onClick={() => {
+                              setSelectedChain(chain.id);
+                              setShowNetworkDropdown(false);
+                            }}
+                          >
+                            <span className="w-6 h-6 flex items-center justify-center rounded-full bg-black/80">
+                              {chain.logoUrl ? (
+                                <TokenLogo
+                                  src={chain.logoUrl}
+                                  alt={chain.name}
+                                  size={16}
+                                />
+                              ) : (
+                                chain.name.charAt(0)
+                              )}
+                            </span>
+                            {chain.name}
+                            {selectedChain === chain.id && (
+                              <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
+                            )}
+                          </button>
+                        ))}
+                      </>
+                    )}
+
                   {/* Filter EVM chains based on active tab */}
                   {filteredMainnetChains.evmChains.length > 0 && (
                     <>
-                      <div className="px-3 py-1 text-xs text-gray-500">
+                      <div className="px-3 py-1 text-xs text-gray-500 mt-2">
                         EVM Chains
                       </div>
                       {filteredMainnetChains.evmChains
@@ -364,45 +404,6 @@ function NetworkDropdown({
                         ))}
                     </>
                   )}
-
-                  {filteredMainnetChains.nonEvmChains.length > 0 &&
-                    activeTab !== "recent" && (
-                      <>
-                        <div className="px-3 py-1 text-xs text-gray-500 mt-2">
-                          Non-EVM Chains
-                        </div>
-                        {filteredMainnetChains.nonEvmChains.map((chain) => (
-                          <button
-                            key={chain.id}
-                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
-                              selectedChain === chain.id
-                                ? "bg-[#00ff00]/20 text-[#00ff00]"
-                                : "hover:bg-black/80"
-                            }`}
-                            onClick={() => {
-                              setSelectedChain(chain.id);
-                              setShowNetworkDropdown(false);
-                            }}
-                          >
-                            <span className="w-6 h-6 flex items-center justify-center rounded-full bg-black/80">
-                              {chain.logoUrl ? (
-                                <TokenLogo
-                                  src={chain.logoUrl}
-                                  alt={chain.name}
-                                  size={16}
-                                />
-                              ) : (
-                                chain.name.charAt(0)
-                              )}
-                            </span>
-                            {chain.name}
-                            {selectedChain === chain.id && (
-                              <CheckCircle className="h-4 w-4 ml-auto text-[#00ff00]" />
-                            )}
-                          </button>
-                        ))}
-                      </>
-                    )}
 
                   {filteredMainnetChains.otherChains.length > 0 &&
                     activeTab !== "recent" && (
