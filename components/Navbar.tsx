@@ -102,6 +102,30 @@ function Navbar() {
       badge: "Join Waitlist",
     },
     {
+      href: "/tokenomics",
+      label: "Tokenomics",
+      color: "text-[#ff00ff]",
+      hoverColor: "hover:text-[#00ffff]",
+      borderColor: "border-[#ff00ff]",
+      bgHoverColor: "hover:bg-[#ff00ff]/10",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      ),
+    },
+    {
       href: "#",
       label: "Chrome Extension (Soon)",
       color: "text-[#00ffff]/60",
@@ -139,7 +163,7 @@ function Navbar() {
 
   return (
     <header className="w-full border-b border-[#ffa500]/20 backdrop-blur-md bg-black/50 p-3 sm:p-4 md:p-5 sticky top-0 z-50">
-      <div className="container mx-auto px-2 flex items-center justify-between">
+      <div className="mx-auto px-2 flex items-center justify-between">
         <div className="flex items-center">
           <Link
             href="/"
