@@ -24,7 +24,8 @@ export const metadata: Metadata = {
     siteName: "RugProof",
     images: [
       {
-        url: "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now(),
+        url:
+          "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now(),
         width: 1200,
         height: 630,
         alt: "RugProof Banner",
@@ -36,7 +37,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RugProof - Protect Your Crypto Assets",
     description: "Detect and protect against crypto spam, honeypots, and scams",
-    images: ["https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now()],
+    images: [
+      "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now(),
+    ],
   },
 };
 
@@ -61,8 +64,7 @@ export default function RootLayout({
         <meta
           property="og:image"
           content={
-            "https://rugproofai.com/newbanner.png?v=4&t=20250614_" +
-            Date.now()
+            "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now()
           }
         />
         <meta property="og:url" content="https://rugproofai.com" />
@@ -82,8 +84,7 @@ export default function RootLayout({
         <meta
           name="twitter:image"
           content={
-            "https://rugproofai.com/newbanner.png?v=4&t=20250614_" +
-            Date.now()
+            "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now()
           }
         />
         <meta name="twitter:image:alt" content="RugProof Banner" />
@@ -93,8 +94,7 @@ export default function RootLayout({
         <meta
           property="telegram:image"
           content={
-            "https://rugproofai.com/newbanner.png?v=4&t=20250614_" +
-            Date.now()
+            "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now()
           }
         />
 
