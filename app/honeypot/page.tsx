@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   keywords:
     "honeypot detector, crypto scam detection, token scanner, rugpull prevention, defi security, token analysis, smart contract verification, crypto security tools",
   openGraph: {
-    title: "Honeypot Scanner | RugProof.AI - Detect Token Scams Instantly",
+    title: "Honeypot Scanner | RugProof.AI",
     description:
       "Instantly detect honeypot scams and malicious tokens across multiple blockchains. Advanced real-time analysis, buy/sell simulation, and detailed risk assessment for safer crypto trading.",
     url: "https://rugproofai.com/honeypot",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Honeypot Scanner | RugProof.AI - Detect Token Scams Instantly",
+    title: "Honeypot Scanner | RugProof.AI",
     description:
       "Instantly detect honeypot scams and malicious tokens across multiple blockchains. Advanced real-time analysis, buy/sell simulation, and detailed risk assessment for safer crypto trading.",
     site: "@rugproofai",
