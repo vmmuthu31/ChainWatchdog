@@ -1,16 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import WalletConnect from "./WalletConnect";
+import { useLogin, usePrivy } from "@privy-io/react-auth";
 import WaitlistDialog from "./WaitlistDialog";
 import { pixelFont, pixelMonoFont } from "@/lib/font";
-import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { LogOut, Wallet, X } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "./ui/dropdown-menu";
 
 function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const pathname = usePathname();
+  const { login } = useLogin();
+  const { ready, authenticated, user, logout } = usePrivy();
+
+  const connectedWallets = useMemo(() => {
+    return (
+      user?.linkedAccounts?.filter((account) => account.type === "wallet") || []
+    );
+  }, [user]);
 
   const navItems = [
     {
@@ -185,7 +200,62 @@ function Navbar() {
 
         <div className="flex items-center gap-2">
           <div className="hidden md:block">
-            <WalletConnect />
+            {ready && authenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-[#00ff00] bg-transparent text-[#00ff00] hover:bg-[#00ff00]/10 hover:text-[#00ffff] font-semibold transition-all duration-200">
+                    <Wallet className="w-5 h-5" strokeWidth={2} />
+                    <span className="truncate max-w-[80px]">
+                      {connectedWallets.length > 0
+                        ? connectedWallets[0].address.slice(0, 6) +
+                          "..." +
+                          connectedWallets[0].address.slice(-4)
+                        : "Wallet"}
+                    </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="min-w-[220px] bg-black border border-[#00ff00]/30"
+                >
+                  <div className="px-3 py-2 text-xs text-[#00ff00] font-mono">
+                    Connected Wallets
+                  </div>
+                  {connectedWallets.length > 0 ? (
+                    connectedWallets.map((w) => (
+                      <DropdownMenuItem
+                        key={w.address}
+                        className="gap-2 text-[#00ffff] font-mono"
+                      >
+                        <Wallet className="w-4 h-4" />
+                        <span className="truncate">
+                          {w.address.slice(0, 8)}...{w.address.slice(-4)}
+                        </span>
+                      </DropdownMenuItem>
+                    ))
+                  ) : (
+                    <DropdownMenuItem disabled className="text-slate-400">
+                      No wallets connected
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={logout}
+                    className="gap-2 text-red-500 font-semibold cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <button
+                className={`${pixelFont.className} text-[10px] xs:text-xs sm:text-sm bg-transparent border-2 border-[#00ff00] hover:bg-[#00ff00]/10 text-[#00ff00] hover:text-[#00ffff] font-semibold px-2 sm:px-4 md:px-6 py-1 sm:py-1.5 md:py-2 rounded-xl shadow-[0_0_10px_rgba(0,255,0,0.3)] hover:shadow-[0_0_15px_rgba(0,255,0,0.5)] transition-all duration-200`}
+                onClick={login}
+              >
+                Connect Wallet
+              </button>
+            )}
           </div>
 
           <div className="block md:hidden relative z-50">
@@ -276,7 +346,66 @@ function Navbar() {
                       Wallet
                     </div>
                     <div className="p-2">
-                      <WalletConnect />
+                      {ready && authenticated ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-[#00ff00] bg-transparent text-[#00ff00] hover:bg-[#00ff00]/10 hover:text-[#00ffff] font-semibold transition-all duration-200 w-full">
+                              <Wallet className="w-5 h-5" strokeWidth={2} />
+                              <span className="truncate max-w-[80px]">
+                                {connectedWallets.length > 0
+                                  ? connectedWallets[0].address.slice(0, 6) +
+                                    "..." +
+                                    connectedWallets[0].address.slice(-4)
+                                  : "Wallet"}
+                              </span>
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="min-w-[220px] bg-black border border-[#00ff00]/30"
+                          >
+                            <div className="px-3 py-2 text-xs text-[#00ff00] font-mono">
+                              Connected Wallets
+                            </div>
+                            {connectedWallets.length > 0 ? (
+                              connectedWallets.map((w) => (
+                                <DropdownMenuItem
+                                  key={w.address}
+                                  className="gap-2 text-[#00ffff] font-mono"
+                                >
+                                  <Wallet className="w-4 h-4" />
+                                  <span className="truncate">
+                                    {w.address.slice(0, 8)}...
+                                    {w.address.slice(-4)}
+                                  </span>
+                                </DropdownMenuItem>
+                              ))
+                            ) : (
+                              <DropdownMenuItem
+                                disabled
+                                className="text-slate-400"
+                              >
+                                No wallets connected
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={logout}
+                              className="gap-2 text-red-500 font-semibold cursor-pointer"
+                            >
+                              <LogOut className="w-4 h-4" />
+                              Logout
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <button
+                          className={`${pixelFont.className} text-[10px] xs:text-xs sm:text-sm bg-transparent border-2 border-[#00ff00] hover:bg-[#00ff00]/10 text-[#00ff00] hover:text-[#00ffff] font-semibold px-2 sm:px-4 md:px-6 py-1 sm:py-1.5 md:py-2 rounded-xl shadow-[0_0_10px_rgba(0,255,0,0.3)] hover:shadow-[0_0_15px_rgba(0,255,0,0.5)] transition-all duration-200 w-full`}
+                          onClick={login}
+                        >
+                          Connect Wallet
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
