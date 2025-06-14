@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: "RugProof",
     images: [
       {
-        url: "/banner.png?v=2",
+        url: "/newbanner.png?v=2",
         width: 1200,
         height: 630,
         alt: "RugProof Banner",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RugProof - Protect Your Crypto Assets",
     description: "Detect and protect against crypto spam, honeypots, and scams",
-    images: ["/banner.png?v=2"],
+    images: ["/newbanner.png?v=2"],
   },
 };
 
@@ -57,7 +57,7 @@ export default function RootLayout({
           property="og:description"
           content="Detect and protect against crypto spam, honeypots, and scams"
         />
-        <meta property="og:image" content="/banner.png?v=2" />
+        <meta property="og:image" content="/newbanner.png?v=2" />
         <meta property="og:url" content="https://rugproofai.com" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta
@@ -68,7 +68,7 @@ export default function RootLayout({
           name="twitter:description"
           content="Detect and protect against crypto spam, honeypots, and scams"
         />
-        <meta name="twitter:image" content="/banner.png?v=2" />
+        <meta name="twitter:image" content="/newbanner.png?v=2" />
         <style
           dangerouslySetInnerHTML={{
             __html: `
