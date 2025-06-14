@@ -257,16 +257,16 @@ function TokenomicsPage() {
     <div className="flex min-h-screen flex-col bg-black text-white">
       <Navbar />
 
-      <main className="container mx-auto flex flex-1 flex-col items-center gap-12 py-12">
+      <main className="container mx-auto flex flex-1 flex-col items-center gap-8 md:gap-12 py-6 md:py-12 px-4 md:px-0">
         {/* Hero Section */}
-        <div className="text-center space-y-6 max-w-4xl relative px-4">
+        <div className="text-center space-y-4 md:space-y-6 max-w-4xl relative w-full">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#00ff00]/20 via-transparent to-transparent blur-3xl"></div>
 
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className={`${pixelFont.className} text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-[#00ff00] via-[#00ffff] to-[#ff00ff] bg-clip-text text-transparent glow-green-md`}
+            className={`${pixelFont.className} text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-[#00ff00] via-[#00ffff] to-[#ff00ff] bg-clip-text text-transparent glow-green-md`}
           >
             $R TOKENOMICS
           </motion.h1>
@@ -275,7 +275,7 @@ function TokenomicsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className={`${pixelMonoFont.className} text-xl sm:text-2xl text-[#00ffff] leading-relaxed max-w-2xl mx-auto`}
+            className={`${pixelMonoFont.className} text-lg sm:text-xl md:text-2xl text-[#00ffff] leading-relaxed max-w-2xl mx-auto`}
           >
             Utility-driven token powering the RugProof ecosystem —
             <span className="text-[#ff00ff] font-semibold">
@@ -288,16 +288,16 @@ function TokenomicsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-4 mt-8"
+            className="flex flex-wrap justify-center gap-2 sm:gap-4 mt-6 sm:mt-8"
           >
-            <Badge className="py-2 px-4 text-base bg-[#00ff00]/20 text-[#00ff00] border border-[#00ff00]/30 hover:bg-[#00ff00]/30">
-              <Zap className="h-4 w-4 mr-1" /> Deflationary Burns
+            <Badge className="py-1.5 sm:py-2 px-3 sm:px-4 text-xs sm:text-sm md:text-base bg-[#00ff00]/20 text-[#00ff00] border border-[#00ff00]/30 hover:bg-[#00ff00]/30">
+              <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> Deflationary Burns
             </Badge>
-            <Badge className="py-2 px-4 text-base bg-[#00ffff]/20 text-[#00ffff] border border-[#00ffff]/30 hover:bg-[#00ffff]/30">
-              <Users className="h-4 w-4 mr-1" /> DAO Governance
+            <Badge className="py-1.5 sm:py-2 px-3 sm:px-4 text-xs sm:text-sm md:text-base bg-[#00ffff]/20 text-[#00ffff] border border-[#00ffff]/30 hover:bg-[#00ffff]/30">
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> DAO Governance
             </Badge>
-            <Badge className="py-2 px-4 text-base bg-[#ff00ff]/20 text-[#ff00ff] border border-[#ff00ff]/30 hover:bg-[#ff00ff]/30">
-              <ShieldCheck className="h-4 w-4 mr-1" /> Stake-to-Use Model
+            <Badge className="py-1.5 sm:py-2 px-3 sm:px-4 text-xs sm:text-sm md:text-base bg-[#ff00ff]/20 text-[#ff00ff] border border-[#ff00ff]/30 hover:bg-[#ff00ff]/30">
+              <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> Stake-to-Use Model
             </Badge>
           </motion.div>
         </div>
@@ -307,46 +307,46 @@ function TokenomicsPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="w-full max-w-4xl backdrop-blur-lg bg-black/50 p-8 rounded-2xl border border-[#00ff00]/30 shadow-xl relative z-[10] transform hover:shadow-[0_0_50px_-12px_rgba(0,255,0,0.5)] mx-4 overflow-hidden"
+          className="w-full max-w-4xl backdrop-blur-lg bg-black/50 p-4 sm:p-6 md:p-8 rounded-2xl border border-[#00ff00]/30 shadow-xl relative z-[10] transform hover:shadow-[0_0_50px_-12px_rgba(0,255,0,0.5)] overflow-hidden"
         >
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[#00ff00]/10 via-transparent to-transparent"></div>
 
-          <h2 className={`${pixelFont.className} text-2xl text-[#00ffff] mb-6`}>
+          <h2 className={`${pixelFont.className} text-xl sm:text-2xl text-[#00ffff] mb-4 sm:mb-6`}>
             KEY PRINCIPLES
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-black/70 p-5 rounded-xl border border-[#00ff00]/30 transform transition-all hover:scale-105 hover:border-[#00ff00]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            <div className="bg-black/70 p-4 sm:p-5 rounded-xl border border-[#00ff00]/30 transform transition-all hover:scale-105 hover:border-[#00ff00]">
               <h3
-                className={`${pixelMonoFont.className} text-xl text-[#00ff00] mb-3`}
+                className={`${pixelMonoFont.className} text-lg sm:text-xl text-[#00ff00] mb-2 sm:mb-3`}
               >
                 Try → Stake → Burn
               </h3>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-sm sm:text-base">
                 Free basics, premium via stake, power-use via burn. Simple
                 economy that rewards users.
               </p>
             </div>
 
-            <div className="bg-black/70 p-5 rounded-xl border border-[#00ffff]/30 transform transition-all hover:scale-105 hover:border-[#00ffff]">
+            <div className="bg-black/70 p-4 sm:p-5 rounded-xl border border-[#00ffff]/30 transform transition-all hover:scale-105 hover:border-[#00ffff]">
               <h3
-                className={`${pixelMonoFont.className} text-xl text-[#00ffff] mb-3`}
+                className={`${pixelMonoFont.className} text-lg sm:text-xl text-[#00ffff] mb-2 sm:mb-3`}
               >
                 Ship Every 2-3 Weeks
               </h3>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-sm sm:text-base">
                 Frequent drops keep momentum high and continuous utility
                 expansion.
               </p>
             </div>
 
-            <div className="bg-black/70 p-5 rounded-xl border border-[#ff00ff]/30 transform transition-all hover:scale-105 hover:border-[#ff00ff]">
+            <div className="bg-black/70 p-4 sm:p-5 rounded-xl border border-[#ff00ff]/30 transform transition-all hover:scale-105 hover:border-[#ff00ff]">
               <h3
-                className={`${pixelMonoFont.className} text-xl text-[#ff00ff] mb-3`}
+                className={`${pixelMonoFont.className} text-lg sm:text-xl text-[#ff00ff] mb-2 sm:mb-3`}
               >
                 Community-First
               </h3>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-sm sm:text-base">
                 Bug bounties, DAO votes, Genesis perks reward engaged users.
               </p>
             </div>
@@ -354,18 +354,21 @@ function TokenomicsPage() {
         </motion.div>
 
         {/* Roadmap Section */}
-        <div ref={roadmapRef} className="w-full max-w-4xl mx-4 py-12 relative">
+        <div ref={roadmapRef} className="w-full max-w-4xl py-8 md:py-12 relative">
           <h2
-            className={`${pixelFont.className} text-3xl text-center text-[#00ffff] mb-16`}
+            className={`${pixelFont.className} text-2xl sm:text-3xl text-center text-[#00ffff] mb-10 md:mb-16`}
           >
             <Calendar className="inline-block mr-2 mb-1 text-[#00ff00]" />{" "}
             ROADMAP
           </h2>
 
-          {/* Center timeline line */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 top-28 bottom-20 w-1 bg-gradient-to-b from-[#00ff00] via-[#00ffff] to-[#ff00ff] z-0"></div>
+          {/* Center timeline line - visible only on desktop */}
+          <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 top-28 bottom-20 w-1 bg-gradient-to-b from-[#00ff00] via-[#00ffff] to-[#ff00ff] z-0"></div>
 
-          <div ref={timelineRef} className="relative z-10 space-y-24">
+          {/* Mobile timeline line - only visible on mobile */}
+          <div className="md:hidden absolute left-6 top-28 bottom-20 w-1 bg-gradient-to-b from-[#00ff00] via-[#00ffff] to-[#ff00ff] z-0"></div>
+
+          <div ref={timelineRef} className="relative z-10 space-y-12 md:space-y-24">
             {roadmapItems.map((item, index) => (
               <motion.div
                 key={index}
@@ -373,7 +376,7 @@ function TokenomicsPage() {
                 animate={{
                   opacity: activeMonth >= index ? 1 : 0.5,
                   x: 0,
-                  scale: activeMonth === index ? 1.05 : 1,
+                  scale: activeMonth === index ? 1.02 : 1,
                 }}
                 transition={{
                   duration: 0.8,
@@ -381,11 +384,11 @@ function TokenomicsPage() {
                 }}
                 className={`flex ${
                   index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                } flex-col items-center gap-4`}
+                } flex-col items-start md:items-center gap-4`}
               >
-                {/* Month indicator on timeline */}
+                {/* Month indicator on timeline - Desktop */}
                 <div
-                  className={`absolute left-1/2 transform -translate-x-1/2 z-20 p-2 rounded-full 
+                  className={`hidden md:block absolute left-1/2 transform -translate-x-1/2 z-20 p-2 rounded-full 
                   ${
                     activeMonth === index
                       ? "bg-black border-2 border-[#00ff00] shadow-[0_0_15px_rgba(0,255,0,0.7)]"
@@ -397,18 +400,32 @@ function TokenomicsPage() {
                   </div>
                 </div>
 
+                {/* Month indicator on timeline - Mobile */}
+                <div
+                  className={`md:hidden absolute left-6 transform -translate-x-1/2 z-20 p-1.5 rounded-full 
+                  ${
+                    activeMonth === index
+                      ? "bg-black border-2 border-[#00ff00] shadow-[0_0_15px_rgba(0,255,0,0.7)]"
+                      : "bg-black/80 border border-gray-700"
+                  }`}
+                >
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-black">
+                    {item.icon}
+                  </div>
+                </div>
+
                 {/* Content card */}
                 <div
-                  className={`w-full md:w-5/12 bg-black/60 p-6 rounded-2xl border 
+                  className={`ml-10 md:ml-0 w-full md:w-5/12 bg-black/60 p-4 sm:p-6 rounded-2xl border 
                   ${
                     activeMonth === index
                       ? "border-[#00ff00]/70 shadow-[0_0_30px_-12px_rgba(0,255,0,0.5)]"
                       : "border-gray-800"
                   }`}
                 >
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-3 mb-3 md:mb-4">
                     <Badge
-                      className={`py-1 px-3 text-sm 
+                      className={`py-0.5 sm:py-1 px-2 sm:px-3 text-xs sm:text-sm 
                       ${
                         index === 0
                           ? "bg-[#00ff00]/20 text-[#00ff00]"
@@ -420,44 +437,44 @@ function TokenomicsPage() {
                       {item.month}
                     </Badge>
                     <h3
-                      className={`${pixelMonoFont.className} text-xl text-white`}
+                      className={`${pixelMonoFont.className} text-lg sm:text-xl text-white`}
                     >
                       {item.title}
                     </h3>
                   </div>
 
-                  <ul className="space-y-2">
+                  <ul className="space-y-1 sm:space-y-2">
                     {item.features.map((feature, fIndex) => (
                       <li key={fIndex} className="flex gap-2 items-start">
-                        <ArrowRight className="h-5 w-5 text-[#00ff00] flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-300">{feature}</span>
+                        <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-[#00ff00] flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-300 text-sm sm:text-base">{feature}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Empty div to maintain layout */}
-                <div className="w-full md:w-5/12"></div>
+                {/* Empty div to maintain layout - only needed for desktop */}
+                <div className="hidden md:block w-5/12"></div>
               </motion.div>
             ))}
           </div>
         </div>
 
         {/* Token Utility Section */}
-        <div ref={featuresRef} className="w-full max-w-4xl mx-4 mb-12">
+        <div ref={featuresRef} className="w-full max-w-4xl mb-8 md:mb-12">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={
               isFeaturesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
             }
             transition={{ duration: 0.8 }}
-            className={`${pixelFont.className} text-3xl text-center text-[#00ffff] mb-12`}
+            className={`${pixelFont.className} text-2xl sm:text-3xl text-center text-[#00ffff] mb-8 md:mb-12`}
           >
             <Zap className="inline-block mr-2 mb-1 text-[#00ff00]" /> TOKEN
             UTILITY
           </motion.h2>
 
-          <div className="space-y-12">
+          <div className="space-y-8 md:space-y-12">
             {tokenUtility.map((category, cIndex) => (
               <motion.div
                 key={cIndex}
@@ -468,17 +485,17 @@ function TokenomicsPage() {
                     : { opacity: 0, y: 30 }
                 }
                 transition={{ duration: 0.8, delay: 0.2 * cIndex }}
-                className={`backdrop-blur-lg bg-black/50 p-6 rounded-2xl border ${category.borderColor} overflow-hidden relative`}
+                className={`backdrop-blur-lg bg-black/50 p-4 sm:p-6 rounded-2xl border ${category.borderColor} overflow-hidden relative`}
               >
                 <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-black via-transparent to-transparent"></div>
 
                 <h3
-                  className={`${pixelMonoFont.className} text-2xl ${category.iconColor} mb-6`}
+                  className={`${pixelMonoFont.className} text-xl sm:text-2xl ${category.iconColor} mb-4 sm:mb-6`}
                 >
                   {category.category} Utility
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   {category.items.map((item, iIndex) => (
                     <motion.div
                       key={iIndex}
@@ -489,14 +506,14 @@ function TokenomicsPage() {
                           : { opacity: 0, x: -20 }
                       }
                       transition={{ duration: 0.5, delay: 0.2 + 0.1 * iIndex }}
-                      className={`bg-black/70 p-4 rounded-xl border ${category.borderColor} ${category.hoverColor} transform transition-all duration-300 hover:scale-[1.02]`}
+                      className={`bg-black/70 p-3 sm:p-4 rounded-xl border ${category.borderColor} ${category.hoverColor} transform transition-all duration-300 hover:scale-[1.02]`}
                     >
                       <h4
-                        className={`${pixelMonoFont.className} text-lg text-white mb-2`}
+                        className={`${pixelMonoFont.className} text-base sm:text-lg text-white mb-1.5 sm:mb-2`}
                       >
                         {item.name}
                       </h4>
-                      <p className="text-gray-300 text-sm mb-2">
+                      <p className="text-gray-300 text-xs sm:text-sm mb-1.5 sm:mb-2">
                         {item.description}
                       </p>
                       <p className="text-gray-400 text-xs">{item.benefit}</p>
@@ -509,20 +526,20 @@ function TokenomicsPage() {
         </div>
 
         {/* Live Products Section */}
-        <div ref={productsRef} className="w-full max-w-4xl mx-4 py-12">
+        <div ref={productsRef} className="w-full max-w-4xl py-8 md:py-12">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={
               isProductsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
             }
             transition={{ duration: 0.8 }}
-            className={`${pixelFont.className} text-3xl text-center text-[#00ffff] mb-12`}
+            className={`${pixelFont.className} text-2xl sm:text-3xl text-center text-[#00ffff] mb-8 md:mb-12`}
           >
             <Rocket className="inline-block mr-2 mb-1 text-[#00ff00]" /> LIVE
             PRODUCTS
           </motion.h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {liveProducts.map((product, index) => (
               <motion.div
                 key={index}
@@ -533,31 +550,31 @@ function TokenomicsPage() {
                     : { opacity: 0, y: 30 }
                 }
                 transition={{ duration: 0.5, delay: 0.1 * index }}
-                className={`backdrop-blur-lg bg-black/50 p-6 rounded-2xl border ${product.color} transform transition-all duration-300 ${product.hoverColor} hover:scale-[1.02]`}
+                className={`backdrop-blur-lg bg-black/50 p-4 sm:p-6 rounded-2xl border ${product.color} transform transition-all duration-300 ${product.hoverColor} hover:scale-[1.02]`}
               >
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
                   {product.icon}
                   <h3
-                    className={`${pixelMonoFont.className} text-xl text-white`}
+                    className={`${pixelMonoFont.className} text-lg sm:text-xl text-white`}
                   >
                     {product.name}
                   </h3>
                 </div>
 
-                <p className="text-gray-300 mb-4">{product.description}</p>
+                <p className="text-gray-300 text-sm sm:text-base mb-3 sm:mb-4">{product.description}</p>
 
-                <div className="space-y-1 mb-4">
+                <div className="space-y-1 mb-3 sm:mb-4">
                   {product.actions.map((action, aIndex) => (
-                    <div key={aIndex} className="flex items-center gap-2">
-                      <ArrowRight className="h-4 w-4 text-[#00ff00]" />
-                      <span className="text-gray-400 text-sm">{action}</span>
+                    <div key={aIndex} className="flex items-start sm:items-center gap-1.5 sm:gap-2">
+                      <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 text-[#00ff00] mt-0.5 sm:mt-0 flex-shrink-0" />
+                      <span className="text-gray-400 text-xs sm:text-sm">{action}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-4 border-t border-gray-800 pt-4">
+                <div className="mt-3 sm:mt-4 border-t border-gray-800 pt-3 sm:pt-4">
                   <span
-                    className={`${pixelMonoFont.className} text-sm text-[#00ffff]`}
+                    className={`${pixelMonoFont.className} text-xs sm:text-sm text-[#00ffff]`}
                   >
                     {product.coverage}
                   </span>
@@ -573,42 +590,42 @@ function TokenomicsPage() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true, margin: "-100px" }}
-          className="w-full max-w-4xl backdrop-blur-lg bg-black/50 p-8 rounded-2xl border border-[#ff00ff]/30 shadow-xl relative mx-4 mb-12 overflow-hidden"
+          className="w-full max-w-4xl backdrop-blur-lg bg-black/50 p-4 sm:p-6 md:p-8 rounded-2xl border border-[#ff00ff]/30 shadow-xl relative mx-4 sm:mx-6 md:mx-0 mb-8 md:mb-12 overflow-hidden"
         >
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#ff00ff]/10 via-transparent to-transparent"></div>
 
-          <h2 className={`${pixelFont.className} text-2xl text-[#ff00ff] mb-6`}>
+          <h2 className={`${pixelFont.className} text-xl sm:text-2xl text-[#ff00ff] mb-4 sm:mb-6`}>
             METRICS TO WATCH
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-black/70 p-5 rounded-xl border border-[#00ff00]/20 transform transition-all hover:scale-105">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            <div className="bg-black/70 p-4 sm:p-5 rounded-xl border border-[#00ff00]/20 transform transition-all hover:scale-105">
               <h3
-                className={`${pixelMonoFont.className} text-xl text-[#00ff00] mb-3`}
+                className={`${pixelMonoFont.className} text-lg sm:text-xl text-[#00ff00] mb-2 sm:mb-3`}
               >
                 North-star
               </h3>
-              <p className="text-gray-300">Monthly active protected wallets</p>
+              <p className="text-gray-300 text-sm sm:text-base">Monthly active protected wallets</p>
             </div>
 
-            <div className="bg-black/70 p-5 rounded-xl border border-[#00ffff]/20 transform transition-all hover:scale-105">
+            <div className="bg-black/70 p-4 sm:p-5 rounded-xl border border-[#00ffff]/20 transform transition-all hover:scale-105">
               <h3
-                className={`${pixelMonoFont.className} text-xl text-[#00ffff] mb-3`}
+                className={`${pixelMonoFont.className} text-lg sm:text-xl text-[#00ffff] mb-2 sm:mb-3`}
               >
                 Token health
               </h3>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-sm sm:text-base">
                 % supply staked, monthly burn rate, liquidity depth
               </p>
             </div>
 
-            <div className="bg-black/70 p-5 rounded-xl border border-[#ff00ff]/20 transform transition-all hover:scale-105">
+            <div className="bg-black/70 p-4 sm:p-5 rounded-xl border border-[#ff00ff]/20 transform transition-all hover:scale-105">
               <h3
-                className={`${pixelMonoFont.className} text-xl text-[#ff00ff] mb-3`}
+                className={`${pixelMonoFont.className} text-lg sm:text-xl text-[#ff00ff] mb-2 sm:mb-3`}
               >
                 Revenue
               </h3>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-sm sm:text-base">
                 Scan burns, API fees, staking withdrawal fees
               </p>
             </div>

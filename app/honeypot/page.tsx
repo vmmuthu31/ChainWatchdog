@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { pixelMonoFont } from "@/lib/font";
 
 export const metadata: Metadata = {
-  title: "Honeypot Scanner | RugProof.AI - Detect Token Scams Instantly",
+  title: "Honeypot Scanner | RugProofAI",
   description:
     "Instantly detect honeypot scams and malicious tokens across multiple blockchains. Advanced real-time analysis, buy/sell simulation, and detailed risk assessment for safer crypto trading.",
   keywords:
