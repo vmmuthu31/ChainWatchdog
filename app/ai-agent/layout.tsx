@@ -2,15 +2,18 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "RugProof - AI Security Agent",
-  description: "Advanced AI-powered crypto security analysis. Detect scams, analyze smart contracts, and protect your investments.",
+  description:
+    "Advanced AI-powered crypto security analysis. Detect scams, analyze smart contracts, and protect your investments.",
   openGraph: {
     title: "RugProof - AI Security Agent",
-    description: "Advanced AI-powered crypto security analysis. Detect scams, analyze smart contracts, and protect your investments.",
+    description:
+      "Advanced AI-powered crypto security analysis. Detect scams, analyze smart contracts, and protect your investments.",
     url: "https://rugproofai.com/ai-agent",
     siteName: "RugProof",
     images: [
       {
-        url: "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now(),
+        url:
+          "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now(),
         width: 1200,
         height: 630,
         alt: "RugProof AI Security Agent",
@@ -21,8 +24,11 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "RugProof - AI Security Agent",
-    description: "Advanced AI-powered crypto security analysis. Detect scams, analyze smart contracts, and protect your investments.",
-    images: ["https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now()],
+    description:
+      "Advanced AI-powered crypto security analysis. Detect scams, analyze smart contracts, and protect your investments.",
+    images: [
+      "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now(),
+    ],
   },
 };
 
