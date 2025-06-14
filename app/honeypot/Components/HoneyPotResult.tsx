@@ -1,6 +1,12 @@
+import {
+  AlertTriangle,
+  CheckCircle,
+  ExternalLink,
+  Info,
+  Share2,
+} from "lucide-react";
 import { pixelFont, pixelMonoFont } from "@/lib/font";
 import { getExplorerUrl } from "@/lib/utils/getExplorerUrl";
-import { AlertTriangle, CheckCircle, ExternalLink, Info } from "lucide-react";
 
 function HoneyPotResult({
   honeypotResult,
@@ -54,22 +60,54 @@ function HoneyPotResult({
     detectedChain === "solana-mainnet" ||
     honeypotResult?.chain === "solana-mainnet";
 
+  const handleShare = () => {
+    const tokenName = honeypotResult.token.name || "Token";
+    const tokenSymbol = honeypotResult.token.symbol || "Unknown";
+    const isHoneypot = honeypotResult?.honeypotResult?.isHoneypot;
+    const riskLevel = honeypotResult?.summary?.risk || "unknown";
+
+    const tweetText = `I just checked ${tokenName} ($${tokenSymbol}) using @RugProofAI\n\n${
+      isHoneypot
+        ? "⚠️ HONEYPOT DETECTED! This token appears to be a scam. Stay safe!"
+        : `Risk Level: ${riskLevel.toUpperCase()}\n${
+            riskLevel === "low"
+              ? "✅ Appears to be safe, but always DYOR!"
+              : "⚠️ Exercise caution before trading!"
+          }`
+    }\n\nCheck your tokens at https://rugproofai.com/honeypot`;
+
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`,
+      "_blank"
+    );
+  };
+
   return (
     <div className="w-full max-w-2xl mt-6 animate-fade-in">
       {/* Token Summary Card */}
       <div className="p-4 sm:p-6 backdrop-blur-lg bg-black/50 rounded-2xl border border-[#ffa500]/30 shadow-[0_0_15px_rgba(255,165,0,0.2)] overflow-hidden relative mb-6">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#ffa500]/10 via-transparent to-transparent"></div>
 
-        <div className="flex items-center gap-2 mb-4 sm:mb-6">
-          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-[#ffa500]/10 flex items-center justify-center">
-            <AlertTriangle className="h-6 w-6 sm:h-7 sm:w-7 text-[#ffa500]" />
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <div className="flex items-center gap-2">
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-[#ffa500]/10 flex items-center justify-center">
+              <AlertTriangle className="h-6 w-6 sm:h-7 sm:w-7 text-[#ffa500]" />
+            </div>
+            <h3
+              className={`${pixelFont.className} text-xl sm:text-2xl md:text-3xl font-bold text-[#ffa500]`}
+            >
+              HONEYPOT ANALYSIS
+              {isSolana && <span className="ml-2 text-sm">• SOLANA</span>}
+            </h3>
           </div>
-          <h3
-            className={`${pixelFont.className} text-xl sm:text-2xl md:text-3xl font-bold text-[#ffa500]`}
+
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1DA1F2] hover:bg-[#1a8cd8] transition-colors text-white"
           >
-            HONEYPOT ANALYSIS
-            {isSolana && <span className="ml-2 text-sm">• SOLANA</span>}
-          </h3>
+            <Share2 className="h-4 w-4" />
+            <span className={`${pixelMonoFont.className} text-sm`}>Share</span>
+          </button>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
