@@ -66,7 +66,7 @@ function HoneyPotResult({
     const isHoneypot = honeypotResult?.honeypotResult?.isHoneypot;
     const riskLevel = honeypotResult?.summary?.risk || "unknown";
 
-    const tweetText = `🤖 RUGPROOF.AI SCAN COMPLETE 🔍\n\n${tokenName} (${tokenSymbol})\n\n${
+    const tweetText = `🤖 RUGPROOFAI SCAN COMPLETE 🔍\n\n${tokenName} (${tokenSymbol})\n\n${
       isHoneypot
         ? "🚨 CRITICAL: HONEYPOT DETECTED!\n⚠️ High probability of malicious intent detected. Avoid at all costs."
         : `Risk Level: ${riskLevel.toUpperCase()}\n${

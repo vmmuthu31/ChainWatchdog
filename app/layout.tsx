@@ -15,31 +15,42 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RugProof - Protect Your Crypto Assets",
-  description: "Detect and protect against crypto spam, honeypots, and scams",
+  title: "RugProof.AI - Advanced Crypto Security & Token Analysis Platform",
+  description: "Protect your crypto investments with AI-powered security tools. Detect spam tokens, honeypots, and scams across multiple blockchains. Real-time analysis and automated protection for DeFi traders.",
+  keywords: "crypto security, token scanner, honeypot detector, defi protection, blockchain security, crypto scam prevention, smart contract analysis, rugpull detection",
   openGraph: {
-    title: "RugProof - Protect Your Crypto Assets",
-    description: "Detect and protect against crypto spam, honeypots, and scams",
+    title: "RugProof.AI - Advanced Crypto Security & Token Analysis Platform",
+    description: "Protect your crypto investments with AI-powered security tools. Detect spam tokens, honeypots, and scams across multiple blockchains. Real-time analysis and automated protection for DeFi traders.",
     url: "https://rugproofai.com",
-    siteName: "RugProof",
+    siteName: "RugProof.AI",
     images: [
       {
-        url:
-          "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now(),
+        url: "https://rugproofai.com/newbanner.png?v=5&t=" + Date.now(),
         width: 1200,
         height: 630,
-        alt: "RugProof Banner",
+        alt: "RugProof.AI - Advanced Crypto Security Platform",
       },
     ],
     type: "website",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "RugProof - Protect Your Crypto Assets",
-    description: "Detect and protect against crypto spam, honeypots, and scams",
-    images: [
-      "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now(),
-    ],
+    title: "RugProof.AI - Advanced Crypto Security & Token Analysis Platform",
+    description: "Protect your crypto investments with AI-powered security tools. Detect spam tokens, honeypots, and scams across multiple blockchains. Real-time analysis and automated protection for DeFi traders.",
+    site: "@rugproofai",
+    creator: "@rugproofai",
+    images: ["https://rugproofai.com/newbanner.png?v=5&t=" + Date.now()],
+  },
+  alternates: {
+    canonical: "https://rugproofai.com",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    "max-snippet": -1,
+    "max-image-preview": "large",
+    "max-video-preview": -1,
   },
 };
 
