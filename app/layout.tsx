@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: "RugProof",
     images: [
       {
-        url: "https://rugproofai.com/newbanner.png?v=3&t=20250614",
+        url: "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now(),
         width: 1200,
         height: 630,
         alt: "RugProof Banner",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RugProof - Protect Your Crypto Assets",
     description: "Detect and protect against crypto spam, honeypots, and scams",
-    images: ["https://rugproofai.com/newbanner.png?v=3&t=20250614"],
+    images: ["https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now()],
   },
 };
 
