@@ -499,6 +499,42 @@ function HoneyPot() {
         currentDetectedChain: detectedChain,
       });
 
+      // Handle chain detection first
+      if (isSolanaAddress) {
+        console.log("Setting chain to solana-mainnet for Solana address");
+        setSelectedChain("solana-mainnet");
+        setAutoDetectChain(true);
+        setDetectedChain("solana-mainnet");
+      } else if (isEvmAddress) {
+        if (autoDetectChain) {
+          console.log("Auto-detecting chain for EVM address");
+          setIsDetectingChain(true);
+          try {
+            const detectedChainId = await detectChain(contractAddress);
+            if (detectedChainId) {
+              console.log("Chain detected:", detectedChainId);
+              setSelectedChain(detectedChainId);
+              setDetectedChain(detectedChainId);
+            } else {
+              console.log("No chain detected, defaulting to Ethereum mainnet");
+              setSelectedChain("1");
+              setDetectedChain("1");
+            }
+          } catch (error) {
+            console.error("Error detecting chain:", error);
+            setSelectedChain("1");
+            setDetectedChain("1");
+          } finally {
+            setIsDetectingChain(false);
+          }
+        }
+      }
+
+      // Wait a moment for chain detection to complete
+      if (isEvmAddress && autoDetectChain) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
       if (isSolanaAddress) {
         console.log("Using solana-mainnet for Solana address in handleCheck");
         setSelectedChain("solana-mainnet");
@@ -574,6 +610,7 @@ function HoneyPot() {
   };
 
   useEffect(() => {
+    // Handle initial query parameters
     const address = searchParams.get("address");
     const chainId = searchParams.get("chainId");
 
@@ -599,52 +636,65 @@ function HoneyPot() {
         setSelectedChain("solana-mainnet");
         setAutoDetectChain(true);
         setDetectedChain("solana-mainnet");
+        setInitialQueryHandled(true);
       } else if (isEvmAddress) {
         if (chainId) {
           console.log("Using provided chain for EVM address:", chainId);
           setSelectedChain(chainId);
           setAutoDetectChain(false);
           setDetectedChain(chainId);
+          setInitialQueryHandled(true);
         } else {
           console.log("No chain provided, will auto-detect for EVM address");
           setAutoDetectChain(true);
+          setIsDetectingChain(true);
+          detectChain(address)
+            .then((detectedChainId) => {
+              if (detectedChainId) {
+                console.log("Chain detected:", detectedChainId);
+                setSelectedChain(detectedChainId);
+                setDetectedChain(detectedChainId);
+              } else {
+                console.log(
+                  "No chain detected, defaulting to Ethereum mainnet"
+                );
+                setSelectedChain("1");
+                setDetectedChain("1");
+              }
+              setInitialQueryHandled(true);
+            })
+            .catch((error) => {
+              console.error("Error detecting chain:", error);
+              setSelectedChain("1");
+              setDetectedChain("1");
+              setInitialQueryHandled(true);
+            })
+            .finally(() => {
+              setIsDetectingChain(false);
+            });
         }
       }
+    }
+  }, [searchParams, initialQueryHandled]);
 
+  // Separate useEffect for running the initial check after chain detection is complete
+  useEffect(() => {
+    if (contractAddress && initialQueryHandled && !isDetectingChain) {
       const runInitialCheck = async () => {
         setIsLoading(true);
         setError(null);
-
         try {
-          let chainToUse;
-
-          if (isSolanaAddress) {
-            chainToUse = "solana-mainnet";
-          } else if (isEvmAddress) {
-            if (chainId) {
-              chainToUse = chainId;
-            } else if (autoDetectChain) {
-              const detectedChainId = await detectChain(address);
-              chainToUse = detectedChainId || "1";
-
-              setSelectedChain(chainToUse);
-              setDetectedChain(chainToUse);
-              console.log("Auto-detected chain:", chainToUse);
-            } else {
-              chainToUse = selectedChain;
-            }
-          } else {
-            throw new Error("Invalid address format");
-          }
-
+          const chainToUse = selectedChain;
           console.log(
             "Using chain for analysis:",
             chainToUse,
             "for address:",
-            address
+            contractAddress
           );
-
-          const honeypotData = await fetchHoneypotData(address, chainToUse);
+          const honeypotData = await fetchHoneypotData(
+            contractAddress,
+            chainToUse
+          );
           setHoneypotResult(honeypotData);
         } catch (err) {
           const errorMessage =
@@ -655,44 +705,12 @@ function HoneyPot() {
           console.error(err);
         } finally {
           setIsLoading(false);
-          setInitialQueryHandled(true);
         }
       };
 
       runInitialCheck();
     }
-  }, [
-    searchParams,
-    initialQueryHandled,
-    selectedChain,
-    fetchHoneypotData,
-    autoDetectChain,
-    detectChain,
-  ]);
-
-  useEffect(() => {
-    if (initialQueryHandled) {
-      const timer = setTimeout(() => {
-        if (
-          contractAddress &&
-          ((contractAddress.length >= 42 && contractAddress.startsWith("0x")) ||
-            /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(contractAddress)) &&
-          autoDetectChain
-        ) {
-          const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-          if (solanaRegex.test(contractAddress)) {
-            console.log("Directly setting Solana chain for Solana address");
-            setDetectedChain("solana-mainnet");
-            setSelectedChain("solana-mainnet");
-          } else {
-            detectChain(contractAddress);
-          }
-        }
-      }, 500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [contractAddress, autoDetectChain, initialQueryHandled, detectChain]);
+  }, [contractAddress, initialQueryHandled, selectedChain, isDetectingChain]);
 
   return (
     <Suspense>
@@ -796,7 +814,21 @@ function HoneyPot() {
                     type="text"
                     placeholder="Enter a contract address (0x... for EVM or base58 for Solana)"
                     value={contractAddress}
-                    onChange={(e) => setContractAddress(e.target.value)}
+                    onChange={(e) => {
+                      detectChain(e.target.value).then((detectedChainId) => {
+                        if (detectedChainId) {
+                          console.log("Detected chain ID:", detectedChainId);
+                          setDetectedChain(detectedChainId);
+                          setSelectedChain(detectedChainId);
+                        } else {
+                          console.log("No chain detected, using default");
+                          setDetectedChain(null);
+                          setSelectedChain("1"); // Default to Ethereum
+                        }
+                        setError(null);
+                      });
+                      setContractAddress(e.target.value);
+                    }}
                     disabled={isLoading}
                     className={`${pixelMonoFont.className} w-full pl-10 pr-3 py-3 sm:py-4 rounded-md bg-[#111] border border-[#ffa500]/50 text-[#00ffff] focus:ring-[#ffa500] focus:border-[#ffa500] focus:outline-none focus:ring-2 text-base sm:text-lg placeholder:text-[#ffa500]/50`}
                     style={{
