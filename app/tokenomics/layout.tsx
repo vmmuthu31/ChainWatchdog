@@ -1,24 +1,24 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tokenomics | RugProof.AI - Revolutionary Crypto Security Token",
+  title: "Tokenomics | RugProofAI - Revolutionary Crypto Security Token",
   description:
     "Discover RugProof's innovative tokenomics: deflationary burns, staking rewards, governance rights, and utility features. Join our mission to create a safer crypto ecosystem.",
   keywords:
     "rugproof token, crypto security token, deflationary tokenomics, staking rewards, defi governance, token utility, crypto security platform, token economics",
   openGraph: {
-    title: "Tokenomics | RugProof.AI - Revolutionary Crypto Security Token",
+    title: "Tokenomics | RugProofAI - Revolutionary Crypto Security Token",
     description:
       "Discover RugProof's innovative tokenomics: deflationary burns, staking rewards, governance rights, and utility features. Join our mission to create a safer crypto ecosystem.",
     url: "https://rugproofai.com/tokenomics",
-    siteName: "RugProof.AI",
+    siteName: "RugProofAI",
     images: [
       {
         url:
           "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now(),
         width: 1200,
         height: 630,
-        alt: "RugProof.AI Token - Revolutionary Crypto Security",
+        alt: "RugProofAI Token - Revolutionary Crypto Security",
       },
     ],
     type: "website",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tokenomics | RugProof.AI - Revolutionary Crypto Security Token",
+    title: "Tokenomics | RugProofAI - Revolutionary Crypto Security Token",
     description:
       "Discover RugProof's innovative tokenomics: deflationary burns, staking rewards, governance rights, and utility features. Join our mission to create a safer crypto ecosystem.",
     site: "@rugproofai",

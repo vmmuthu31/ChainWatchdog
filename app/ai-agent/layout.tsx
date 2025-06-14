@@ -1,24 +1,24 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI Security Agent | RugProof.AI - Intelligent Crypto Protection",
+  title: "AI Security Agent | RugProofAI - Intelligent Crypto Protection",
   description:
     "Experience next-gen crypto security with our AI-powered analysis engine. Deep smart contract analysis, automated threat detection, and real-time protection across all major blockchains.",
   keywords:
     "AI crypto security, blockchain AI, smart contract analysis, automated security, crypto threat detection, AI token analysis, defi protection, crypto AI agent",
   openGraph: {
-    title: "AI Security Agent | RugProof.AI - Intelligent Crypto Protection",
+    title: "AI Security Agent | RugProofAI - Intelligent Crypto Protection",
     description:
       "Experience next-gen crypto security with our AI-powered analysis engine. Deep smart contract analysis, automated threat detection, and real-time protection across all major blockchains.",
     url: "https://rugproofai.com/ai-agent",
-    siteName: "RugProof.AI",
+    siteName: "RugProofAI",
     images: [
       {
         url:
           "https://rugproofai.com/newbanner.png?v=4&t=20250614_" + Date.now(),
         width: 1200,
         height: 630,
-        alt: "RugProof.AI - Advanced AI Security Agent",
+        alt: "RugProofAI - Advanced AI Security Agent",
       },
     ],
     type: "website",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Security Agent | RugProof.AI - Intelligent Crypto Protection",
+    title: "AI Security Agent | RugProofAI - Intelligent Crypto Protection",
     description:
       "Experience next-gen crypto security with our AI-powered analysis engine. Deep smart contract analysis, automated threat detection, and real-time protection across all major blockchains.",
     site: "@rugproofai",

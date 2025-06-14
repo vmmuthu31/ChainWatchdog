@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     description:
       "Protect your crypto investments with AI-powered security tools. Detect spam tokens, honeypots, and scams across multiple blockchains. Real-time analysis and automated protection for DeFi traders.",
     url: "https://rugproofai.com",
-    siteName: "RugProof.AI",
+    siteName: "RugProofAI",
     images: [
       {
         url: "https://rugproofai.com/newbanner.png?v=5&t=" + Date.now(),
