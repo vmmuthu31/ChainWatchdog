@@ -74,7 +74,7 @@ function HoneyPotResult({
               ? "✅ SECURE: Token passed security checks\n💫 Always verify before investing"
               : "⚠️ CAUTION: Potential risks detected\n🔐 Enhanced vigilance recommended"
           }`
-    }\n\n🌐 Verify your tokens at:\nhttps://rugproofai.com/honeypot\n\n#CryptoSecurity #RugProofAI #web3 #web3security`;
+    }\n\n🌐 Verify your tokens at:\nhttps://rugproofai.com/honeypot?fresh=1\n\n#CryptoSecurity #RugProofAI #web3 #web3security`;
 
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`,
