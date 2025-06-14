@@ -499,7 +499,6 @@ function HoneyPot() {
         currentDetectedChain: detectedChain,
       });
 
-      // Handle chain detection first
       if (isSolanaAddress) {
         console.log("Setting chain to solana-mainnet for Solana address");
         setSelectedChain("solana-mainnet");
@@ -530,7 +529,6 @@ function HoneyPot() {
         }
       }
 
-      // Wait a moment for chain detection to complete
       if (isEvmAddress && autoDetectChain) {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
@@ -610,7 +608,6 @@ function HoneyPot() {
   };
 
   useEffect(() => {
-    // Handle initial query parameters
     const address = searchParams.get("address");
     const chainId = searchParams.get("chainId");
 
@@ -677,7 +674,6 @@ function HoneyPot() {
     }
   }, [searchParams, initialQueryHandled]);
 
-  // Separate useEffect for running the initial check after chain detection is complete
   useEffect(() => {
     if (contractAddress && initialQueryHandled && !isDetectingChain) {
       const runInitialCheck = async () => {
@@ -823,7 +819,7 @@ function HoneyPot() {
                         } else {
                           console.log("No chain detected, using default");
                           setDetectedChain(null);
-                          setSelectedChain("1"); // Default to Ethereum
+                          setSelectedChain("1");
                         }
                         setError(null);
                       });

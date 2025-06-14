@@ -1,6 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const RUGCHECK_API_URL = "https://api.rugcheck.xyz/v1";
+const HELIUS_API_URL = "https://api.helius.xyz/v0";
+const HELIUS_API_KEY = "b477781a-99e7-41be-972e-1942d84d0669";
+
+async function fetchHeliusTokenMetadata(
+  tokenAddress: string
+): Promise<any | null> {
+  try {
+    const response = await fetch(
+      `${HELIUS_API_URL}/token-metadata?api-key=${HELIUS_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          includeOffChain: false,
+          disableCache: false,
+          mintAccounts: [tokenAddress],
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      console.error("Helius API error:", response.statusText);
+      return null;
+    }
+
+    const data = await response.json();
+    return data[0] || null;
+  } catch (error) {
+    console.error("Error fetching from Helius API:", error);
+    return null;
+  }
+}
 
 export interface RugCheckTokenReport {
   mint: string;
@@ -88,7 +123,7 @@ export interface RugCheckSummary {
 }
 
 /**
- * Fetches the full token report from RugCheck API
+ * Fetches the full token report from RugCheck API with Helius API fallback
  */
 export async function fetchRugCheckTokenReport(
   tokenAddress: string
@@ -101,6 +136,88 @@ export async function fetchRugCheckTokenReport(
     if (!response.ok) {
       const errorData = await response.text();
       console.error(`RugCheck API error (${response.status}):`, errorData);
+      if (errorData.includes("unable to generate report")) {
+        console.log("Falling back to Helius API...");
+        const heliusData = await fetchHeliusTokenMetadata(tokenAddress);
+
+        if (heliusData) {
+          return {
+            mint: tokenAddress,
+            tokenProgram: heliusData.onChainAccountInfo.accountInfo.owner,
+            creator:
+              heliusData.onChainMetadata?.metadata?.updateAuthority || "",
+            creatorBalance: 0,
+            token: {
+              mintAuthority:
+                heliusData.onChainAccountInfo.accountInfo.data.parsed.info
+                  .mintAuthority || null,
+              supply: Number(
+                heliusData.onChainAccountInfo.accountInfo.data.parsed.info
+                  .supply
+              ),
+              decimals:
+                heliusData.onChainAccountInfo.accountInfo.data.parsed.info
+                  .decimals,
+              isInitialized:
+                heliusData.onChainAccountInfo.accountInfo.data.parsed.info
+                  .isInitialized,
+              freezeAuthority:
+                heliusData.onChainAccountInfo.accountInfo.data.parsed.info
+                  .freezeAuthority || null,
+            },
+            token_extensions: null,
+            tokenMeta: {
+              name:
+                heliusData.onChainMetadata?.metadata?.data?.name || "Unknown",
+              symbol:
+                heliusData.onChainMetadata?.metadata?.data?.symbol || "UNKNOWN",
+              uri: heliusData.onChainMetadata?.metadata?.data?.uri || "",
+              mutable: heliusData.onChainMetadata?.metadata?.isMutable || false,
+              updateAuthority:
+                heliusData.onChainMetadata?.metadata?.updateAuthority || "",
+            },
+            topHolders: [],
+            freezeAuthority:
+              heliusData.onChainAccountInfo.accountInfo.data.parsed.info
+                .freezeAuthority || null,
+            mintAuthority:
+              heliusData.onChainAccountInfo.accountInfo.data.parsed.info
+                .mintAuthority || null,
+            risks: [],
+            score: 50,
+            score_normalised: 50,
+            fileMeta: {
+              description: "",
+              name:
+                heliusData.onChainMetadata?.metadata?.data?.name || "Unknown",
+              symbol:
+                heliusData.onChainMetadata?.metadata?.data?.symbol || "UNKNOWN",
+              image: "",
+            },
+            lockerOwners: {},
+            lockers: {},
+            markets: null,
+            totalMarketLiquidity: 0,
+            totalLPProviders: 0,
+            totalHolders: 0,
+            price: 0,
+            rugged: false,
+            tokenType: "Unknown",
+            transferFee: {
+              pct: 0,
+              maxAmount: 0,
+              authority: "",
+            },
+            knownAccounts: {},
+            events: [],
+            verification: null,
+            graphInsidersDetected: 0,
+            insiderNetworks: null,
+            detectedAt: new Date().toISOString(),
+            creatorTokens: null,
+          };
+        }
+      }
       return null;
     }
 
