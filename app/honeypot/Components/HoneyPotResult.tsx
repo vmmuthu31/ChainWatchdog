@@ -66,15 +66,15 @@ function HoneyPotResult({
     const isHoneypot = honeypotResult?.honeypotResult?.isHoneypot;
     const riskLevel = honeypotResult?.summary?.risk || "unknown";
 
-    const tweetText = `I just checked ${tokenName} ($${tokenSymbol}) using @RugProofAI\n\n${
+    const tweetText = `🤖 RUGPROOF.AI SCAN COMPLETE 🔍\n\n${tokenName} ($${tokenSymbol})\n\n${
       isHoneypot
-        ? "⚠️ HONEYPOT DETECTED! This token appears to be a scam. Stay safe!"
+        ? "🚨 CRITICAL: HONEYPOT DETECTED!\n⚠️ High probability of malicious intent detected. Avoid at all costs."
         : `Risk Level: ${riskLevel.toUpperCase()}\n${
             riskLevel === "low"
-              ? "✅ Appears to be safe, but always DYOR!"
-              : "⚠️ Exercise caution before trading!"
+              ? "✅ SECURE: Token passed security checks\n💫 Always verify before investing"
+              : "⚠️ CAUTION: Potential risks detected\n🔐 Enhanced vigilance recommended"
           }`
-    }\n\nCheck your tokens at https://rugproofai.com/honeypot`;
+    }\n\n🌐 Verify your tokens at https://rugproofai.com/honeypot #CryptoSecurity #RugProofAI`;
 
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`,
@@ -103,10 +103,10 @@ function HoneyPotResult({
 
           <button
             onClick={handleShare}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1DA1F2] hover:bg-[#1a8cd8] transition-colors text-white"
+            className="group relative flex items-center gap-2 px-3 cursor-pointer py-2 rounded-lg bg-black/80 hover:bg-black/90 border border-[#00ffff]/30 transition-all overflow-hidden"
           >
-            <Share2 className="h-4 w-4" />
-            <span className={`${pixelMonoFont.className} text-sm`}>Share</span>
+            <div className="absolute inset-0 bg-[linear-gradient(110deg,transparent_0%,transparent_35%,#00ffff_50%,transparent_65%,transparent_100%)] opacity-20 group-hover:animate-[shine_1.5s_ease-in-out_infinite]"></div>
+            <Share2 className="h-4 w-4 text-[#00ffff]" />
           </button>
         </div>
 
