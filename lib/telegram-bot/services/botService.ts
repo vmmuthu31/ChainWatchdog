@@ -225,7 +225,9 @@ async function checkEvmHoneypot(
         address: contractAddress,
         chainId,
         isHoneypot: false,
-        honeypotReason: riskCheck.reason || "Unable to perform complete analysis. Exercise caution.",
+        honeypotReason:
+          riskCheck.reason ||
+          "Unable to perform complete analysis. Exercise caution.",
         buyTax: riskCheck.buyTax || 0,
         sellTax: riskCheck.sellTax || 0,
         tokenName: tokenInfo.name,
@@ -382,5 +384,6 @@ export function getSupportedChains() {
     id: chain.id,
     name: chain.name,
     type: chain.type,
+    category: chain.category,
   }));
 }
