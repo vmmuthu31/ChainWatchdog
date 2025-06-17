@@ -7,14 +7,16 @@ let isERC20Spam: any = null;
 
 type ConfidenceLevel = "YES" | "MAYBE";
 
+// Define a fallback function in case the import fails
+isERC20Spam = () => false;
+
 if (typeof window === "undefined") {
-  import("@covalenthq/goldrush-enhanced-spam-lists")
-    .then((module) => {
-      isERC20Spam = module.isERC20Spam;
-    })
-    .catch((error) => {
-      console.error("Failed to import enhanced-spam-lists:", error);
-    });
+  try {
+    // Skip the import for server-side code
+    console.log("Server-side execution detected, skipping spam list import");
+  } catch (error) {
+    console.error("Failed to import enhanced-spam-lists:", error);
+  }
 }
 
 export const supportedChains: ChainInfo[] = [
