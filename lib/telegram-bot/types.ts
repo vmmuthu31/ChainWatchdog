@@ -19,12 +19,24 @@ export interface CommandHandler {
   execute: (ctx: BotContext) => Promise<void>;
 }
 
+export interface TokenInfo {
+  name: string;
+  symbol: string;
+  balance: string;
+  formattedBalance: string;
+  value?: number;
+  isSpam: boolean;
+  contractAddress: string;
+}
+
 export interface WalletScanResult {
   address: string;
   chainId: string;
   spamTokensCount: number;
   safeTokensCount: number;
   totalTokens: number;
+  totalValue?: number;
+  tokens: TokenInfo[];
 }
 
 export interface ContractCheckResult {

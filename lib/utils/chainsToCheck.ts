@@ -42,4 +42,10 @@ export const chainsToCheck = [
     explorer: "https://api.optimistic.etherscan.io",
     apikey: process.env.NEXT_PUBLIC_OPTIMISM_API_KEY,
   },
+  {
+    id: "8453",
+    name: "Base",
+    explorer: "https://api.basescan.org",
+    apikey: process.env.NEXT_PUBLIC_BASESCAN_API_KEY,
+  },
 ];

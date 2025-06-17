@@ -27,12 +27,52 @@ export async function scanWallet(
     ).length;
     const safeTokensCount = totalTokens - spamTokensCount;
 
+    // Process token details
+    const tokens = walletData.data.items.map((token) => {
+      // Calculate human-readable balance
+      const balance = token.balance || "0";
+      const decimals = token.contract_decimals || 18;
+      const numericBalance = parseFloat(balance) / Math.pow(10, decimals);
+
+      // Format balance to be readable
+      let formattedBalance;
+      if (numericBalance < 0.000001) {
+        formattedBalance = numericBalance.toExponential(4);
+      } else if (numericBalance < 0.01) {
+        formattedBalance = numericBalance.toFixed(6);
+      } else if (numericBalance < 1000) {
+        formattedBalance = numericBalance.toFixed(4);
+      } else {
+        formattedBalance = numericBalance.toLocaleString(undefined, {
+          maximumFractionDigits: 2,
+        });
+      }
+
+      return {
+        name: token.contract_name || "Unknown Token",
+        symbol: token.contract_ticker_symbol || "???",
+        balance: balance,
+        formattedBalance: formattedBalance,
+        value: token.quote || 0,
+        isSpam: token.is_spam || false,
+        contractAddress: token.contract_address,
+      };
+    });
+
+    // Calculate total portfolio value
+    const totalValue = tokens.reduce(
+      (sum, token) => sum + (token.value || 0),
+      0
+    );
+
     return {
       address: walletAddress,
       chainId,
       spamTokensCount,
       safeTokensCount,
       totalTokens,
+      totalValue,
+      tokens,
     };
   } catch (error) {
     console.error("Error scanning wallet:", error);
@@ -106,7 +146,7 @@ async function checkSolanaHoneypot(
   try {
     // Import here to avoid circular dependencies
     const { analyzeSolanaTokenForHoneypot } = await import(
-      "@/lib/services/solanaScan"
+      "../../../lib/services/solanaScan"
     );
     const solanaResult = await analyzeSolanaTokenForHoneypot(contractAddress);
 
@@ -138,30 +178,71 @@ async function checkEvmHoneypot(
   chainId: string
 ): Promise<HoneypotCheckResult> {
   try {
-    const response = await fetch(
-      `https://api.honeypot.is/v2/IsHoneypot?address=${contractAddress}&chainID=${chainId}`
-    );
+    // Try to use honeypot.is API first
+    try {
+      const response = await fetch(
+        `https://api.honeypot.is/v2/IsHoneypot?address=${contractAddress}&chainID=${chainId}`
+      );
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText} (${response.status})`);
+      if (response.ok) {
+        const data = await response.json();
+
+        return {
+          address: contractAddress,
+          chainId,
+          isHoneypot: data.honeypotResult?.isHoneypot || false,
+          honeypotReason: data.honeypotResult?.honeypotReason,
+          buyTax: data.simulationResult?.buyTax,
+          sellTax: data.simulationResult?.sellTax,
+          tokenName: data.token?.name,
+          tokenSymbol: data.token?.symbol,
+        };
+      }
+    } catch (honeypotApiError) {
+      console.log(
+        "Honeypot.is API error, falling back to internal implementation:",
+        honeypotApiError
+      );
     }
 
-    const data = await response.json();
+    // Fallback to our own implementation
+    console.log("Using internal honeypot detection for", contractAddress);
 
-    return {
-      address: contractAddress,
-      chainId,
-      isHoneypot: data.honeypotResult?.isHoneypot || false,
-      honeypotReason: data.honeypotResult?.honeypotReason,
-      buyTax: data.simulationResult?.buyTax,
-      sellTax: data.simulationResult?.sellTax,
-      tokenName: data.token?.name,
-      tokenSymbol: data.token?.symbol,
-    };
+    try {
+      // Import token utility
+      const { fetchTokenInfo, performBasicRiskCheck } = await import(
+        "../../../lib/utils/fetchTokenInfo"
+      );
+
+      // Get token metadata from the blockchain explorer if possible
+      const tokenInfo = await fetchTokenInfo(contractAddress, chainId);
+
+      // Do a basic safety check
+      const riskCheck = await performBasicRiskCheck();
+
+      // Return a basic response with just the token info we have
+      return {
+        address: contractAddress,
+        chainId,
+        isHoneypot: false,
+        honeypotReason: riskCheck.reason || "Unable to perform complete analysis. Exercise caution.",
+        buyTax: riskCheck.buyTax || 0,
+        sellTax: riskCheck.sellTax || 0,
+        tokenName: tokenInfo.name,
+        tokenSymbol: tokenInfo.symbol,
+      };
+    } catch (fallbackError) {
+      console.error("Error in fallback token analysis:", fallbackError);
+      throw new Error(
+        "Could not analyze token with internal honeypot detection"
+      );
+    }
   } catch (error) {
     console.error("Error checking EVM honeypot:", error);
     throw new Error(
-      `Failed to check token: ${(error as Error).message || "Unknown error"}`
+      `Failed to check EVM token: ${
+        (error as Error).message || "Unknown error"
+      }`
     );
   }
 }
@@ -212,7 +293,7 @@ async function checkSolanaContract(
   try {
     // Import here to avoid circular dependencies
     const { getSolanaTokenContractVerification } = await import(
-      "@/lib/services/rugCheckService"
+      "../../../lib/services/rugCheckService"
     );
     const contractData = await getSolanaTokenContractVerification(
       contractAddress

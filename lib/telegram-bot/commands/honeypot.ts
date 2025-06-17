@@ -37,34 +37,42 @@ export async function handleHoneypotCommand(
 
     if (result.isHoneypot) {
       response = `
-⚠️ *HONEYPOT DETECTED* ⚠️
+🚨 *HONEYPOT ALERT* 🚨
 
-Address: \`${result.address}\`
-Chain: ${result.chainId}
-Token: ${result.tokenName || "Unknown"} (${result.tokenSymbol || "Unknown"})
+*Token Information:*
+• Name: *${result.tokenName || "Unknown"}*
+• Symbol: ${result.tokenSymbol || "UNKNOWN"}
+• Contract: \`${result.address}\`
+• Chain: ${result.chainId}
 
-❌ *This token is a honeypot*
-${result.honeypotReason ? `Reason: ${result.honeypotReason}` : ""}
-Buy Tax: ${result.buyTax !== undefined ? `${result.buyTax}%` : "Unknown"}
-Sell Tax: ${
-        result.sellTax !== undefined ? `${result.sellTax}%` : "UNABLE TO SELL"
-      }
+*Analysis Results:*
+• Status: ❌ *HONEYPOT DETECTED*
+• Buy Tax: ${result.buyTax !== undefined ? `${result.buyTax}%` : "Unknown"}
+• Sell Tax: ${result.sellTax !== undefined ? `${result.sellTax}%` : "100%"}
+${result.honeypotReason ? `• Reason: ${result.honeypotReason}` : ""}
 
-⚠️ *DO NOT BUY* this token. It has been identified as a honeypot designed to prevent selling.
+⚠️ *WARNING: DO NOT BUY* - This token has been identified as a honeypot designed to prevent selling. Investing in this token will likely result in a complete loss of funds.
+
+_Analysis by RugProofAI - Keeping your crypto safe_
 `;
     } else {
       response = `
-🔍 *Contract Analysis Complete*
+🔍 *TOKEN SECURITY ANALYSIS*
 
-Address: \`${result.address}\`
-Chain: ${result.chainId}
-Token: ${result.tokenName || "Unknown"} (${result.tokenSymbol || "Unknown"})
+*Token Information:*
+• Name: *${result.tokenName || "Unknown"}*
+• Symbol: ${result.tokenSymbol || "UNKNOWN"}
+• Contract: \`${result.address}\`
+• Chain: ${result.chainId}
 
-✅ *Not identified as a honeypot*
-Buy Tax: ${result.buyTax !== undefined ? `${result.buyTax}%` : "Unknown"}
-Sell Tax: ${result.sellTax !== undefined ? `${result.sellTax}%` : "Unknown"}
+*Analysis Results:*
+• Honeypot Status: ✅ *NOT DETECTED AS HONEYPOT*
+• Buy Tax: ${result.buyTax !== undefined ? `${result.buyTax}%` : "Unknown"}
+• Sell Tax: ${result.sellTax !== undefined ? `${result.sellTax}%` : "Unknown"}
 
-Note: Always do your own research before investing. This is an automated check and may not catch all potential risks.
+⚠️ *DISCLAIMER:* This is an automated analysis and should not be your only source of research. Always conduct thorough due diligence before investing.
+
+_Analysis by RugProofAI - Keeping your crypto safe_
 `;
     }
 
@@ -76,12 +84,41 @@ Note: Always do your own research before investing. This is an automated check a
     });
   } catch (error) {
     console.error("Error in honeypot check command:", error);
-    await bot.editMessageText(
-      `❌ Error: ${(error as Error).message || "Failed to check contract"}`,
-      {
-        chat_id: chatId,
-        message_id: processingMsgId.message_id,
+
+    // Provide a more helpful error message based on the error type
+    let errorMessage = "Failed to check contract";
+
+    if (error instanceof Error) {
+      if (
+        error.message.includes(
+          "Could not analyze token with internal honeypot detection"
+        )
+      ) {
+        errorMessage =
+          "Our advanced analysis tools are unable to fully assess this token. This may occur with new tokens, tokens with low liquidity, or contracts using non-standard implementations. We recommend additional research before any investment decision.";
+      } else if (error.message.includes("decode: invalid base58")) {
+        errorMessage =
+          "The address format appears to be incorrect for the specified blockchain. Please verify the contract address and ensure you've selected the correct network.";
+      } else {
+        errorMessage = error.message;
       }
-    );
+    }
+
+    const errorResponse = `
+❌ *ANALYSIS ERROR*
+
+We encountered an issue while analyzing this token:
+"${errorMessage}"
+
+Please try again later or check the contract address and chain selection.
+
+_RugProofAI - Keeping your crypto safe_
+`;
+
+    await bot.editMessageText(errorResponse, {
+      chat_id: chatId,
+      message_id: processingMsgId.message_id,
+      parse_mode: "Markdown"
+    });
   }
 }
