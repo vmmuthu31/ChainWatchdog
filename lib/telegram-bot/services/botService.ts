@@ -217,19 +217,17 @@ async function checkEvmHoneypot(
       // Get token metadata from the blockchain explorer if possible
       const tokenInfo = await fetchTokenInfo(contractAddress, chainId);
 
-      // Do a basic safety check
-      const riskCheck = await performBasicRiskCheck();
+      // Do a basic safety check with the improved risk analysis
+      const riskCheck = await performBasicRiskCheck(contractAddress, chainId);
 
-      // Return a basic response with just the token info we have
+      // Return a response with enhanced token info and risk analysis
       return {
         address: contractAddress,
         chainId,
-        isHoneypot: false,
-        honeypotReason:
-          riskCheck.reason ||
-          "Unable to perform complete analysis. Exercise caution.",
-        buyTax: riskCheck.buyTax || 0,
-        sellTax: riskCheck.sellTax || 0,
+        isHoneypot: riskCheck.isHighRisk,
+        honeypotReason: riskCheck.reason || "Analysis complete. No critical issues detected, but exercise caution.",
+        buyTax: riskCheck.buyTax !== undefined ? riskCheck.buyTax : 0,
+        sellTax: riskCheck.sellTax !== undefined ? riskCheck.sellTax : 0,
         tokenName: tokenInfo.name,
         tokenSymbol: tokenInfo.symbol,
       };

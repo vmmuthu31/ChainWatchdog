@@ -87,6 +87,7 @@ _Analysis by RugProofAI - Keeping your crypto safe_
 
     // Provide a more helpful error message based on the error type
     let errorMessage = "Failed to check contract";
+    let suggestions = "";
 
     if (error instanceof Error) {
       if (
@@ -95,10 +96,26 @@ _Analysis by RugProofAI - Keeping your crypto safe_
         )
       ) {
         errorMessage =
-          "Our advanced analysis tools are unable to fully assess this token. This may occur with new tokens, tokens with low liquidity, or contracts using non-standard implementations. We recommend additional research before any investment decision.";
+          "Our advanced analysis tools are unable to fully assess this token. This may occur with new tokens, tokens with low liquidity, or contracts using non-standard implementations.";
+        suggestions =
+          "Try checking the token on a blockchain explorer like Etherscan/BSCScan/BaseScan for verification status and transaction history before investing.";
       } else if (error.message.includes("decode: invalid base58")) {
         errorMessage =
-          "The address format appears to be incorrect for the specified blockchain. Please verify the contract address and ensure you've selected the correct network.";
+          "The address format appears to be incorrect for the specified blockchain.";
+        suggestions =
+          "Ethereum, BSC, and other EVM chains use addresses starting with '0x', while Solana addresses are base58 encoded. Make sure you're using the right format for the selected chain.";
+      } else if (
+        error.message.includes("API error") ||
+        error.message.includes("fetch")
+      ) {
+        errorMessage =
+          "External API service temporarily unavailable or rate limited.";
+        suggestions =
+          "Please try again in a few minutes. Our honeypot detection relies on multiple external data sources.";
+      } else if (error.message.includes("Unsupported chain")) {
+        errorMessage = "The specified blockchain is not currently supported.";
+        suggestions =
+          "Currently supported chains: Ethereum (eth-mainnet), BSC (bsc-mainnet), Base (base-mainnet), Solana (solana-mainnet), and more. Use /honeypot <address> <chain-id> format.";
       } else {
         errorMessage = error.message;
       }
@@ -110,6 +127,7 @@ _Analysis by RugProofAI - Keeping your crypto safe_
 We encountered an issue while analyzing this token:
 "${errorMessage}"
 
+${suggestions ? `\n*SUGGESTION:*\n${suggestions}\n` : ""}
 Please try again later or check the contract address and chain selection.
 
 _RugProofAI - Keeping your crypto safe_
@@ -118,7 +136,7 @@ _RugProofAI - Keeping your crypto safe_
     await bot.editMessageText(errorResponse, {
       chat_id: chatId,
       message_id: processingMsgId.message_id,
-      parse_mode: "Markdown"
+      parse_mode: "Markdown",
     });
   }
 }

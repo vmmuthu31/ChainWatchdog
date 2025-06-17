@@ -13,21 +13,28 @@ export async function handleScanWalletCommand(
   if (args.length === 0) {
     await bot.sendMessage(
       chatId,
-      `*Wallet Scan Usage*
+      `*Wallet Scan Usage* 🔍
 
 Please provide a wallet address to scan:
 \`/scan <wallet_address> [chain_id]\`
 
-*Examples:*
+*Supported Chains:*
 \`/scan 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 eth-mainnet\` - Ethereum
 \`/scan 0x0000000000000000000000000000000000000000 base-mainnet\` - Base
 \`/scan 0x0000000000000000000000000000000000000000 bsc-mainnet\` - BNB Chain
 \`/scan 0x0000000000000000000000000000000000000000 matic-mainnet\` - Polygon
 \`/scan 0x0000000000000000000000000000000000000000 optimism-mainnet\` - Optimism
 \`/scan 0x0000000000000000000000000000000000000000 arbitrum-mainnet\` - Arbitrum
+\`/scan 0x0000000000000000000000000000000000000000 avalanche-mainnet\` - Avalanche
 \`/scan <solana_address> solana-mainnet\` - Solana
 
-The default chain is Ethereum mainnet if not specified.`,
+The default chain is Ethereum mainnet if not specified.
+
+*Analysis includes:*
+• Portfolio overview with total value
+• Token breakdown with values and percentages
+• Security assessment of holdings
+• Spam token identification`,
       { parse_mode: "Markdown" }
     );
     return;
@@ -59,7 +66,14 @@ The default chain is Ethereum mainnet if not specified.`,
 • Total Holdings: ${result.totalTokens} tokens
 • Safe Assets: ${result.safeTokensCount} tokens
 • Flagged Assets: ${result.spamTokensCount} tokens
-• Total Value: $${result.totalValue ? result.totalValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "N/A"}
+• Total Value: $${
+      result.totalValue
+        ? result.totalValue.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        : "N/A"
+    }
 
 *Security Assessment:*
 ${formatSummary(result)}
@@ -77,18 +91,28 @@ ${formatSummary(result)}
 
       sortedTokens.slice(0, 10).forEach((token) => {
         const status = token.isSpam ? "⚠️" : "💠";
-        const valueStr = token.value 
-          ? `$${token.value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+        const valueStr = token.value
+          ? `$${token.value.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}`
           : "N/A";
         const percentOfTotal =
           result.totalValue && token.value && result.totalValue > 0
             ? ((token.value / result.totalValue) * 100).toFixed(1) + "%"
             : "N/A";
 
-        response += `\n${status} *${token.symbol}* (${token.name.length > 15 ? token.name.substring(0, 15) + '...' : token.name})
+        response += `\n${status} *${token.symbol}* (${
+          token.name.length > 15
+            ? token.name.substring(0, 15) + "..."
+            : token.name
+        })
    • Balance: ${token.formattedBalance}
    • Value: ${valueStr} (${percentOfTotal} of portfolio)
-   • Contract: \`${token.contractAddress.slice(0, 6)}...${token.contractAddress.slice(-4)}\`
+   • Contract: \`${token.contractAddress.slice(
+     0,
+     6
+   )}...${token.contractAddress.slice(-4)}\`
    • Status: ${token.isSpam ? "⚠️ Flagged" : "✅ Safe"}`;
       });
 
@@ -97,7 +121,7 @@ ${formatSummary(result)}
           sortedTokens.length - 10
         } more tokens not shown_`;
       }
-      
+
       response += `\n\n_Analysis by RugProofAI - Keeping your crypto safe_`;
     }
 
@@ -109,16 +133,21 @@ ${formatSummary(result)}
     });
   } catch (error) {
     console.error("Error in scan wallet command:", error);
-    
+
     let errorMessage = (error as Error).message || "Failed to scan wallet";
-    
+
     // Handle common errors with user-friendly messages
     if (errorMessage.includes("Unsupported chain")) {
-      errorMessage = "The requested blockchain is not currently supported. Please try another chain from the supported list.";
-    } else if (errorMessage.includes("wallet") && errorMessage.includes("not found")) {
-      errorMessage = "We couldn't find this wallet address on the specified blockchain. Please verify the address and chain.";
+      errorMessage =
+        "The requested blockchain is not currently supported. Please try another chain from the supported list.";
+    } else if (
+      errorMessage.includes("wallet") &&
+      errorMessage.includes("not found")
+    ) {
+      errorMessage =
+        "We couldn't find this wallet address on the specified blockchain. Please verify the address and chain.";
     }
-    
+
     const errorResponse = `
 ❌ *SCAN ERROR*
 
@@ -129,11 +158,11 @@ Please verify the wallet address and selected blockchain, then try again.
 
 _RugProofAI - Keeping your crypto safe_
 `;
-    
+
     await bot.editMessageText(errorResponse, {
       chat_id: chatId,
       message_id: processingMsgId.message_id,
-      parse_mode: "Markdown"
+      parse_mode: "Markdown",
     });
   }
 }
