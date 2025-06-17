@@ -15,6 +15,7 @@ RugProof is an advanced blockchain security and analytics platform designed to h
 - ✅ Integration with blockchain explorers
 - ✅ Modern retro-futuristic UI design
 - ✅ Chrome Extension (Coming Soon)
+- ✅ Telegram Bot for on-the-go wallet and contract scanning
 
 ## Tech Stack
 
@@ -86,6 +87,14 @@ RugProof is an advanced blockchain security and analytics platform designed to h
 - Advanced contract analysis
 - Liquidity pool verification
 - Token contract security assessment
+
+### Telegram Bot
+
+- Scan wallets for spam tokens on multiple chains
+- Check if token contracts are honeypots
+- Analyze contract security and verification
+- Multi-chain support
+- Easy-to-use command interface
 
 ### AI Agent
 
