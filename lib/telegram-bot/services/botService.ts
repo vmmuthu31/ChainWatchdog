@@ -1,5 +1,5 @@
-import { fetchWalletData } from "@/lib/utils/fetchWalletData";
-import { supportedChains } from "@/lib/services/goldrush";
+import fetchWalletData from "../../services/goldrush";
+import { supportedChains } from "../../services/goldrush";
 import {
   ContractCheckResult,
   HoneypotCheckResult,
