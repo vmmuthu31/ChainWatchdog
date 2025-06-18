@@ -225,7 +225,9 @@ async function checkEvmHoneypot(
         address: contractAddress,
         chainId,
         isHoneypot: riskCheck.isHighRisk,
-        honeypotReason: riskCheck.reason || "Analysis complete. No critical issues detected, but exercise caution.",
+        honeypotReason:
+          riskCheck.reason ||
+          "Analysis complete. No critical issues detected, but exercise caution.",
         buyTax: riskCheck.buyTax !== undefined ? riskCheck.buyTax : 0,
         sellTax: riskCheck.sellTax !== undefined ? riskCheck.sellTax : 0,
         tokenName: tokenInfo.name,
