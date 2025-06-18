@@ -8,7 +8,6 @@ export async function handleGreeting(
   const { message: msg } = ctx;
   const chatId = msg.chat.id;
 
-  // Get user's first name if available
   const firstName = msg.from?.first_name || "there";
 
   const messageText = `Hello ${firstName}! 👋 Welcome to RugProofAI Bot.

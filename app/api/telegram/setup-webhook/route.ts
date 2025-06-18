@@ -23,15 +23,13 @@ export async function GET() {
         { status: 500 }
       );
     }
-    
-    // Ensure we use HTTPS
-    webhookBaseUrl = webhookBaseUrl.startsWith("http") 
-      ? webhookBaseUrl 
+
+    webhookBaseUrl = webhookBaseUrl.startsWith("http")
+      ? webhookBaseUrl
       : `https://${webhookBaseUrl}`;
-    
-    // Remove trailing slash if present
+
     webhookBaseUrl = webhookBaseUrl.replace(/\/$/, "");
-    
+
     const webhookUrl = `${webhookBaseUrl}/api/telegram/webhook`;
 
     const deleteRes = await fetch(
