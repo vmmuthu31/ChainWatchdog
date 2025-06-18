@@ -6,7 +6,6 @@ import {
   WalletScanResult,
 } from "../types";
 
-// Create a local copy of supportedChains to avoid issues with module resolution in serverless functions
 const supportedChains = [...importedSupportedChains];
 
 /**
