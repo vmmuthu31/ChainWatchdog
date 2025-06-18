@@ -8,7 +8,23 @@
   "functions": {
     "app/api/telegram/webhook/route.ts": {
       "memory": 1024,
-      "maxDuration": 10
+      "maxDuration": 30
+    },
+    "app/api/telegram/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 30
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/api/telegram/webhook",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, proxy-revalidate"
+        },
+        { "key": "Connection", "value": "keep-alive" }
+      ]
+    }
+  ]
 }

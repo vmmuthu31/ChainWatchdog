@@ -11,14 +11,23 @@ import { handleGreeting } from "../../../../lib/telegram-bot/commands/greeting";
 import { detectCommand } from "../../../../lib/telegram-bot/utils/commandDetector";
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+if (!TELEGRAM_BOT_TOKEN) {
+  console.error("TELEGRAM_BOT_TOKEN environment variable is not set!");
+}
 
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN || "", { polling: false });
 
 export async function POST(req: NextRequest) {
+  console.log("Webhook hit, processing update");
   try {
     const update = await req.json();
+    console.log(
+      "Received update:",
+      JSON.stringify(update).substring(0, 200) + "..."
+    );
 
     if (!update || !update.message) {
+      console.log("No message in update, skipping");
       return NextResponse.json({ success: true });
     }
 
@@ -74,12 +83,40 @@ export async function POST(req: NextRequest) {
         break;
     }
 
-    return NextResponse.json({ success: true });
+    console.log("Command processed successfully");
+
+    return NextResponse.json(
+      {
+        success: true,
+        ok: true,
+        processed: true,
+      },
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error handling webhook update:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to process update" },
-      { status: 500 }
+      {
+        success: false,
+        ok: true,
+        error:
+          error instanceof Error ? error.message : "Failed to process update",
+      },
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+        },
+      }
     );
   }
 }

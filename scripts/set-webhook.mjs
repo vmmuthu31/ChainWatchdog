@@ -3,8 +3,15 @@ import fetch from "node-fetch";
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
-const WEBHOOK_URL =
+let WEBHOOK_URL =
   process.env.WEBHOOK_URL || process.env.VERCEL_URL || "https://rugproofai.com";
+
+WEBHOOK_URL = WEBHOOK_URL.startsWith("http")
+  ? WEBHOOK_URL
+  : `https://${WEBHOOK_URL}`;
+
+WEBHOOK_URL = WEBHOOK_URL.replace(/\/$/, "");
+
 const webhook = `${WEBHOOK_URL}/api/telegram/webhook`;
 
 async function setWebhook() {
