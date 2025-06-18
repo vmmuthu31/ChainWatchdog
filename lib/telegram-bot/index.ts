@@ -10,6 +10,34 @@ import { handleNetworksCommand } from "./commands/networks";
 import { handleGreeting } from "./commands/greeting";
 import { detectCommand } from "./utils/commandDetector";
 
+/**
+ * Handle direct address input (without commands) from users
+ * This provides a more user-friendly experience for pasting addresses
+ */
+async function handleDirectAddressInput(
+  bot: TelegramBot,
+  text: string,
+  message: TelegramBot.Message
+): Promise<void> {
+  const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+  const solanaAddressRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+
+  const isEvm = ethAddressRegex.test(text);
+  const isSolana = solanaAddressRegex.test(text);
+
+  if (!isEvm && !isSolana) {
+    return;
+  }
+
+  const ctx: BotContext = {
+    message,
+    command: "honeypot",
+    args: [text],
+  };
+
+  await handleHoneypotCommand(bot, ctx);
+}
+
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
 
 console.log(`RugProofAI Bot is starting up...`);
@@ -62,6 +90,8 @@ bot.on("message", async (message) => {
             message.chat.id,
             `Unknown command. Type /help to see available commands.`
           );
+        } else if (text.trim() !== "") {
+          await handleDirectAddressInput(bot, text.trim(), message);
         }
         break;
     }

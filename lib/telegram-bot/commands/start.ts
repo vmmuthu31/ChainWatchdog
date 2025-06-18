@@ -19,7 +19,10 @@ I can help you:
 • 🔎 Check if a contract is a honeypot
 • ⚠️ Analyze contract security
 
-Try these commands:
+*Quick Analysis:*
+Simply paste any Ethereum or Solana token address directly into the chat for instant analysis!
+
+*Detailed Commands:*
 /scan <wallet_address> [chain_id] - Scan a wallet for spam tokens
 /honeypot <token_address> [chain_id] - Check if a token is a honeypot
 /contract <contract_address> [chain_id] - Check contract security

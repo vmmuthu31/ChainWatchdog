@@ -44,6 +44,10 @@ export async function handleHelpCommand(
 
 *Available Commands:*
 
+� *QUICK ANALYSIS*
+Simply paste any token address directly into the chat!
+*Example:* \`0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE\`
+
 � *WALLET ANALYSIS*
 \`/scan <wallet_address> [chain_id]\`
 Analyze a wallet for spam tokens, scams, and security risks
