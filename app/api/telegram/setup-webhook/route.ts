@@ -13,7 +13,7 @@ export async function GET() {
       );
     }
 
-    const webhookBaseUrl = process.env.WEBHOOK_URL || process.env.VERCEL_URL;
+    let webhookBaseUrl = process.env.WEBHOOK_URL || process.env.VERCEL_URL;
     if (!webhookBaseUrl) {
       return NextResponse.json(
         {
@@ -23,7 +23,15 @@ export async function GET() {
         { status: 500 }
       );
     }
-
+    
+    // Ensure we use HTTPS
+    webhookBaseUrl = webhookBaseUrl.startsWith("http") 
+      ? webhookBaseUrl 
+      : `https://${webhookBaseUrl}`;
+    
+    // Remove trailing slash if present
+    webhookBaseUrl = webhookBaseUrl.replace(/\/$/, "");
+    
     const webhookUrl = `${webhookBaseUrl}/api/telegram/webhook`;
 
     const deleteRes = await fetch(
