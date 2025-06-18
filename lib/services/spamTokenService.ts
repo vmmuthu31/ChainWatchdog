@@ -1,9 +1,7 @@
-// Define types for Networks and Confidence
 export enum Networks {
   ETH_MAINNET = "eth-mainnet",
   BSC_MAINNET = "bsc-mainnet",
   POLYGON_MAINNET = "polygon-mainnet",
-  // Add other networks as needed
 }
 
 export enum Confidence {
@@ -11,8 +9,6 @@ export enum Confidence {
   MAYBE = "maybe",
 }
 
-// Skip dynamic imports for now - we'll use our defined enums
-// and implement alternative functionality
 import { YamlData } from "../types";
 import { BASE_COVALENT_SPAM_LIST_GITHUB_URL } from "@/constants/constant";
 
@@ -193,5 +189,3 @@ export async function isNFTSpam(
 export function getSpamScore(entry: string): string {
   return entry.split("/")[2];
 }
-
-// We've already exported Networks and Confidence above

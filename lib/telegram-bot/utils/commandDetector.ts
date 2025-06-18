@@ -1,7 +1,6 @@
 import { CommandType } from "../types";
 
 export function detectCommand(command: string): CommandType {
-  // Normalize commands by removing '/' and '@botUsername' if present
   const normalizedCommand = command.toLowerCase();
 
   switch (normalizedCommand) {
@@ -24,6 +23,16 @@ export function detectCommand(command: string): CommandType {
     case "honeypot":
     case "hp":
       return CommandType.HONEYPOT;
+
+    case "networks":
+    case "chains":
+    case "available":
+      return CommandType.NETWORKS;
+
+    case "hi":
+    case "hello":
+    case "hey":
+      return CommandType.GREETING;
 
     default:
       return CommandType.UNKNOWN;

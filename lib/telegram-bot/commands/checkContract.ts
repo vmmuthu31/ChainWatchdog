@@ -9,7 +9,6 @@ export async function handleCheckContractCommand(
   const { message, args } = ctx;
   const chatId = message.chat.id;
 
-  // Check if contract address is provided
   if (args.length === 0) {
     await bot.sendMessage(
       chatId,
@@ -19,20 +18,16 @@ export async function handleCheckContractCommand(
   }
 
   const contractAddress = args[0];
-  // Optionally get chain ID if provided
   const chainId = args.length > 1 ? args[1] : "eth-mainnet";
 
-  // Send processing message
   const processingMsgId = await bot.sendMessage(
     chatId,
     `⏳ Analyzing contract ${contractAddress} on chain ${chainId}...`
   );
 
   try {
-    // Call the contract check service
     const result = await checkContract(contractAddress, chainId);
 
-    // Format the result based on contract verification
     const response = `
 🔍 *Contract Verification Results*
 
@@ -53,7 +48,6 @@ ${formatSecurityRisks(result.securityRisks)}
 ${formatRecommendation(result)}
 `;
 
-    // Edit the processing message with the result
     await bot.editMessageText(response, {
       chat_id: chatId,
       message_id: processingMsgId.message_id,

@@ -9,7 +9,6 @@ export async function handleHoneypotCommand(
   const { message, args } = ctx;
   const chatId = message.chat.id;
 
-  // Check if contract address is provided
   if (args.length === 0) {
     await bot.sendMessage(
       chatId,
@@ -19,20 +18,16 @@ export async function handleHoneypotCommand(
   }
 
   const contractAddress = args[0];
-  // Optionally get chain ID if provided
   const chainId = args.length > 1 ? args[1] : "eth-mainnet";
 
-  // Send processing message
   const processingMsgId = await bot.sendMessage(
     chatId,
     `⏳ Analyzing contract ${contractAddress} on chain ${chainId}...`
   );
 
   try {
-    // Call the honeypot check service
     const result = await checkHoneypot(contractAddress, chainId);
 
-    // Format the result
     let response: string;
 
     if (result.isHoneypot) {
@@ -76,7 +71,6 @@ _Analysis by RugProofAI - Keeping your crypto safe_
 `;
     }
 
-    // Edit the processing message with the result
     await bot.editMessageText(response, {
       chat_id: chatId,
       message_id: processingMsgId.message_id,
@@ -85,7 +79,6 @@ _Analysis by RugProofAI - Keeping your crypto safe_
   } catch (error) {
     console.error("Error in honeypot check command:", error);
 
-    // Provide a more helpful error message based on the error type
     let errorMessage = "Failed to check contract";
     let suggestions = "";
 

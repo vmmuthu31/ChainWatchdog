@@ -9,7 +9,6 @@ export async function handleScanWalletCommand(
   const { message, args } = ctx;
   const chatId = message.chat.id;
 
-  // Check if wallet address is provided
   if (args.length === 0) {
     await bot.sendMessage(
       chatId,
@@ -41,20 +40,48 @@ The default chain is Ethereum mainnet if not specified.
   }
 
   const walletAddress = args[0];
-  // Optionally get chain ID if provided
+
+  if (args.length === 1) {
+    const mightBeSolana =
+      !walletAddress.startsWith("0x") &&
+      walletAddress.length >= 32 &&
+      walletAddress.length <= 44;
+
+    const suggestedChain = mightBeSolana ? "solana-mainnet" : "eth-mainnet";
+    const message = `Please specify the chain for this wallet address:
+    
+I detected this might be a ${
+      mightBeSolana ? "Solana" : "EVM"
+    } address. You can use:
+
+\`/scan ${walletAddress} ${suggestedChain}\`
+
+Or choose another network:
+\`/networks\` - to see all supported networks
+
+For example:
+\`/scan ${walletAddress} bsc-mainnet\` - for BNB Chain
+\`/scan ${walletAddress} matic-mainnet\` - for Polygon
+${
+  mightBeSolana
+    ? ""
+    : "`/scan " + walletAddress + " solana-mainnet` - for Solana"
+}`;
+
+    await bot.sendMessage(chatId, message);
+    return;
+  }
+
   const chainId = args.length > 1 ? args[1] : "eth-mainnet";
 
-  // Send processing message
   const processingMsgId = await bot.sendMessage(
     chatId,
     `⏳ Scanning wallet ${walletAddress} on chain ${chainId}...`
   );
 
   try {
-    // Call the scan wallet service
     const result = await scanWallet(walletAddress, chainId);
 
-    // Format the result
     let response = `
 🔍 *WALLET ANALYSIS REPORT*
 
@@ -79,14 +106,11 @@ The default chain is Ethereum mainnet if not specified.
 ${formatSummary(result)}
 `;
 
-    // Add token details
     if (result.tokens && result.tokens.length > 0) {
-      // Sort tokens by value (highest first)
       const sortedTokens = [...result.tokens].sort(
         (a, b) => (b.value || 0) - (a.value || 0)
       );
 
-      // Show top tokens (maximum 10 to avoid message length issues)
       response += `\n� *TOP HOLDINGS:*\n`;
 
       sortedTokens.slice(0, 10).forEach((token) => {
@@ -125,7 +149,6 @@ ${formatSummary(result)}
       response += `\n\n_Analysis by RugProofAI - Keeping your crypto safe_`;
     }
 
-    // Edit the processing message with the result
     await bot.editMessageText(response, {
       chat_id: chatId,
       message_id: processingMsgId.message_id,
@@ -136,7 +159,6 @@ ${formatSummary(result)}
 
     let errorMessage = (error as Error).message || "Failed to scan wallet";
 
-    // Handle common errors with user-friendly messages
     if (errorMessage.includes("Unsupported chain")) {
       errorMessage =
         "The requested blockchain is not currently supported. Please try another chain from the supported list.";

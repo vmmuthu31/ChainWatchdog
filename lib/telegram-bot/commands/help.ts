@@ -9,10 +9,8 @@ export async function handleHelpCommand(
   const { message } = ctx;
   const chatId = message.chat.id;
 
-  // Get supported chains
   const chains = getSupportedChains();
 
-  // Get mainnet chains
   const evmMainnets = chains
     .filter((chain) => chain.type === "Mainnet" && chain.category === "EVM")
     .map((chain) => chain.name)
@@ -53,6 +51,7 @@ Audit smart contract security and identify potential risks
 ℹ️ *HELP & INFO*
 \`/help\` - Display this help guide
 \`/start\` - Initialize the bot
+\`/networks\` - List all supported networks
 
 *Supported Networks:*
 • *Major Networks:* ${mainnetChains.join(", ")}

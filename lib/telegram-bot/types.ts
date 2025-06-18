@@ -12,6 +12,8 @@ export enum CommandType {
   HONEYPOT = "honeypot",
   HELP = "help",
   START = "start",
+  NETWORKS = "networks",
+  GREETING = "greeting",
   UNKNOWN = "unknown",
 }
 

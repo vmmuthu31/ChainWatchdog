@@ -14,27 +14,21 @@ export async function scanWallet(
   chainId: string = "eth-mainnet"
 ): Promise<WalletScanResult> {
   try {
-    // Validate chain ID
     validateChainId(chainId);
 
-    // Fetch wallet data
     const walletData = await fetchWalletData(walletAddress, chainId);
 
-    // Count tokens
     const totalTokens = walletData.data.items.length;
     const spamTokensCount = walletData.data.items.filter(
       (t) => t.is_spam
     ).length;
     const safeTokensCount = totalTokens - spamTokensCount;
 
-    // Process token details
     const tokens = walletData.data.items.map((token) => {
-      // Calculate human-readable balance
       const balance = token.balance || "0";
       const decimals = token.contract_decimals || 18;
       const numericBalance = parseFloat(balance) / Math.pow(10, decimals);
 
-      // Format balance to be readable
       let formattedBalance;
       if (numericBalance < 0.000001) {
         formattedBalance = numericBalance.toExponential(4);
@@ -59,7 +53,6 @@ export async function scanWallet(
       };
     });
 
-    // Calculate total portfolio value
     const totalValue = tokens.reduce(
       (sum, token) => sum + (token.value || 0),
       0
@@ -90,10 +83,8 @@ export async function checkHoneypot(
   chainId: string = "eth-mainnet"
 ): Promise<HoneypotCheckResult> {
   try {
-    // Validate chain ID
     validateChainId(chainId);
 
-    // Convert chain to format needed by API
     const apiChainId = convertChainForAPI(chainId);
 
     const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
@@ -123,7 +114,6 @@ export async function checkHoneypot(
  * Convert internal chain ID to API format
  */
 function convertChainForAPI(chainId: string): string {
-  // Map common chains to their API ID format
   const chainMapping: Record<string, string> = {
     "eth-mainnet": "1",
     "bsc-mainnet": "56",
@@ -144,7 +134,6 @@ async function checkSolanaHoneypot(
   contractAddress: string
 ): Promise<HoneypotCheckResult> {
   try {
-    // Import here to avoid circular dependencies
     const { analyzeSolanaTokenForHoneypot } = await import(
       "../../../lib/services/solanaScan"
     );
@@ -178,7 +167,6 @@ async function checkEvmHoneypot(
   chainId: string
 ): Promise<HoneypotCheckResult> {
   try {
-    // Try to use honeypot.is API first
     try {
       const response = await fetch(
         `https://api.honeypot.is/v2/IsHoneypot?address=${contractAddress}&chainID=${chainId}`
@@ -205,22 +193,17 @@ async function checkEvmHoneypot(
       );
     }
 
-    // Fallback to our own implementation
     console.log("Using internal honeypot detection for", contractAddress);
 
     try {
-      // Import token utility
       const { fetchTokenInfo, performBasicRiskCheck } = await import(
         "../../../lib/utils/fetchTokenInfo"
       );
 
-      // Get token metadata from the blockchain explorer if possible
       const tokenInfo = await fetchTokenInfo(contractAddress, chainId);
 
-      // Do a basic safety check with the improved risk analysis
       const riskCheck = await performBasicRiskCheck(contractAddress, chainId);
 
-      // Return a response with enhanced token info and risk analysis
       return {
         address: contractAddress,
         chainId,
@@ -257,10 +240,8 @@ export async function checkContract(
   chainId: string = "eth-mainnet"
 ): Promise<ContractCheckResult> {
   try {
-    // Validate chain ID
     validateChainId(chainId);
 
-    // Convert chain to format needed by API
     const apiChainId = convertChainForAPI(chainId);
 
     const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
@@ -293,7 +274,6 @@ async function checkSolanaContract(
   contractAddress: string
 ): Promise<ContractCheckResult> {
   try {
-    // Import here to avoid circular dependencies
     const { getSolanaTokenContractVerification } = await import(
       "../../../lib/services/rugCheckService"
     );
@@ -346,7 +326,7 @@ async function checkEvmContract(
     return {
       address: contractAddress,
       chainId,
-      isContract: true, // If we got a response, it's a contract
+      isContract: true,
       isOpenSource: data.isRootOpenSource || false,
       hasProxyCalls: data.summary?.hasProxyCalls || false,
       securityRisks: {

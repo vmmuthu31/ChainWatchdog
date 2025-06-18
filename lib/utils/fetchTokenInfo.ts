@@ -15,12 +15,9 @@ export async function fetchTokenInfo(
   let tokenSymbol = "UNKNOWN";
 
   try {
-    // Use different APIs based on the chain
     if (chainId === "1") {
-      // Ethereum - Etherscan API
-      const apiKey = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || ""; // Use the provided key directly
+      const apiKey = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || "";
 
-      // First try to get token details
       const response = await fetch(
         `https://api.etherscan.io/api?module=account&action=tokentx&address=${contractAddress}&apikey=${apiKey}`
       );
@@ -28,9 +25,7 @@ export async function fetchTokenInfo(
       if (response.ok) {
         const data = await response.json();
         if (data.status === "1" && data.result && data.result[0]) {
-          // Try to extract token name and symbol from contract name or ABI
           if (data.result[0].ContractName) {
-            // Often the contract name has the token name or has "Token" suffix
             const contractName = data.result[0].ContractName;
             if (
               contractName !== "Token" &&
@@ -42,7 +37,6 @@ export async function fetchTokenInfo(
         }
       }
 
-      // Then try ERC20 specific endpoints for more accurate info
       const erc20Response = await fetch(
         `https://api.etherscan.io/api?module=account&action=tokentx&address=${contractAddress}&page=1&offset=1&sort=asc&apikey=${apiKey}`
       );
@@ -50,16 +44,13 @@ export async function fetchTokenInfo(
       if (erc20Response.ok) {
         const data = await erc20Response.json();
         if (data.status === "1" && data.result && data.result.length > 0) {
-          // Get token details from transaction
           tokenName = data.result[0].tokenName || tokenName;
           tokenSymbol = data.result[0].tokenSymbol || tokenSymbol;
         }
       }
     } else if (chainId === "8453") {
-      // Base - BaseScan API
-      const apiKey = process.env.NEXT_PUBLIC_BASESCAN_API_KEY || ""; // Use the provided key directly
+      const apiKey = process.env.NEXT_PUBLIC_BASESCAN_API_KEY || "";
 
-      // Try source code first
       const response = await fetch(
         `https://api.basescan.org/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=${apiKey}`
       );
@@ -79,7 +70,6 @@ export async function fetchTokenInfo(
         }
       }
 
-      // Then try token transactions
       const erc20Response = await fetch(
         `https://api.basescan.org/api?module=account&action=tokentx&address=${contractAddress}&page=1&offset=1&sort=asc&apikey=${apiKey}`
       );
@@ -92,10 +82,8 @@ export async function fetchTokenInfo(
         }
       }
     } else if (chainId === "56") {
-      // BSC - BscScan API
-      const apiKey = process.env.NEXT_PUBLIC_BSCSCAN_API_KEY || ""; // Use the provided key directly
+      const apiKey = process.env.NEXT_PUBLIC_BSCSCAN_API_KEY || "";
 
-      // Try source code first
       const response = await fetch(
         `https://api.bscscan.com/api?module=contract&action=getsourcecode&address=${contractAddress}&apikey=${apiKey}`
       );
@@ -115,7 +103,6 @@ export async function fetchTokenInfo(
         }
       }
 
-      // Then try token transactions
       const erc20Response = await fetch(
         `https://api.bscscan.com/api?module=account&action=tokentx&address=${contractAddress}&page=1&offset=1&sort=asc&apikey=${apiKey}`
       );
@@ -128,9 +115,8 @@ export async function fetchTokenInfo(
         }
       }
     } else {
-      // For other chains, fall back to a general approach using the Covalent API
       try {
-        const goldrushApiKey = process.env.NEXT_PUBLIC_GOLDRUSH_API_KEY || ""; // Use the Goldrush/Covalent API key
+        const goldrushApiKey = process.env.NEXT_PUBLIC_GOLDRUSH_API_KEY || "";
         const covalentResponse = await fetch(
           `https://api.covalenthq.com/v1/${chainId}/tokens/${contractAddress}/`,
           {
@@ -196,10 +182,8 @@ export async function performBasicRiskCheck(
       };
     }
 
-    // Check for contract verification status which can be a risk indicator
     let contractName = "";
 
-    // Determine which API to use based on chain
     let apiUrl = "";
     let apiKey = "";
 
@@ -215,7 +199,6 @@ export async function performBasicRiskCheck(
     }
 
     if (apiUrl) {
-      // Check contract verification status
       const response = await fetch(
         `${apiUrl}?module=contract&action=getsourcecode&address=${contractAddress}&apikey=${apiKey}`
       );
@@ -224,19 +207,15 @@ export async function performBasicRiskCheck(
         const data = await response.json();
 
         if (data.status === "1" && data.result && data.result[0]) {
-          // Contract exists
           const sourceCode = data.result[0].SourceCode;
           contractName = data.result[0].ContractName || "";
 
-          // Check if contract is verified (has source code)
           if (sourceCode && sourceCode.length > 10) {
-            // Crude check for proxy contracts or implementation contracts
             const isProxy =
               contractName.toLowerCase().includes("proxy") ||
               sourceCode.toLowerCase().includes("delegatecall") ||
               sourceCode.toLowerCase().includes("implementation");
 
-            // Check for common honeypot patterns in source code
             const hasRevertOnSell =
               sourceCode.toLowerCase().includes("revert") &&
               (sourceCode.toLowerCase().includes("sell") ||
@@ -247,7 +226,6 @@ export async function performBasicRiskCheck(
               (sourceCode.toLowerCase().includes("change") ||
                 sourceCode.toLowerCase().includes("set"));
 
-            // If any suspicious patterns are found
             if (hasRevertOnSell || hasFeeManipulation) {
               return {
                 isHighRisk: true,
@@ -273,7 +251,6 @@ export async function performBasicRiskCheck(
               };
             }
           } else {
-            // Contract is not verified, which is a red flag
             return {
               isHighRisk: true,
               reason:
@@ -283,7 +260,6 @@ export async function performBasicRiskCheck(
             };
           }
         } else {
-          // Contract doesn't exist or API error
           return {
             isHighRisk: true,
             reason:
@@ -295,7 +271,6 @@ export async function performBasicRiskCheck(
       }
     }
 
-    // Default response if we reached here with no red flags
     return {
       isHighRisk: false,
       reason:

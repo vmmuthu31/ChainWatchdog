@@ -6,31 +6,27 @@ import { handleHelpCommand } from "./commands/help";
 import { handleScanWalletCommand } from "./commands/scanWallet";
 import { handleCheckContractCommand } from "./commands/checkContract";
 import { handleHoneypotCommand } from "./commands/honeypot";
+import { handleNetworksCommand } from "./commands/networks";
+import { handleGreeting } from "./commands/greeting";
 import { detectCommand } from "./utils/commandDetector";
 
-// Create the bot instance
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
 
 console.log(`RugProofAI Bot is starting up...`);
 
-// Handle all messages
 bot.on("message", async (message) => {
   try {
-    // Extract the command and arguments
     const text = message.text || "";
     const { command, args } = parseCommand(text);
 
-    // Create context object
     const ctx: BotContext = {
       message,
       command,
       args,
     };
 
-    // Detect command type
     const commandType = detectCommand(command);
 
-    // Route to appropriate handler
     switch (commandType) {
       case CommandType.START:
         await handleStartCommand(bot, ctx);
@@ -52,8 +48,15 @@ bot.on("message", async (message) => {
         await handleHoneypotCommand(bot, ctx);
         break;
 
+      case CommandType.NETWORKS:
+        await handleNetworksCommand(bot, ctx);
+        break;
+
+      case CommandType.GREETING:
+        await handleGreeting(bot, ctx);
+        break;
+
       default:
-        // Handle unknown commands or regular messages
         if (text.startsWith("/")) {
           await bot.sendMessage(
             message.chat.id,
@@ -75,24 +78,32 @@ bot.on("message", async (message) => {
   }
 });
 
-// Handle errors
 bot.on("polling_error", (error) => {
   console.error("Polling error:", error);
 });
 
-// Parse command from text
 function parseCommand(text: string): { command: string; args: string[] } {
   const parts = text.split(" ");
   const commandPart = parts[0];
 
-  // Extract command name (remove @ part if exists)
+  const lowerText = text.toLowerCase().trim();
+  if (
+    !text.startsWith("/") &&
+    (lowerText === "hi" ||
+      lowerText === "hello" ||
+      lowerText === "hey" ||
+      lowerText === "hi!" ||
+      lowerText === "hello!" ||
+      lowerText === "hey!")
+  ) {
+    return { command: lowerText, args: [] };
+  }
+
   const command = commandPart.split("@")[0].replace("/", "").toLowerCase();
 
-  // Get arguments (everything after the command)
   const args = parts.slice(1).filter((arg) => arg.trim() !== "");
 
   return { command, args };
 }
 
-// Log that the bot is ready
 console.log(`RugProofAI Telegram Bot is now online as @${BOT_USERNAME}`);
