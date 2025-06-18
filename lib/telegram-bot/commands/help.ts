@@ -12,17 +12,25 @@ export async function handleHelpCommand(
   const chains = getSupportedChains();
 
   const evmMainnets = chains
-    .filter((chain) => chain.type === "Mainnet" && chain.category === "EVM")
+    .filter(
+      (chain) => chain && chain.type === "Mainnet" && chain.category === "EVM"
+    )
     .map((chain) => chain.name)
     .slice(0, 6);
 
   const layer2Mainnets = chains
-    .filter((chain) => chain.type === "Mainnet" && chain.category === "Layer2")
+    .filter(
+      (chain) =>
+        chain && chain.type === "Mainnet" && chain.category === "Layer2"
+    )
     .map((chain) => chain.name)
     .slice(0, 4);
 
   const nonEvmMainnets = chains
-    .filter((chain) => chain.type === "Mainnet" && chain.category === "Non-EVM")
+    .filter(
+      (chain) =>
+        chain && chain.type === "Mainnet" && chain.category === "Non-EVM"
+    )
     .map((chain) => chain.name);
 
   const mainnetChains = [

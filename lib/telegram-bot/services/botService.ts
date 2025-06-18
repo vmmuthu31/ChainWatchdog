@@ -1,24 +1,32 @@
 import { fetchWalletData } from "../../../lib/utils/fetchWalletData";
-import { supportedChains as importedSupportedChains } from "../../../lib/services/goldrush";
 import {
   ContractCheckResult,
   HoneypotCheckResult,
   WalletScanResult,
 } from "../types";
+import { ChainInfo } from "@/lib/types";
 
-const defaultChains = [
+const supportedChains: ChainInfo[] = [
   {
     id: "eth-mainnet",
     name: "Ethereum",
     explorer: "https://etherscan.io",
     type: "Mainnet",
+    logoUrl: "https://www.datocms-assets.com/86369/1669653891-eth.svg",
     category: "EVM",
   },
   {
-    id: "bsc-mainnet",
-    name: "BNB Smart Chain",
-    explorer: "https://bscscan.com",
-    type: "Mainnet",
+    id: "eth-sepolia",
+    name: "Ethereum Sepolia",
+    explorer: "https://sepolia.etherscan.io",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "eth-holesky",
+    name: "Holesky Testnet",
+    explorer: "https://holesky.etherscan.io",
+    type: "Testnet",
     category: "EVM",
   },
   {
@@ -29,18 +37,608 @@ const defaultChains = [
     category: "EVM",
   },
   {
-    id: "solana-mainnet",
-    name: "Solana",
-    explorer: "https://solscan.io",
+    id: "polygon-amoy-testnet",
+    name: "Polygon Amoy",
+    explorer: "https://amoy.polygonscan.com",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "bsc-mainnet",
+    name: "BNB Smart Chain",
+    explorer: "https://bscscan.com",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "bsc-testnet",
+    name: "BSC Testnet",
+    explorer: "https://testnet.bscscan.com",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "optimism-mainnet",
+    name: "Optimism",
+    explorer: "https://optimistic.etherscan.io",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "optimism-sepolia",
+    name: "Optimism Sepolia",
+    explorer: "https://optimism-sepolia.blockscout.com",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "base-mainnet",
+    name: "Base",
+    explorer: "https://basescan.org",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "base-sepolia-testnet",
+    name: "Base Sepolia",
+    explorer: "https://base-sepolia.blockscout.com",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "gnosis-mainnet",
+    name: "Gnosis",
+    explorer: "https://gnosis.blockscout.com",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "gnosis-testnet",
+    name: "Chiado Testnet",
+    explorer: "https://gnosis-chiado.blockscout.com",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "btc-mainnet",
+    name: "Bitcoin",
+    explorer: "https://blockstream.info",
     type: "Mainnet",
     category: "Non-EVM",
   },
+  {
+    id: "solana-mainnet",
+    name: "Solana",
+    explorer: "https://explorer.solana.com",
+    type: "Mainnet",
+    category: "Non-EVM",
+  },
+  {
+    id: "apechain-mainnet",
+    name: "ApeChain",
+    explorer: "https://apechain.calderaexplorer.xyz",
+    type: "Mainnet",
+    category: "Other",
+  },
+  {
+    id: "apechain-testnet",
+    name: "ApeChain Testnet",
+    explorer: "https://apechain.calderaexplorer.xyz",
+    type: "Testnet",
+    category: "Other",
+  },
+  {
+    id: "arbitrum-mainnet",
+    name: "Arbitrum",
+    explorer: "https://arbiscan.io",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "arbitrum-sepolia",
+    name: "Arbitrum Sepolia",
+    explorer: "https://sepolia.arbiscan.io",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "arbitrum-nova-mainnet",
+    name: "Arbitrum Nova",
+    explorer: "https://nova.arbiscan.io",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "avalanche-mainnet",
+    name: "Avalanche C-Chain",
+    explorer: "https://avascan.info/blockchain/c",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-testnet",
+    name: "Avalanche Fuji",
+    explorer: "https://testnet.avascan.info",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "axie-mainnet",
+    name: "Ronin",
+    explorer: "https://explorer.roninchain.com",
+    type: "Mainnet",
+    category: "Other",
+  },
+  {
+    id: "berachain-mainnet",
+    name: "Berachain",
+    explorer: "https://berascan.com",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "berachain-testnet",
+    name: "Berachain Testnet",
+    explorer: "https://bartio.beratrail.io",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "boba-mainnet",
+    name: "Boba Ethereum",
+    explorer: "https://bobascan.com",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "linea-mainnet",
+    name: "Linea",
+    explorer: "https://lineascan.build",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "linea-sepolia-testnet",
+    name: "Linea Sepolia",
+    explorer: "https://sepolia.lineascan.build",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "scroll-mainnet",
+    name: "Scroll",
+    explorer: "https://blockscout.scroll.io",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "scroll-sepolia-testnet",
+    name: "Scroll Sepolia",
+    explorer: "https://sepolia-blockscout.scroll.io",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "zksync-mainnet",
+    name: "zkSync Era",
+    explorer: "https://explorer.zksync.io",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "zksync-sepolia-testnet",
+    name: "zkSync Sepolia",
+    explorer: "https://sepolia.explorer.zksync.io",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "blast-mainnet",
+    name: "Blast",
+    explorer: "https://blastexplorer.io",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "mantle-mainnet",
+    name: "Mantle",
+    explorer: "https://explorer.mantle.xyz",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "mantle-sepolia-testnet",
+    name: "Mantle Sepolia",
+    explorer: "https://explorer.testnet.mantle.xyz",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "sei-mainnet",
+    name: "Sei",
+    explorer: "https://seistream.app",
+    type: "Mainnet",
+    category: "Non-EVM",
+  },
+  {
+    id: "taiko-mainnet",
+    name: "Taiko",
+    explorer: "https://taikoscan.network",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "taiko-hekla-testnet",
+    name: "Taiko Hekla",
+    explorer: "https://explorer.hekla.taiko.xyz",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "fantom-mainnet",
+    name: "Fantom",
+    explorer: "https://ftmscan.com",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "fantom-testnet",
+    name: "Fantom Testnet",
+    explorer: "https://testnet.ftmscan.com",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "celo-mainnet",
+    name: "Celo",
+    explorer: "https://explorer.celo.org/mainnet",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "zora-mainnet",
+    name: "Zora",
+    explorer: "https://explorer.zora.energy",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "zora-sepolia-testnet",
+    name: "Zora Sepolia",
+    explorer: "https://sepolia.explorer.zora.energy",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "fraxtal-mainnet",
+    name: "Fraxtal",
+    explorer: "https://fraxscan.com",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "aurora-mainnet",
+    name: "Aurora",
+    explorer: "https://aurorascan.dev",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "aurora-testnet",
+    name: "Aurora Testnet",
+    explorer: "https://testnet.aurorascan.dev",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-beam-mainnet",
+    name: "Beam",
+    explorer: "https://subnets.avax.network/beam",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-beam-testnet",
+    name: "Beam Testnet",
+    explorer: "https://gaming.meritcircle.io",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-dexalot-mainnet",
+    name: "Dexalot",
+    explorer: "https://subnets.avax.network/dexalot",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-dexalot-testnet",
+    name: "Dexalot Testnet",
+    explorer: "https://subnets-test.avax.network/dexalot",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-meld-mainnet",
+    name: "MELDchain",
+    explorer: "https://snowtrace.io",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-meld-testnet",
+    name: "MELDchain Testnet",
+    explorer: "https://subnets-test.avax.network",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-mirai-testnet",
+    name: "Mirai Testnet",
+    explorer: "https://testnet.avascan.info/blockchain/mirai",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-numbers",
+    name: "Numbers Protocol",
+    explorer: "https://mainnet.num.network/overview",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-shrapnel-mainnet",
+    name: "Shrapnel",
+    explorer: "https://subnets.avax.network/shrapnel",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-shrapnel-testnet",
+    name: "Shrapnel Testnet",
+    explorer: "https://subnets-test.avax.network/shrapnel",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-step-network",
+    name: "Step Network",
+    explorer: "https://stepscan.io",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-uptn",
+    name: "UPTN",
+    explorer: "https://explorer.uptn.io",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "avalanche-xanachain",
+    name: "XANA Chain",
+    explorer: "https://avascan.info/blockchain/xana",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "bnb-opbnb-mainnet",
+    name: "opBNB",
+    explorer: "https://opbnbscan.com",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "bnb-opbnb-testnet",
+    name: "opBNB Testnet",
+    explorer: "https://mainnet.opbnbscan.com",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "canto-mainnet",
+    name: "Canto",
+    explorer: "https://evm.explorer.canto.io",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "covalent-internal-network-v1",
+    name: "Covalent",
+    explorer: "https://cqtscan.com",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "cronos-mainnet",
+    name: "Cronos",
+    explorer: "https://cronoscan.com",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "cronos-testnet",
+    name: "Cronos Testnet",
+    explorer: "https://testnet.cronoscan.com",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "cronos-zkevm-mainnet",
+    name: "Cronos zkEVM",
+    explorer: "https://explorer.zkevm.cronos.org",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "defi-kingdoms-mainnet",
+    name: "DeFi Kingdoms",
+    explorer: "https://subnets.avax.network/defi-kingdoms",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "defi-kingdoms-testnet",
+    name: "DeFi Kingdoms Testnet",
+    explorer: "https://subnets-test.avax.network/defi-kingdoms",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "emerald-paratime-mainnet",
+    name: "Oasis Emerald",
+    explorer: "https://explorer.emerald.oasis.dev",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "horizen-eon-mainnet",
+    name: "Horizen EON",
+    explorer: "https://eon-explorer.horizenlabs.io",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "horizen-gobi-testnet",
+    name: "Horizen Gobi Testnet",
+    explorer: "https://gobi-explorer.horizen.io",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "manta-sepolia-testnet",
+    name: "Manta Pacific Testnet",
+    explorer: "https://pacific-explorer.manta.network",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "merlin-mainnet",
+    name: "Merlin",
+    explorer: "https://scan.merlinchain.io",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "merlin-testnet",
+    name: "Merlin Testnet",
+    explorer: "https://testnet-scan.merlinchain.io",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "metis-mainnet",
+    name: "Metis",
+    explorer: "https://andromeda-explorer.metis.io",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "metis-stardust",
+    name: "Metis Stardust",
+    explorer: "",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "metis-testnet",
+    name: "Metis Testnet",
+    explorer: "https://goerli.explorer.metisdevops.link",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "moonbeam-mainnet",
+    name: "Moonbeam",
+    explorer: "https://moonscan.io",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "moonbeam-moonbase-alpha",
+    name: "Moonbase Alpha Testnet",
+    explorer: "https://moonbase-blockscout.testnet.moonbeam.network",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "moonbeam-moonriver",
+    name: "Moonriver",
+    explorer: "https://moonriver.moonscan.io",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "movement-mevm-testnet",
+    name: "Movement MEVM Devnet",
+    explorer: "https://explorer.testnet.m2.movement.org",
+    type: "Testnet",
+    category: "EVM",
+  },
+  {
+    id: "polygon-zkevm-mainnet",
+    name: "Polygon zkEVM",
+    explorer: "https://zkevm.polygonscan.com",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "polygon-zkevm-cardona-testnet",
+    name: "Polygon zkEVM Cardona",
+    explorer: "https://cardona-zkevm.polygonscan.com",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "redstone-mainnet",
+    name: "Redstone",
+    explorer: "https://explorer.redstone.xyz",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "rollux-mainnet",
+    name: "Rollux",
+    explorer: "https://explorer.rollux.com",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "rollux-testnet",
+    name: "Rollux Testnet",
+    explorer: "https://rollux.tanenbaum.io",
+    type: "Testnet",
+    category: "Layer2",
+  },
+  {
+    id: "sx-mainnet",
+    name: "SX Network",
+    explorer: "https://explorer.sx.technology",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "x1-mainnet",
+    name: "X Layer",
+    explorer: "https://www.okx.com/explorer/x1",
+    type: "Mainnet",
+    category: "Layer2",
+  },
+  {
+    id: "zetachain-mainnet",
+    name: "ZetaChain",
+    explorer: "https://explorer.zetachain.com",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "zetachain-testnet",
+    name: "ZetaChain Testnet",
+    explorer: "https://explorer.zetachain.com/testnet",
+    type: "Testnet",
+    category: "EVM",
+  },
 ];
-
-const supportedChains = Array.isArray(importedSupportedChains)
-  ? [...importedSupportedChains]
-  : defaultChains;
-
 /**
  * Scan a wallet for tokens and analyze them for spam
  */
@@ -385,44 +983,19 @@ async function checkEvmContract(
 function validateChainId(chainId: string): void {
   if (!Array.isArray(supportedChains)) {
     console.error("supportedChains is not an array:", supportedChains);
-    // Instead of throwing, we'll use a default validation approach
-    if (
-      chainId &&
-      [
-        "eth-mainnet",
-        "bsc-mainnet",
-        "matic-mainnet",
-        "solana-mainnet",
-      ].includes(chainId)
-    ) {
-      return; // Consider common chains as valid
-    }
     throw new Error("Internal server error: Chain validation failed");
   }
 
   try {
-    // Safe check for array elements
     const isSupportedChain = supportedChains.some(
-      (chain) => chain && typeof chain === "object" && chain.id === chainId
+      (chain) => chain && chain.id === chainId
     );
 
     if (!isSupportedChain) {
-      // Let's support common chains even if not in the list
-      if (
-        chainId &&
-        [
-          "eth-mainnet",
-          "bsc-mainnet",
-          "matic-mainnet",
-          "solana-mainnet",
-        ].includes(chainId)
-      ) {
-        return; // Consider common chains as valid
-      }
       throw new Error(`Unsupported chain ID: ${chainId}`);
     }
   } catch (error) {
-    console.error("Error validating chain ID:", error, "Chain ID:", chainId);
+    console.error("Error validating chain ID:", error);
     throw new Error(`Failed to validate chain ID: ${chainId}`);
   }
 }
@@ -437,39 +1010,17 @@ export function getSupportedChains() {
         "supportedChains is not an array in getSupportedChains:",
         supportedChains
       );
-      // Return default chains if the imported chains aren't available
-      return defaultChains.map((chain) => ({
-        id: chain.id,
-        name: chain.name,
-        type: chain.type,
-        category: chain.category,
-      }));
+      return [];
     }
 
-    return supportedChains
-      .map((chain) => {
-        // Ensure each chain has all required properties
-        if (!chain || typeof chain !== "object") {
-          console.error("Invalid chain in supportedChains:", chain);
-          return null;
-        }
-
-        return {
-          id: chain.id || "unknown",
-          name: chain.name || "Unknown Chain",
-          type: chain.type || "Mainnet",
-          category: chain.category || "Other",
-        };
-      })
-      .filter(Boolean); // Remove any null entries
-  } catch (error) {
-    console.error("Error getting supported chains:", error);
-    // Return default chains on error
-    return defaultChains.map((chain) => ({
+    return supportedChains.map((chain) => ({
       id: chain.id,
       name: chain.name,
       type: chain.type,
       category: chain.category,
     }));
+  } catch (error) {
+    console.error("Error getting supported chains:", error);
+    return [];
   }
 }
