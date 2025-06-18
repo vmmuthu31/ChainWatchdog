@@ -6,7 +6,40 @@ import {
   WalletScanResult,
 } from "../types";
 
-const supportedChains = [...importedSupportedChains];
+const defaultChains = [
+  {
+    id: "eth-mainnet",
+    name: "Ethereum",
+    explorer: "https://etherscan.io",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "bsc-mainnet",
+    name: "BNB Smart Chain",
+    explorer: "https://bscscan.com",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "matic-mainnet",
+    name: "Polygon",
+    explorer: "https://polygonscan.com",
+    type: "Mainnet",
+    category: "EVM",
+  },
+  {
+    id: "solana-mainnet",
+    name: "Solana",
+    explorer: "https://solscan.io",
+    type: "Mainnet",
+    category: "Non-EVM",
+  },
+];
+
+const supportedChains = Array.isArray(importedSupportedChains)
+  ? [...importedSupportedChains]
+  : defaultChains;
 
 /**
  * Scan a wallet for tokens and analyze them for spam
@@ -352,19 +385,44 @@ async function checkEvmContract(
 function validateChainId(chainId: string): void {
   if (!Array.isArray(supportedChains)) {
     console.error("supportedChains is not an array:", supportedChains);
+    // Instead of throwing, we'll use a default validation approach
+    if (
+      chainId &&
+      [
+        "eth-mainnet",
+        "bsc-mainnet",
+        "matic-mainnet",
+        "solana-mainnet",
+      ].includes(chainId)
+    ) {
+      return; // Consider common chains as valid
+    }
     throw new Error("Internal server error: Chain validation failed");
   }
 
   try {
+    // Safe check for array elements
     const isSupportedChain = supportedChains.some(
-      (chain) => chain && chain.id === chainId
+      (chain) => chain && typeof chain === "object" && chain.id === chainId
     );
 
     if (!isSupportedChain) {
+      // Let's support common chains even if not in the list
+      if (
+        chainId &&
+        [
+          "eth-mainnet",
+          "bsc-mainnet",
+          "matic-mainnet",
+          "solana-mainnet",
+        ].includes(chainId)
+      ) {
+        return; // Consider common chains as valid
+      }
       throw new Error(`Unsupported chain ID: ${chainId}`);
     }
   } catch (error) {
-    console.error("Error validating chain ID:", error);
+    console.error("Error validating chain ID:", error, "Chain ID:", chainId);
     throw new Error(`Failed to validate chain ID: ${chainId}`);
   }
 }
@@ -379,17 +437,39 @@ export function getSupportedChains() {
         "supportedChains is not an array in getSupportedChains:",
         supportedChains
       );
-      return [];
+      // Return default chains if the imported chains aren't available
+      return defaultChains.map((chain) => ({
+        id: chain.id,
+        name: chain.name,
+        type: chain.type,
+        category: chain.category,
+      }));
     }
 
-    return supportedChains.map((chain) => ({
+    return supportedChains
+      .map((chain) => {
+        // Ensure each chain has all required properties
+        if (!chain || typeof chain !== "object") {
+          console.error("Invalid chain in supportedChains:", chain);
+          return null;
+        }
+
+        return {
+          id: chain.id || "unknown",
+          name: chain.name || "Unknown Chain",
+          type: chain.type || "Mainnet",
+          category: chain.category || "Other",
+        };
+      })
+      .filter(Boolean); // Remove any null entries
+  } catch (error) {
+    console.error("Error getting supported chains:", error);
+    // Return default chains on error
+    return defaultChains.map((chain) => ({
       id: chain.id,
       name: chain.name,
       type: chain.type,
       category: chain.category,
     }));
-  } catch (error) {
-    console.error("Error getting supported chains:", error);
-    return [];
   }
 }
