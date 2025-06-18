@@ -1,0 +1,108 @@
+import { NextRequest, NextResponse } from "next/server";
+import TelegramBot from "node-telegram-bot-api";
+import { BotContext, CommandType } from "../../../../lib/telegram-bot/types";
+import { handleStartCommand } from "../../../../lib/telegram-bot/commands/start";
+import { handleHelpCommand } from "../../../../lib/telegram-bot/commands/help";
+import { handleScanWalletCommand } from "../../../../lib/telegram-bot/commands/scanWallet";
+import { handleCheckContractCommand } from "../../../../lib/telegram-bot/commands/checkContract";
+import { handleHoneypotCommand } from "../../../../lib/telegram-bot/commands/honeypot";
+import { handleNetworksCommand } from "../../../../lib/telegram-bot/commands/networks";
+import { handleGreeting } from "../../../../lib/telegram-bot/commands/greeting";
+import { detectCommand } from "../../../../lib/telegram-bot/utils/commandDetector";
+
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+
+const bot = new TelegramBot(TELEGRAM_BOT_TOKEN || "", { polling: false });
+
+export async function POST(req: NextRequest) {
+  try {
+    const update = await req.json();
+
+    if (!update || !update.message) {
+      return NextResponse.json({ success: true });
+    }
+
+    const message = update.message;
+    const text = message.text || "";
+
+    const { command, args } = parseCommand(text);
+
+    const ctx: BotContext = {
+      message,
+      command,
+      args,
+    };
+
+    const commandType = detectCommand(command);
+
+    switch (commandType) {
+      case CommandType.START:
+        await handleStartCommand(bot, ctx);
+        break;
+
+      case CommandType.HELP:
+        await handleHelpCommand(bot, ctx);
+        break;
+
+      case CommandType.SCAN_WALLET:
+        await handleScanWalletCommand(bot, ctx);
+        break;
+
+      case CommandType.CHECK_CONTRACT:
+        await handleCheckContractCommand(bot, ctx);
+        break;
+
+      case CommandType.HONEYPOT:
+        await handleHoneypotCommand(bot, ctx);
+        break;
+
+      case CommandType.NETWORKS:
+        await handleNetworksCommand(bot, ctx);
+        break;
+
+      case CommandType.GREETING:
+        await handleGreeting(bot, ctx);
+        break;
+
+      default:
+        if (text.startsWith("/")) {
+          await bot.sendMessage(
+            message.chat.id,
+            `Unknown command. Type /help to see available commands.`
+          );
+        }
+        break;
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error handling webhook update:", error);
+    return NextResponse.json(
+      { success: false, error: "Failed to process update" },
+      { status: 500 }
+    );
+  }
+}
+
+function parseCommand(text: string): { command: string; args: string[] } {
+  const parts = text.split(" ");
+  const commandPart = parts[0];
+
+  const lowerText = text.toLowerCase().trim();
+  if (
+    !text.startsWith("/") &&
+    (lowerText === "hi" ||
+      lowerText === "hello" ||
+      lowerText === "hey" ||
+      lowerText === "hi!" ||
+      lowerText === "hello!" ||
+      lowerText === "hey!")
+  ) {
+    return { command: lowerText, args: [] };
+  }
+
+  const command = commandPart.split("@")[0].replace("/", "").toLowerCase();
+  const args = parts.slice(1).filter((arg) => arg.trim() !== "");
+
+  return { command, args };
+}

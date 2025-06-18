@@ -7,10 +7,10 @@ export async function handleGreeting(
 ): Promise<void> {
   const { message: msg } = ctx;
   const chatId = msg.chat.id;
-  
+
   // Get user's first name if available
   const firstName = msg.from?.first_name || "there";
-  
+
   const messageText = `Hello ${firstName}! 👋 Welcome to RugProofAI Bot.
 
 I'm here to help you analyze tokens and wallets across multiple blockchains. Here's what you can do:

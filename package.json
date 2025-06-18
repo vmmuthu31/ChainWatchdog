@@ -1,5 +1,5 @@
 {
-  "name": "RugProof",
+  "name": "rugproof-ai",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,8 @@
     "bot": "npx ts-node -P tsconfig.bot.json ./lib/telegram-bot/index.ts",
     "telegram-bot": "node ./scripts/start-bot.mjs",
     "telegram-bot:dev": "npx ts-node-dev --project tsconfig.bot.json --respawn ./lib/telegram-bot/index.ts",
-    "test-bot": "npx ts-node -P tsconfig.bot.json ./lib/telegram-bot/index.ts"
+    "test-bot": "npx ts-node -P tsconfig.bot.json ./lib/telegram-bot/index.ts",
+    "set-webhook": "node ./scripts/set-webhook.mjs"
   },
   "dependencies": {
     "@covalenthq/client-sdk": "^2.2.6",

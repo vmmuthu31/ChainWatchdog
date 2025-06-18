@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "buildCommand": "next build",
+  "postBuildCommands": ["node scripts/set-webhook.mjs"],
+  "installCommand": "npm install",
+  "framework": "nextjs"
+}
