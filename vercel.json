@@ -4,5 +4,11 @@
       "path": "/api/telegram/heartbeat",
       "schedule": "*/5 * * * *"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/telegram/webhook/route.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
 }
