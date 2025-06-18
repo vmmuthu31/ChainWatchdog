@@ -1,23 +1,13 @@
 {
-  "crons": [
-    {
-      "path": "/api/telegram/heartbeat",
-      "schedule": "*/5 * * * *"
-    }
-  ],
   "functions": {
-    "app/api/telegram/webhook/route.ts": {
-      "memory": 1024,
-      "maxDuration": 30
-    },
-    "app/api/telegram/**/*.ts": {
+    "app/api/telegram/**": {
       "memory": 1024,
       "maxDuration": 30
     }
   },
   "headers": [
     {
-      "source": "/api/telegram/webhook",
+      "source": "/api/telegram/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
