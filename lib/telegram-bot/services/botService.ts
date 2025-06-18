@@ -1,10 +1,13 @@
 import { fetchWalletData } from "../../../lib/utils/fetchWalletData";
-import { supportedChains } from "../../../lib/services/goldrush";
+import { supportedChains as importedSupportedChains } from "../../../lib/services/goldrush";
 import {
   ContractCheckResult,
   HoneypotCheckResult,
   WalletScanResult,
 } from "../types";
+
+// Create a local copy of supportedChains to avoid issues with module resolution in serverless functions
+const supportedChains = [...importedSupportedChains];
 
 /**
  * Scan a wallet for tokens and analyze them for spam
@@ -348,11 +351,22 @@ async function checkEvmContract(
  * Validate that the chain ID is supported
  */
 function validateChainId(chainId: string): void {
-  const isSupportedChain = supportedChains.some(
-    (chain) => chain.id === chainId
-  );
-  if (!isSupportedChain) {
-    throw new Error(`Unsupported chain ID: ${chainId}`);
+  if (!Array.isArray(supportedChains)) {
+    console.error("supportedChains is not an array:", supportedChains);
+    throw new Error("Internal server error: Chain validation failed");
+  }
+
+  try {
+    const isSupportedChain = supportedChains.some(
+      (chain) => chain && chain.id === chainId
+    );
+
+    if (!isSupportedChain) {
+      throw new Error(`Unsupported chain ID: ${chainId}`);
+    }
+  } catch (error) {
+    console.error("Error validating chain ID:", error);
+    throw new Error(`Failed to validate chain ID: ${chainId}`);
   }
 }
 
@@ -360,10 +374,23 @@ function validateChainId(chainId: string): void {
  * Get supported chains
  */
 export function getSupportedChains() {
-  return supportedChains.map((chain) => ({
-    id: chain.id,
-    name: chain.name,
-    type: chain.type,
-    category: chain.category,
-  }));
+  try {
+    if (!Array.isArray(supportedChains)) {
+      console.error(
+        "supportedChains is not an array in getSupportedChains:",
+        supportedChains
+      );
+      return [];
+    }
+
+    return supportedChains.map((chain) => ({
+      id: chain.id,
+      name: chain.name,
+      type: chain.type,
+      category: chain.category,
+    }));
+  } catch (error) {
+    console.error("Error getting supported chains:", error);
+    return [];
+  }
 }
