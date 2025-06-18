@@ -1,6 +1,10 @@
 import TelegramBot from "node-telegram-bot-api";
 import { BotContext } from "../types";
 import { scanWallet } from "../services/botService";
+import {
+  getExplorerLinkForTelegram,
+  getExplorerButtonForTelegram,
+} from "../utils/getExplorerLinkForTelegram";
 
 export async function handleScanWalletCommand(
   bot: TelegramBot,
@@ -126,6 +130,12 @@ ${formatSummary(result)}
             ? ((token.value / result.totalValue) * 100).toFixed(1) + "%"
             : "N/A";
 
+        const tokenExplorerLink = getExplorerLinkForTelegram(
+          result.chainId,
+          token.contractAddress,
+          true
+        );
+
         response += `\n${status} *${token.symbol}* (${
           token.name.length > 15
             ? token.name.substring(0, 15) + "..."
@@ -137,6 +147,7 @@ ${formatSummary(result)}
      0,
      6
    )}...${token.contractAddress.slice(-4)}\`
+   ${tokenExplorerLink}
    • Status: ${token.isSpam ? "⚠️ Flagged" : "✅ Safe"}`;
       });
 
@@ -149,10 +160,17 @@ ${formatSummary(result)}
       response += `\n\n_Analysis by RugProofAI - Keeping your crypto safe_`;
     }
 
+    const explorerButtons = getExplorerButtonForTelegram(
+      result.chainId,
+      result.address,
+      false
+    );
+
     await bot.editMessageText(response, {
       chat_id: chatId,
       message_id: processingMsgId.message_id,
       parse_mode: "Markdown",
+      reply_markup: explorerButtons,
     });
   } catch (error) {
     console.error("Error in scan wallet command:", error);

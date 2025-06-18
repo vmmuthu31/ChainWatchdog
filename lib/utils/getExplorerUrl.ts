@@ -20,6 +20,12 @@ export const getExplorerUrl = (chainId: string, address?: string) => {
     case "8453":
       baseUrl = "https://basescan.org";
       break;
+    case "42161":
+      baseUrl = "https://arbiscan.io";
+      break;
+    case "250":
+      baseUrl = "https://ftmscan.com";
+      break;
     case "100":
       baseUrl = "https://gnosisscan.io";
       break;
