@@ -1,6 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
 import { BotContext } from "../types";
 import { checkContract } from "../services/botService";
+import { getExplorerButtonForTelegram } from "../utils/getExplorerLinkForTelegram";
 
 export async function handleCheckContractCommand(
   bot: TelegramBot,
@@ -48,10 +49,17 @@ ${formatSecurityRisks(result.securityRisks)}
 ${formatRecommendation(result)}
 `;
 
+    const explorerButtons = getExplorerButtonForTelegram(
+      result.chainId,
+      result.address,
+      true
+    );
+
     await bot.editMessageText(response, {
       chat_id: chatId,
       message_id: processingMsgId.message_id,
       parse_mode: "Markdown",
+      reply_markup: explorerButtons,
     });
   } catch (error) {
     console.error("Error in contract check command:", error);

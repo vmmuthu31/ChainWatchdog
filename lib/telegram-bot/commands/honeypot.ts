@@ -1,10 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
 import { BotContext } from "../types";
 import { checkHoneypot } from "../services/botService";
-import {
-  getExplorerLinkForTelegram,
-  getExplorerButtonForTelegram,
-} from "../utils/getExplorerLinkForTelegram";
+import { getExplorerButtonForTelegram } from "../utils/getExplorerLinkForTelegram";
 
 export async function handleHoneypotCommand(
   bot: TelegramBot,
@@ -55,12 +52,6 @@ ${result.honeypotReason ? `• Reason: ${result.honeypotReason}` : ""}
 _Analysis by RugProofAI - Keeping your crypto safe_
 `;
     } else {
-      const explorerLink = getExplorerLinkForTelegram(
-        result.chainId,
-        result.address,
-        true
-      );
-
       response = `
 🔍 *TOKEN SECURITY ANALYSIS*
 
@@ -75,34 +66,24 @@ _Analysis by RugProofAI - Keeping your crypto safe_
 • Buy Tax: ${result.buyTax !== undefined ? `${result.buyTax}%` : "Unknown"}
 • Sell Tax: ${result.sellTax !== undefined ? `${result.sellTax}%` : "Unknown"}
 
-${explorerLink}
-
 ⚠️ *DISCLAIMER:* This is an automated analysis and should not be your only source of research. Always conduct thorough due diligence before investing.
 
 _Analysis by RugProofAI - Keeping your crypto safe_
 `;
     }
 
-    if (result.isHoneypot) {
-      const explorerButtons = getExplorerButtonForTelegram(
-        result.chainId,
-        result.address,
-        true
-      );
+    const explorerButtons = getExplorerButtonForTelegram(
+      result.chainId,
+      result.address,
+      true
+    );
 
-      await bot.editMessageText(response, {
-        chat_id: chatId,
-        message_id: processingMsgId.message_id,
-        parse_mode: "Markdown",
-        reply_markup: explorerButtons,
-      });
-    } else {
-      await bot.editMessageText(response, {
-        chat_id: chatId,
-        message_id: processingMsgId.message_id,
-        parse_mode: "Markdown",
-      });
-    }
+    await bot.editMessageText(response, {
+      chat_id: chatId,
+      message_id: processingMsgId.message_id,
+      parse_mode: "Markdown",
+      reply_markup: explorerButtons,
+    });
   } catch (error) {
     console.error("Error in honeypot check command:", error);
 
@@ -153,10 +134,25 @@ Please try again later or check the contract address and chain selection.
 _RugProofAI - Keeping your crypto safe_
 `;
 
-    await bot.editMessageText(errorResponse, {
-      chat_id: chatId,
-      message_id: processingMsgId.message_id,
-      parse_mode: "Markdown",
-    });
+    try {
+      const explorerButtons = getExplorerButtonForTelegram(
+        chainId,
+        contractAddress,
+        true
+      );
+
+      await bot.editMessageText(errorResponse, {
+        chat_id: chatId,
+        message_id: processingMsgId.message_id,
+        parse_mode: "Markdown",
+        reply_markup: explorerButtons,
+      });
+    } catch {
+      await bot.editMessageText(errorResponse, {
+        chat_id: chatId,
+        message_id: processingMsgId.message_id,
+        parse_mode: "Markdown",
+      });
+    }
   }
 }

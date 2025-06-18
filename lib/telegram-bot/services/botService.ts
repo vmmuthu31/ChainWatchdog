@@ -761,6 +761,24 @@ function convertChainForAPI(chainId: string): string {
 }
 
 /**
+ * Convert API chain ID to internal format
+ */
+function chainIdToInternalFormat(chainId: string): string {
+  const reverseChainMapping: Record<string, string> = {
+    "1": "eth-mainnet",
+    "56": "bsc-mainnet",
+    "137": "matic-mainnet",
+    "10": "optimism-mainnet",
+    "8453": "base-mainnet",
+    "42161": "arbitrum-mainnet",
+    "43114": "avalanche-mainnet",
+    "250": "fantom-mainnet",
+  };
+
+  return reverseChainMapping[chainId] || chainId;
+}
+
+/**
  * Check Solana token for honeypot
  */
 async function checkSolanaHoneypot(
@@ -808,9 +826,11 @@ async function checkEvmHoneypot(
       if (response.ok) {
         const data = await response.json();
 
+        const internalChainId = chainIdToInternalFormat(chainId);
+
         return {
           address: contractAddress,
-          chainId,
+          chainId: internalChainId,
           isHoneypot: data.honeypotResult?.isHoneypot || false,
           honeypotReason: data.honeypotResult?.honeypotReason,
           buyTax: data.simulationResult?.buyTax,

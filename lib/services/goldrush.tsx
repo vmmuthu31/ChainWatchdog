@@ -1,4 +1,3 @@
-"use client";
 import { Chain, GoldRushClient } from "@covalenthq/client-sdk";
 import { ChainInfo, GoldRushResponse } from "../types";
 
