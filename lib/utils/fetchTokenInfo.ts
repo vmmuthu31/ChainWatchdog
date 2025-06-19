@@ -139,10 +139,6 @@ export async function fetchTokenInfo(
       } catch (error) {
         console.error("Error using Covalent API:", error);
       }
-
-      console.log(
-        `Attempted fallback for chain ID: ${chainId} using Covalent API`
-      );
     }
 
     return {

@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/api/telegram/webhook")) {
-    console.log("Telegram webhook request detected");
-
     const response = NextResponse.next();
 
     response.headers.set(

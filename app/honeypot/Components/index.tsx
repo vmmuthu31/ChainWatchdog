@@ -60,13 +60,10 @@ function HoneyPot() {
         const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
         if (solanaRegex.test(address)) {
           try {
-            console.log("Detected potential Solana address:", address);
             await fetchSolanaTokenInfo(address);
-            console.log("Valid Solana token address confirmed");
 
             setDetectedChain("solana-mainnet");
             setSelectedChain("solana-mainnet");
-            console.log("Setting chain to solana-mainnet");
 
             setIsDetectingChain(false);
             return "solana-mainnet";
@@ -175,15 +172,7 @@ function HoneyPot() {
         const isSolanaAddress = solanaRegex.test(address);
         const isEvmAddress = evmRegex.test(address);
 
-        console.log("Address check:", {
-          address,
-          isSolana: isSolanaAddress,
-          isEvm: isEvmAddress,
-          providedChain: chainId,
-        });
-
         if (isSolanaAddress) {
-          console.log("Using RugCheck API for Solana address");
           const { getSolanaTokenHoneypotAnalysis } = await import(
             "@/lib/services/rugCheckService"
           );
@@ -243,17 +232,8 @@ function HoneyPot() {
         }
 
         if (isEvmAddress) {
-          console.log(
-            "Using honeypot.is API for EVM address with chain:",
-            chainId
-          );
-
           const numericChainId =
             chainId === "solana-mainnet" ? 1 : parseInt(chainId);
-
-          console.log(
-            `Making request to honeypot.is with chainID=${numericChainId}`
-          );
           const response = await fetch(
             `https://api.honeypot.is/v2/IsHoneypot?address=${address}&chainID=${numericChainId}`
           );
@@ -287,16 +267,7 @@ function HoneyPot() {
 
       const isSolanaAddress = solanaRegex.test(address);
       const isEvmAddress = evmRegex.test(address);
-
-      console.log("Contract verification address check:", {
-        address,
-        isSolana: isSolanaAddress,
-        isEvm: isEvmAddress,
-        providedChain: chainId,
-      });
-
       if (isSolanaAddress) {
-        console.log("Fetching Solana contract verification for:", address);
         const { getSolanaTokenContractVerification } = await import(
           "@/lib/services/rugCheckService"
         );
@@ -304,12 +275,6 @@ function HoneyPot() {
       }
 
       if (isEvmAddress) {
-        console.log(
-          "Fetching EVM contract verification for:",
-          address,
-          "with chain:",
-          chainId
-        );
         const response = await fetch(
           `https://api.honeypot.is/v2/GetContractVerification?address=${address}&chainID=${chainId}`
         );
@@ -339,15 +304,7 @@ function HoneyPot() {
       const isSolanaAddress = solanaRegex.test(address);
       const isEvmAddress = evmRegex.test(address);
 
-      console.log("Pairs address check:", {
-        address,
-        isSolana: isSolanaAddress,
-        isEvm: isEvmAddress,
-        providedChain: chainId,
-      });
-
       if (isSolanaAddress) {
-        console.log("Fetching Solana pairs for:", address);
         const { getSolanaTokenPairs } = await import(
           "@/lib/services/rugCheckService"
         );
@@ -355,7 +312,6 @@ function HoneyPot() {
       }
 
       if (isEvmAddress) {
-        console.log("Fetching EVM pairs for:", address, "with chain:", chainId);
         const response = await fetch(
           `https://api.honeypot.is/v1/GetPairs?address=${address}&chainID=${chainId}`
         );
@@ -385,15 +341,7 @@ function HoneyPot() {
       const isSolanaAddress = solanaRegex.test(address);
       const isEvmAddress = evmRegex.test(address);
 
-      console.log("Top holders address check:", {
-        address,
-        isSolana: isSolanaAddress,
-        isEvm: isEvmAddress,
-        providedChain: chainId,
-      });
-
       if (isSolanaAddress) {
-        console.log("Fetching Solana top holders for:", address);
         const { getSolanaTokenHolders } = await import(
           "@/lib/services/rugCheckService"
         );
@@ -403,14 +351,6 @@ function HoneyPot() {
       if (isEvmAddress) {
         const numericChainId =
           chainId === "solana-mainnet" ? 1 : parseInt(chainId);
-
-        console.log(
-          "Fetching EVM top holders for:",
-          address,
-          "with chain:",
-          chainId,
-          `(numeric: ${numericChainId})`
-        );
         const response = await fetch(
           `https://api.honeypot.is/v1/TopHolders?address=${address}&chainID=${numericChainId}`
         );
@@ -440,21 +380,12 @@ function HoneyPot() {
     const isSolana = solanaAddressRegex.test(address);
     const isValid = isEvm || isSolana;
 
-    console.log("Validating address:", { address, isEvm, isSolana });
-
     if (isSolana) {
-      console.log(
-        "Setting chain to solana-mainnet for Solana address in validateAddress"
-      );
       setSelectedChain("solana-mainnet");
       setDetectedChain("solana-mainnet");
     }
 
     if (isEvm && (!detectedChain || detectedChain === "solana-mainnet")) {
-      console.log(
-        "EVM address detected but chain is not set correctly. Current:",
-        detectedChain
-      );
       const defaultEvmChain = "1";
       setSelectedChain(defaultEvmChain);
     }
@@ -491,31 +422,19 @@ function HoneyPot() {
       const isSolanaAddress = solanaRegex.test(contractAddress);
       const isEvmAddress = evmRegex.test(contractAddress);
 
-      console.log("Handle check address type:", {
-        contractAddress,
-        isSolana: isSolanaAddress,
-        isEvm: isEvmAddress,
-        currentSelectedChain: selectedChain,
-        currentDetectedChain: detectedChain,
-      });
-
       if (isSolanaAddress) {
-        console.log("Setting chain to solana-mainnet for Solana address");
         setSelectedChain("solana-mainnet");
         setAutoDetectChain(true);
         setDetectedChain("solana-mainnet");
       } else if (isEvmAddress) {
         if (autoDetectChain) {
-          console.log("Auto-detecting chain for EVM address");
           setIsDetectingChain(true);
           try {
             const detectedChainId = await detectChain(contractAddress);
             if (detectedChainId) {
-              console.log("Chain detected:", detectedChainId);
               setSelectedChain(detectedChainId);
               setDetectedChain(detectedChainId);
             } else {
-              console.log("No chain detected, defaulting to Ethereum mainnet");
               setSelectedChain("1");
               setDetectedChain("1");
             }
@@ -534,26 +453,19 @@ function HoneyPot() {
       }
 
       if (isSolanaAddress) {
-        console.log("Using solana-mainnet for Solana address in handleCheck");
         setSelectedChain("solana-mainnet");
         setDetectedChain("solana-mainnet");
       } else if (isEvmAddress) {
         if (autoDetectChain && !isDetectingChain) {
-          console.log("Auto-detecting chain for EVM address");
           const chainId = await detectChain(contractAddress);
 
           if (chainId) {
-            console.log("Chain detected:", chainId);
             setSelectedChain(chainId);
             setDetectedChain(chainId);
           } else if (!selectedChain || selectedChain === "solana-mainnet") {
-            console.log("No chain detected, defaulting to Ethereum mainnet");
             setSelectedChain("1");
           }
         } else if (selectedChain === "solana-mainnet") {
-          console.log(
-            "EVM address with Solana chain selected - fixing to Ethereum mainnet"
-          );
           setSelectedChain("1");
         }
       }
@@ -611,7 +523,6 @@ function HoneyPot() {
     const address = searchParams.get("address");
     const chainId = searchParams.get("chainId");
 
-    console.log("Search params:", { address, chainId });
     if (address && !initialQueryHandled) {
       setContractAddress(address);
 
@@ -621,40 +532,26 @@ function HoneyPot() {
       const isSolanaAddress = solanaRegex.test(address);
       const isEvmAddress = evmRegex.test(address);
 
-      console.log("Initial query address check:", {
-        address,
-        isSolana: isSolanaAddress,
-        isEvm: isEvmAddress,
-        providedChain: chainId,
-      });
-
       if (isSolanaAddress) {
-        console.log("Setting chain to solana-mainnet for Solana address");
         setSelectedChain("solana-mainnet");
         setAutoDetectChain(true);
         setDetectedChain("solana-mainnet");
         setInitialQueryHandled(true);
       } else if (isEvmAddress) {
         if (chainId) {
-          console.log("Using provided chain for EVM address:", chainId);
           setSelectedChain(chainId);
           setAutoDetectChain(false);
           setDetectedChain(chainId);
           setInitialQueryHandled(true);
         } else {
-          console.log("No chain provided, will auto-detect for EVM address");
           setAutoDetectChain(true);
           setIsDetectingChain(true);
           detectChain(address)
             .then((detectedChainId) => {
               if (detectedChainId) {
-                console.log("Chain detected:", detectedChainId);
                 setSelectedChain(detectedChainId);
                 setDetectedChain(detectedChainId);
               } else {
-                console.log(
-                  "No chain detected, defaulting to Ethereum mainnet"
-                );
                 setSelectedChain("1");
                 setDetectedChain("1");
               }
@@ -681,12 +578,6 @@ function HoneyPot() {
         setError(null);
         try {
           const chainToUse = selectedChain;
-          console.log(
-            "Using chain for analysis:",
-            chainToUse,
-            "for address:",
-            contractAddress
-          );
           const honeypotData = await fetchHoneypotData(
             contractAddress,
             chainToUse
@@ -813,11 +704,9 @@ function HoneyPot() {
                     onChange={(e) => {
                       detectChain(e.target.value).then((detectedChainId) => {
                         if (detectedChainId) {
-                          console.log("Detected chain ID:", detectedChainId);
                           setDetectedChain(detectedChainId);
                           setSelectedChain(detectedChainId);
                         } else {
-                          console.log("No chain detected, using default");
                           setDetectedChain(null);
                           setSelectedChain("1");
                         }
@@ -865,10 +754,6 @@ function HoneyPot() {
                           setAutoDetectChain(newAutoDetect);
 
                           if (!newAutoDetect && detectedChain) {
-                            console.log(
-                              "Setting selected chain to match detected chain:",
-                              detectedChain
-                            );
                             setSelectedChain(detectedChain);
                           }
                         }}
@@ -883,7 +768,6 @@ function HoneyPot() {
                   <select
                     value={selectedChain}
                     onChange={(e) => {
-                      console.log("Chain selected:", e.target.value);
                       setSelectedChain(e.target.value);
                       if (!autoDetectChain) {
                         setDetectedChain(e.target.value);

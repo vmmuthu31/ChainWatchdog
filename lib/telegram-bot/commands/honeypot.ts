@@ -26,12 +26,7 @@ async function fetchTokenAdditionalData(
   isOpenSource?: boolean;
 }> {
   try {
-    // Check if contract is open source
     const contractData = await checkContract(contractAddress, chainId);
-
-    // This is a simplified version - in a real implementation you would
-    // connect to APIs like Etherscan, Dextools, etc. to get this data
-    // For now we'll return mock data
     return {
       dex: "Uniswap V2",
       liquidityUsd: 117933,

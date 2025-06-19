@@ -18,16 +18,10 @@ if (!TELEGRAM_BOT_TOKEN) {
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN || "", { polling: false });
 
 export async function POST(req: NextRequest) {
-  console.log("Webhook hit, processing update");
   try {
     const update = await req.json();
-    console.log(
-      "Received update:",
-      JSON.stringify(update).substring(0, 200) + "..."
-    );
 
     if (!update || !update.message) {
-      console.log("No message in update, skipping");
       return NextResponse.json({ success: true });
     }
 
@@ -82,8 +76,6 @@ export async function POST(req: NextRequest) {
         }
         break;
     }
-
-    console.log("Command processed successfully");
 
     return NextResponse.json(
       {

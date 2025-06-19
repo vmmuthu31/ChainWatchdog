@@ -40,7 +40,7 @@ async function handleDirectAddressInput(
 
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
 
-console.log(`RugProofAI Bot is starting up...`);
+console.info(`RugProofAI Bot is starting up...`);
 
 bot.on("message", async (message) => {
   try {
@@ -136,4 +136,4 @@ function parseCommand(text: string): { command: string; args: string[] } {
   return { command, args };
 }
 
-console.log(`RugProofAI Telegram Bot is now online as @${BOT_USERNAME}`);
+console.info(`RugProofAI Telegram Bot is now online as @${BOT_USERNAME}`);

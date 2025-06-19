@@ -10,7 +10,7 @@ isERC20Spam = () => false;
 
 if (typeof window === "undefined") {
   try {
-    console.log("Server-side execution detected, skipping spam list import");
+    console.info("Server-side execution detected, skipping spam list import");
   } catch (error) {
     console.error("Failed to import enhanced-spam-lists:", error);
   }

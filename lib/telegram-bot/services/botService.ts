@@ -840,13 +840,11 @@ async function checkEvmHoneypot(
         };
       }
     } catch (honeypotApiError) {
-      console.log(
+      console.error(
         "Honeypot.is API error, falling back to internal implementation:",
         honeypotApiError
       );
     }
-
-    console.log("Using internal honeypot detection for", contractAddress);
 
     try {
       const { fetchTokenInfo, performBasicRiskCheck } = await import(

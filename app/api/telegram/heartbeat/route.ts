@@ -9,8 +9,6 @@ export async function GET() {
 
     const me = await bot.getMe();
 
-    console.log(`Bot heartbeat: @${me.username} is online`);
-
     return NextResponse.json({
       success: true,
       message: `Bot @${me.username} is online`,

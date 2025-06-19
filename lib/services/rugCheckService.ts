@@ -137,7 +137,6 @@ export async function fetchRugCheckTokenReport(
       const errorData = await response.text();
       console.error(`RugCheck API error (${response.status}):`, errorData);
       if (errorData.includes("unable to generate report")) {
-        console.log("Falling back to Helius API...");
         const heliusData = await fetchHeliusTokenMetadata(tokenAddress);
 
         if (heliusData) {

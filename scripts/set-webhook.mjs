@@ -21,14 +21,12 @@ async function setWebhook() {
   }
 
   try {
-    console.log("Removing existing webhook...");
     const deleteResponse = await fetch(
       `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook`
     );
     const deleteData = await deleteResponse.json();
-    console.log("Delete webhook response:", deleteData);
+    console.info("Delete webhook response:", deleteData);
 
-    console.log(`Setting webhook to: ${webhook}`);
     const setResponse = await fetch(
       `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook`,
       {
@@ -46,8 +44,7 @@ async function setWebhook() {
     const setData = await setResponse.json();
 
     if (setData.ok) {
-      console.log("Webhook set successfully!");
-      console.log("Response:", setData);
+      console.info("Webhook set successfully!");
     } else {
       console.error("Failed to set webhook:", setData);
     }
