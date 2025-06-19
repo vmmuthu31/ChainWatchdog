@@ -10,6 +10,35 @@ import { handleNetworksCommand } from "../../../../lib/telegram-bot/commands/net
 import { handleGreeting } from "../../../../lib/telegram-bot/commands/greeting";
 import { detectCommand } from "../../../../lib/telegram-bot/utils/commandDetector";
 
+/**
+ * Handle direct address input (without commands) from users
+ * This provides a more user-friendly experience for pasting addresses
+ */
+async function handleDirectAddressInput(
+  bot: TelegramBot,
+  text: string,
+  message: TelegramBot.Message
+): Promise<boolean> {
+  const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+  const solanaAddressRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+
+  const isEvm = ethAddressRegex.test(text);
+  const isSolana = solanaAddressRegex.test(text);
+
+  if (!isEvm && !isSolana) {
+    return false;
+  }
+
+  const ctx: BotContext = {
+    message,
+    command: "honeypot",
+    args: [text],
+  };
+
+  await handleHoneypotCommand(bot, ctx);
+  return true;
+}
+
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 if (!TELEGRAM_BOT_TOKEN) {
   console.error("TELEGRAM_BOT_TOKEN environment variable is not set!");
@@ -73,6 +102,17 @@ export async function POST(req: NextRequest) {
             message.chat.id,
             `Unknown command. Type /help to see available commands.`
           );
+        } else if (text.trim() !== "") {
+          const wasHandled = await handleDirectAddressInput(
+            bot,
+            text.trim(),
+            message
+          );
+          if (!wasHandled) {
+            console.info(
+              `Ignored non-address message: ${text.substring(0, 20)}...`
+            );
+          }
         }
         break;
     }

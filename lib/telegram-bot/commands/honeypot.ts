@@ -478,6 +478,16 @@ function formatContractInfo(
 }
 
 /**
+ * Escape special characters for Telegram Markdown
+ */
+function escapeMarkdown(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/[\\]/g, "\\\\")
+    .replace(/[_*[\]()~`>#+=|{}.!-]/g, "\\$&");
+}
+
+/**
  * Generate comprehensive token analysis report
  */
 function generateComprehensiveReport(analysis: TokenAnalysisResult): string {
@@ -507,16 +517,22 @@ function generateComprehensiveReport(analysis: TokenAnalysisResult): string {
     honeypot?.summary?.riskReason ||
     "Cannot sell tokens! HONEYPOT DETECTED!";
 
+  const safeName = escapeMarkdown(tokenInfo.name);
+  const safeSymbol = escapeMarkdown(tokenInfo.symbol);
+  const safeDex = escapeMarkdown(liquidityInfo.dex);
+  const safePairName = escapeMarkdown(liquidityInfo.pairName);
+  const safeHoneypotReason = escapeMarkdown(honeypotReason);
+
   if (isHoneypot) {
     return `
 🚨 *HIGH Risk of Honeypot* ❌
-${honeypotReason}
+${safeHoneypotReason}
 
-🪙 *Token:* ${tokenInfo.name} (${tokenInfo.symbol})
+🪙 *Token:* ${safeName} (${safeSymbol})
 ${
   liquidityInfo.dex === "Unknown"
     ? "🚨 *Liquidity Information Unavailable* ❌"
-    : `📊 *DEX:* ${liquidityInfo.dex}: ${liquidityInfo.pairName}`
+    : `📊 *DEX:* ${safeDex}: ${safePairName}`
 }
 💰 *LQ:* $${liquidityInfo.liquidityUsd.toLocaleString()} (${
       liquidityInfo.liquidityPercent
@@ -531,7 +547,9 @@ ${
 🚩 *Risk Flags:*
 ${
   honeypot?.flags && Array.isArray(honeypot.flags)
-    ? honeypot.flags.map((flag: string) => ` • ${flag}`).join("\n")
+    ? honeypot.flags
+        .map((flag: string) => ` • ${escapeMarkdown(flag)}`)
+        .join("\n")
     : " • High sell tax detected\n • Potential honeypot mechanism"
 }
 
@@ -544,11 +562,11 @@ This is a generated report. Not always accurate.
 ✅ *${riskLevel} Risk of Honeypot* ${riskLevel === "Low" ? "✓" : "⚠️"}
 Didn't detect any risks. Always do your own due diligence!
 
-🪙 *Token:* ${tokenInfo.name} (${tokenInfo.symbol})
+🪙 *Token:* ${safeName} (${safeSymbol})
 ${
   liquidityInfo.dex === "Unknown"
     ? "🚨 *Liquidity Information Unavailable* ❌"
-    : `📊 *DEX:* ${liquidityInfo.dex}: ${liquidityInfo.pairName}`
+    : `📊 *DEX:* ${safeDex}: ${safePairName}`
 }
 💰 *LQ:* $${liquidityInfo.liquidityUsd.toLocaleString()} (${
       liquidityInfo.liquidityPercent
