@@ -553,12 +553,12 @@ function generateComprehensiveReport(analysis: TokenAnalysisResult): string {
 ${honeypotReason}
 
 🪙 *Token:* ${tokenInfo.name} (${tokenInfo.symbol})
-  ${
-    liquidityInfo.dex === "Unknown"
-      ? "🚨 *Liquidity Information Unavailable* ❌\n"
-      : "📊 *DEX:* ${liquidityInfo.dex}: ${liquidityInfo.pairName}"
-  }
-    💰 *LQ:* $${liquidityInfo.liquidityUsd.toLocaleString()} (${
+${
+  liquidityInfo.dex === "Unknown"
+    ? "🚨 *Liquidity Information Unavailable* ❌"
+    : `📊 *DEX:* ${liquidityInfo.dex}: ${liquidityInfo.pairName}`
+}
+💰 *LQ:* $${liquidityInfo.liquidityUsd.toLocaleString()} (${
       liquidityInfo.liquidityPercent
     })
 👥 *Top Holders:* ${tokenHolders}
@@ -571,8 +571,8 @@ ${honeypotReason}
 🚩 *Risk Flags:*
 ${
   honeypot?.flags && Array.isArray(honeypot.flags)
-    ? honeypot.flags.map((flag: string) => ` * ${flag}`).join("\n")
-    : " * High sell tax detected\n * Potential honeypot mechanism"
+    ? honeypot.flags.map((flag: string) => ` • ${flag}`).join("\n")
+    : " • High sell tax detected\n • Potential honeypot mechanism"
 }
 
 This is a generated report. Not always accurate.
@@ -587,8 +587,8 @@ Didn't detect any risks. Always do your own due diligence!
 🪙 *Token:* ${tokenInfo.name} (${tokenInfo.symbol})
 ${
   liquidityInfo.dex === "Unknown"
-    ? "🚨 *Liquidity Information Unavailable* ❌\n"
-    : "📊 *DEX:* ${liquidityInfo.dex}: ${liquidityInfo.pairName}"
+    ? "🚨 *Liquidity Information Unavailable* ❌"
+    : `📊 *DEX:* ${liquidityInfo.dex}: ${liquidityInfo.pairName}`
 }
 💰 *LQ:* $${liquidityInfo.liquidityUsd.toLocaleString()} (${
       liquidityInfo.liquidityPercent
