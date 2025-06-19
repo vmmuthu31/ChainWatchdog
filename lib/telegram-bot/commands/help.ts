@@ -42,19 +42,26 @@ export async function handleHelpCommand(
   const helpMessage = `
 🔐 *RUGPROOFAI SECURITY BOT*
 
-*Available Commands:*
-
-� *QUICK ANALYSIS*
+*🚀 INSTANT ANALYSIS*
 Simply paste any token address directly into the chat!
 *Example:* \`0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE\`
 
-� *WALLET ANALYSIS*
-\`/scan <wallet_address> [chain_id]\`
-Analyze a wallet for spam tokens, scams, and security risks
+*Available Commands:*
 
-� *TOKEN SECURITY*
-\`/honeypot <token_address> [chain_id]\`
-Check if a token is a honeypot trap or has selling restrictions
+🧪 *COMPREHENSIVE TOKEN ANALYSIS*
+\`/scan <token_address>\` or \`/honeypot <token_address>\`
+\`/analyze <token_address>\` or \`/token <token_address>\`
+• Auto-detects network (Ethereum, BSC, Base, Solana, etc.)
+• Honeypot detection with buy/sell simulation
+• Contract verification status
+• Top holder analysis
+• Liquidity pool information
+• Tax analysis (buy/sell fees)
+• Security risk assessment
+
+👤 *WALLET ANALYSIS*
+\`/scanwallet <wallet_address> [chain_id]\`
+Analyze a wallet for spam tokens, scams, and security risks
 
 🛡️ *CONTRACT AUDIT*
 \`/contract <contract_address> [chain_id]\`
@@ -65,18 +72,24 @@ Audit smart contract security and identify potential risks
 \`/start\` - Initialize the bot
 \`/networks\` - List all supported networks
 
-*Supported Networks:*
-• *Major Networks:* ${mainnetChains.join(", ")}
-• *Additional Networks:* And many more!
+*🌐 Supported Networks:*
+• *Auto-Detection:* Ethereum, BSC, Base, Polygon, Solana
+• *Manual Selection:* ${mainnetChains.join(", ")}
 
-*Examples:*
-\`/scan 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\` - Scan Vitalik's wallet on Ethereum
-\`/honeypot 0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE SHIB eth-mainnet\` - Check if SHIB is safe
-\`/contract 0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0 matic-mainnet\` - Audit the MATIC contract
+*📋 Examples:*
+• \`0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE\` - Quick SHIB analysis
+• \`/scan 0x1234...\` - Comprehensive token analysis
+• \`/scanwallet 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\` - Scan Vitalik's wallet
+
+*🔍 What You Get:*
+✅ Honeypot Detection ✅ Liquidity Analysis
+✅ Tax Information ✅ Holder Distribution  
+✅ Contract Verification ✅ Security Risks
+✅ Multi-Chain Support ✅ Real-time Data
 
 ⚠️ *DISCLAIMER:* This bot provides automated analysis only. Always conduct your own research before making investment decisions.
 
-_RugProofAI - Keeping your crypto safe_
+_RugProofAI - Advanced DeFi Security Analysis_
 `;
 
   await bot.sendMessage(chatId, helpMessage, { parse_mode: "Markdown" });

@@ -18,7 +18,7 @@ async function handleDirectAddressInput(
   bot: TelegramBot,
   text: string,
   message: TelegramBot.Message
-): Promise<void> {
+): Promise<boolean> {
   const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
   const solanaAddressRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
@@ -26,9 +26,10 @@ async function handleDirectAddressInput(
   const isSolana = solanaAddressRegex.test(text);
 
   if (!isEvm && !isSolana) {
-    return;
+    return false; // Not a valid address
   }
 
+  // Treat direct address as honeypot command
   const ctx: BotContext = {
     message,
     command: "honeypot",
@@ -36,6 +37,7 @@ async function handleDirectAddressInput(
   };
 
   await handleHoneypotCommand(bot, ctx);
+  return true; // Address was handled
 }
 
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
@@ -91,7 +93,20 @@ bot.on("message", async (message) => {
             `Unknown command. Type /help to see available commands.`
           );
         } else if (text.trim() !== "") {
-          await handleDirectAddressInput(bot, text.trim(), message);
+          // Try to handle as direct address input
+          const wasHandled = await handleDirectAddressInput(
+            bot,
+            text.trim(),
+            message
+          );
+
+          // If not a valid address, ignore the message (don't respond to regular chat)
+          if (!wasHandled) {
+            // Optionally, you could add a subtle hint for first-time users
+            console.log(
+              `Ignored non-address message: ${text.substring(0, 20)}...`
+            );
+          }
         }
         break;
     }

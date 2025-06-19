@@ -12,23 +12,33 @@ export async function handleStartCommand(
   const welcomeMessage = `
 👋 Hello, ${firstName}! 
 
-Welcome to *RugProofAI Bot* - your crypto security assistant.
+Welcome to *RugProofAI Bot* - your advanced crypto security assistant.
 
-I can help you:
-• 🔍 Scan wallets for spam tokens
-• 🔎 Check if a contract is a honeypot
-• ⚠️ Analyze contract security
+*🚀 INSTANT ANALYSIS - Just paste any address!*
+Example: \`0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE\`
 
-*Quick Analysis:*
-Simply paste any Ethereum or Solana token address directly into the chat for instant analysis!
+*What I can do for you:*
+🧪 *Comprehensive Token Analysis*
+• Honeypot detection (buy/sell simulation)
+• Contract verification status  
+• Liquidity & holder analysis
+• Tax analysis (fees)
+• Auto-detect network (ETH, BSC, Base, Solana, etc.)
 
-*Detailed Commands:*
-/scan <wallet_address> [chain_id] - Scan a wallet for spam tokens
-/honeypot <token_address> [chain_id] - Check if a token is a honeypot
-/contract <contract_address> [chain_id] - Check contract security
-/help - Show all available commands
+🔍 *Advanced Security Checks*
+• Smart contract auditing
+• Wallet spam token detection
+• Multi-chain support
 
-By default, I'll use Ethereum mainnet, but you can specify a different blockchain by adding the chain ID.
+*Commands Available:*
+\`/scan <address>\` - Full token analysis
+\`/honeypot <address>\` - Quick honeypot check
+\`/scanwallet <address>\` - Wallet security scan
+\`/help\` - Detailed help guide
+
+*💡 Pro Tip:* No commands needed! Just paste any token address and I'll auto-analyze it with comprehensive security data.
+
+Ready to keep your crypto safe? 🛡️
   `;
 
   await bot.sendMessage(chatId, welcomeMessage, { parse_mode: "Markdown" });
