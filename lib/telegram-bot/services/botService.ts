@@ -4,7 +4,7 @@ import {
   HoneypotCheckResult,
   WalletScanResult,
 } from "../types";
-import { ChainInfo } from "@/lib/types";
+import { ChainInfo } from "../../../lib/types";
 
 const supportedChains: ChainInfo[] = [
   {
