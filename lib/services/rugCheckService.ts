@@ -163,7 +163,15 @@ export async function fetchRugCheckTokenReport(
     if (!response.ok) {
       const errorData = await response.text();
       console.error(`RugCheck API error (${response.status}):`, errorData);
-      if (errorData.includes("unable to generate report")) {
+
+      if (
+        response.status === 429 ||
+        errorData.includes("rate limit") ||
+        errorData.includes("unable to generate report")
+      ) {
+        console.log(
+          "RugCheck API rate limited or unavailable, falling back to Helius API"
+        );
         const heliusData = await fetchHeliusTokenMetadata(tokenAddress);
 
         if (heliusData) {

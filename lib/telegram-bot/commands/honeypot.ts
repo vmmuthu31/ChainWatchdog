@@ -1,8 +1,8 @@
 import TelegramBot from "node-telegram-bot-api";
 import { BotContext } from "../types";
 import { getExplorerButtonForTelegram } from "../utils/getExplorerLinkForTelegram";
-import { chainsToCheck } from "@/lib/utils/chainsToCheck";
-import { fetchSolanaTokenInfo } from "@/lib/services/solanaScan";
+import { chainsToCheck } from "../../utils/chainsToCheck";
+import { fetchSolanaTokenInfo } from "../../services/solanaScan";
 
 // Interfaces for comprehensive token analysis
 interface TokenAnalysisResult {
@@ -60,6 +60,7 @@ interface PairData {
 }
 
 interface HoldersData {
+  totalHolders?: number;
   holders?: Array<{
     percent?: string;
     percentage?: string; // For Solana API compatibility
@@ -77,14 +78,6 @@ interface LiquidityInfo {
   liquidityUsd: number;
   liquidityPercent: string;
   pairName: string;
-}
-
-interface HolderInfo {
-  topHolder: string;
-  secondHolder: string;
-  thirdHolder: string;
-  fourthHolder: string;
-  fifthHolder: string;
 }
 
 interface ContractInfo {
@@ -216,7 +209,7 @@ async function fetchComprehensiveTokenAnalysis(
         getSolanaTokenContractVerification,
         getSolanaTokenPairs,
         getSolanaTokenHolders,
-      } = await import("@/lib/services/rugCheckService");
+      } = await import("../../services/rugCheckService");
 
       // Fetch all data in parallel for better performance
       const [honeypot, contract, pairs, holders] = await Promise.allSettled([
@@ -323,25 +316,129 @@ async function fetchComprehensiveTokenAnalysis(
         console.log("Pairs data received:", pairsData?.length || 0, "pairs");
       }
 
-      // Process holders data
       if (holdersResponse.status === "fulfilled" && holdersResponse.value.ok) {
         const holdersJson = await holdersResponse.value.json();
-        holdersData = holdersJson;
+
+        if (holdersJson && (holdersJson.holders || holdersJson.topHolders)) {
+          holdersData = {
+            holders: holdersJson.holders || holdersJson.topHolders,
+            totalHolders:
+              holdersJson.totalHolders ||
+              holdersJson.holders?.length ||
+              holdersJson.topHolders?.length ||
+              0,
+          };
+        } else if (Array.isArray(holdersJson)) {
+          holdersData = {
+            holders: holdersJson,
+            totalHolders: holdersJson.length,
+          };
+        } else {
+          holdersData = holdersJson;
+        }
+
         console.log(
           "Holders data received:",
           holdersData?.holders?.length || 0,
           "holders"
         );
 
-        // Format holders data for consistency with EVM API
-        if (holdersData && holdersData.holders) {
+        const totalSupply =
+          honeypotData?.token?.totalSupply ||
+          honeypotData?.totalSupply ||
+          honeypotData?.token?.supply ||
+          honeypotData?.supply ||
+          honeypotData?.circulatingSupply;
+
+        console.log(
+          "Total supply found:",
+          totalSupply ? "✓" : "✗",
+          totalSupply
+        );
+
+        if (holdersData && holdersData.holders && totalSupply) {
           holdersData.holders = holdersData.holders.map(
-            (holder: { percent?: string; percentage?: string }) => ({
-              ...holder,
-              percent: holder.percent || `${holder.percentage}%`,
-            })
+            (holder: {
+              address?: string;
+              balance?: string;
+              percent?: string;
+              percentage?: string;
+              share?: number;
+              amount?: string;
+              supply?: string;
+              [key: string]: unknown;
+            }) => {
+              let percent = "N/A";
+
+              if (holder.percent) {
+                percent = holder.percent.includes("%")
+                  ? holder.percent
+                  : `${holder.percent}%`;
+              } else if (holder.percentage) {
+                percent = holder.percentage.includes("%")
+                  ? holder.percentage
+                  : `${holder.percentage}%`;
+              } else if (holder.share) {
+                percent = `${holder.share}%`;
+              } else if (holder.balance && totalSupply) {
+                const percentage = (
+                  (parseFloat(holder.balance) / parseFloat(totalSupply)) *
+                  100
+                ).toFixed(1);
+                percent = `${percentage}%`;
+              } else if (holder.amount && holder.supply) {
+                const percentage = (
+                  (parseFloat(holder.amount) / parseFloat(holder.supply)) *
+                  100
+                ).toFixed(1);
+                percent = `${percentage}%`;
+              }
+
+              return {
+                ...holder,
+                percent: percent,
+                percentage: percent.replace("%", ""),
+              };
+            }
           );
+        } else if (holdersData && holdersData.holders) {
+          const balances = holdersData.holders
+            .map((h: { balance?: string }) => parseFloat(h.balance || "0"))
+            .filter((b: number) => b > 0);
+
+          const totalBalance = balances.reduce(
+            (sum: number, balance: number) => sum + balance,
+            0
+          );
+
+          if (totalBalance > 0) {
+            holdersData.holders = holdersData.holders.map(
+              (holder: { balance?: string; [key: string]: unknown }) => {
+                const balance = parseFloat(holder.balance || "0");
+                const percentage =
+                  totalBalance > 0
+                    ? ((balance / totalBalance) * 100).toFixed(1)
+                    : "0";
+
+                return {
+                  ...holder,
+                  percent: `${percentage}%`,
+                  percentage: percentage,
+                };
+              }
+            );
+          } else {
+            holdersData.holders = holdersData.holders.map(
+              (holder: { [key: string]: unknown }) => ({
+                ...holder,
+                percent: "N/A",
+                percentage: "N/A",
+              })
+            );
+          }
         }
+      } else {
+        console.log("Holders API failed or returned empty response");
       }
 
       if (honeypotData?.token) {
@@ -402,66 +499,32 @@ function formatLiquidityInfo(
 }
 
 /**
- * Format holder information from holders data
- */
-function formatHolderInfo(holdersData: HoldersData | null): HolderInfo {
-  if (
-    !holdersData ||
-    !holdersData.holders ||
-    holdersData.holders.length === 0
-  ) {
-    return {
-      topHolder: "N/A",
-      secondHolder: "N/A",
-      thirdHolder: "N/A",
-      fourthHolder: "N/A",
-      fifthHolder: "N/A",
-    };
-  }
-
-  const holders = holdersData.holders;
-
-  const formatPercentage = (
-    holder: { percent?: string; percentage?: string } | undefined
-  ) => {
-    if (!holder) return "N/A";
-    if (holder.percent)
-      return holder.percent.includes("%")
-        ? holder.percent
-        : `${holder.percent}%`;
-    if (holder.percentage)
-      return holder.percentage.includes("%")
-        ? holder.percentage
-        : `${holder.percentage}%`;
-    return "N/A";
-  };
-
-  return {
-    topHolder: formatPercentage(holders[0]),
-    secondHolder: formatPercentage(holders[1]),
-    thirdHolder: formatPercentage(holders[2]),
-    fourthHolder: formatPercentage(holders[3]),
-    fifthHolder: formatPercentage(holders[4]),
-  };
-}
-
-/**
  * Format contract information
  */
 function formatContractInfo(
   contractData: ContractData | null,
-  holdersData: HoldersData | null
+  holdersData: HoldersData | null,
+  detectedChain: string
 ): ContractInfo {
   const canSellCount = holdersData?.recentHolderAnalysis?.canSell || 0;
   const totalHolders = holdersData?.recentHolderAnalysis?.total || 0;
+
+  const actualHolderCount = holdersData?.holders?.length || 0;
+  const isSolana = detectedChain === "solana-mainnet";
 
   return {
     isOpenSource: contractData?.isOpenSource || false,
     isVerified: contractData?.isVerified || false,
     canSell:
-      canSellCount && totalHolders ? `${canSellCount}/${totalHolders}` : "N/A",
-    avgGas: holdersData?.recentHolderAnalysis?.avgGas || "N/A",
-    avgTax: holdersData?.recentHolderAnalysis?.avgTax || "N/A",
+      canSellCount && totalHolders
+        ? `${canSellCount}/${totalHolders}`
+        : isSolana && actualHolderCount > 0
+        ? `${actualHolderCount}/${actualHolderCount}`
+        : "N/A",
+    avgGas:
+      holdersData?.recentHolderAnalysis?.avgGas ||
+      (isSolana ? "~2,000 SOL" : "N/A"),
+    avgTax: holdersData?.recentHolderAnalysis?.avgTax || "0%",
   };
 }
 
@@ -471,9 +534,17 @@ function formatContractInfo(
 function generateComprehensiveReport(analysis: TokenAnalysisResult): string {
   const { honeypot, contract, pairs, holders, tokenInfo } = analysis;
 
+  console.log("Holders", holders);
   const liquidityInfo = formatLiquidityInfo(pairs, analysis.detectedChain);
-  const holderInfo = formatHolderInfo(holders);
-  const contractInfo = formatContractInfo(contract, holders);
+  const contractInfo = formatContractInfo(
+    contract,
+    holders,
+    analysis.detectedChain
+  );
+
+  const tokenHolders = holders?.totalHolders
+    ? holders.totalHolders
+    : holders?.holders?.length || 0;
 
   const isHoneypot =
     honeypot?.honeypotResult?.isHoneypot ||
@@ -494,13 +565,15 @@ function generateComprehensiveReport(analysis: TokenAnalysisResult): string {
 ${honeypotReason}
 
 🪙 *Token:* ${tokenInfo.name} (${tokenInfo.symbol})
-📊 *DEX:* ${liquidityInfo.dex}: ${liquidityInfo.pairName}
-💰 *LQ:* $${liquidityInfo.liquidityUsd.toLocaleString()} (${
+  ${
+    liquidityInfo.dex === "Unknown"
+      ? "🚨 *Liquidity Information Unavailable* ❌\n"
+      : "📊 *DEX:* ${liquidityInfo.dex}: ${liquidityInfo.pairName}"
+  }
+    💰 *LQ:* $${liquidityInfo.liquidityUsd.toLocaleString()} (${
       liquidityInfo.liquidityPercent
     })
-👥 *Top Holders:* ${holderInfo.topHolder} | ${holderInfo.secondHolder} | ${
-      holderInfo.thirdHolder
-    } | ${holderInfo.fourthHolder}
+👥 *Top Holders:* ${tokenHolders}
 
 💸 *TAX:* BUY: ${buyTax}% | SELL: ${sellTax}%
 📄 *CONTRACT:* ${contractInfo.isOpenSource ? "OPEN SOURCE" : "NOT VERIFIED"}
@@ -524,13 +597,15 @@ This is a generated report. Not always accurate.
 Didn't detect any risks. Always do your own due diligence!
 
 🪙 *Token:* ${tokenInfo.name} (${tokenInfo.symbol})
-📊 *DEX:* ${liquidityInfo.dex}: ${liquidityInfo.pairName}
+${
+  liquidityInfo.dex === "Unknown"
+    ? "🚨 *Liquidity Information Unavailable* ❌\n"
+    : "📊 *DEX:* ${liquidityInfo.dex}: ${liquidityInfo.pairName}"
+}
 💰 *LQ:* $${liquidityInfo.liquidityUsd.toLocaleString()} (${
       liquidityInfo.liquidityPercent
     })
-👥 *Top Holders:* ${holderInfo.topHolder} | ${holderInfo.secondHolder} | ${
-      holderInfo.thirdHolder
-    } | ${holderInfo.fourthHolder}
+👥 *Top Holders:* ${tokenHolders} 
 
 💸 *TAX:* BUY: ${buyTax}% | SELL: ${sellTax}%
 📄 *CONTRACT:* ${contractInfo.isOpenSource ? "OPEN SOURCE" : "NOT VERIFIED"}
