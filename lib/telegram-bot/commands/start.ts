@@ -16,6 +16,7 @@ Welcome to *RugProofAI Bot* - your advanced crypto security assistant.
 
 *🚀 INSTANT ANALYSIS - Just paste any address!*
 Example: \`0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE\`
+Example: \`8R5wXjKyQzZe9ruPi4paXayDzHWmUqMkqwCWayFTpump\`
 
 *What I can do for you:*
 🧪 *Comprehensive Token Analysis*
@@ -36,7 +37,7 @@ Example: \`0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE\`
 \`/scanwallet <address>\` - Wallet security scan
 \`/help\` - Detailed help guide
 
-*💡 Pro Tip:* No commands needed! Just paste any token address and I'll auto-analyze it with comprehensive security data.
+*💡 Pro Tip:* No commands needed! Just paste any token address (EVM or Solana) and I'll auto-analyze it with comprehensive security data from honeypot.is API (EVM) and rugcheck.xyz API (Solana).
 
 Ready to keep your crypto safe? 🛡️
   `;

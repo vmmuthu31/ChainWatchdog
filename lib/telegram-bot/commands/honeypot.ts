@@ -50,11 +50,19 @@ interface PairData {
     usd?: number;
   };
   pairName?: string;
+  // Solana specific fields
+  Liquidity?: number;
+  Pair?: {
+    Name?: string;
+    Address?: string;
+  };
+  ChainID?: number;
 }
 
 interface HoldersData {
   holders?: Array<{
     percent?: string;
+    percentage?: string; // For Solana API compatibility
   }>;
   recentHolderAnalysis?: {
     canSell?: number;
@@ -200,6 +208,7 @@ async function fetchComprehensiveTokenAnalysis(
   let tokenInfo = { name: "Unknown", symbol: "UNKNOWN", decimals: 18 };
 
   if (isSolanaAddress) {
+    console.log(`Analyzing Solana token: ${address}`);
     try {
       // Import Solana services
       const {
@@ -217,10 +226,24 @@ async function fetchComprehensiveTokenAnalysis(
         getSolanaTokenHolders(address),
       ]);
 
+      console.log("Solana API responses:", {
+        honeypot: honeypot.status,
+        contract: contract.status,
+        pairs: pairs.status,
+        holders: holders.status,
+      });
+
       honeypotData = honeypot.status === "fulfilled" ? honeypot.value : null;
       contractData = contract.status === "fulfilled" ? contract.value : null;
       pairsData = pairs.status === "fulfilled" ? pairs.value : [];
       holdersData = holders.status === "fulfilled" ? holders.value : null;
+
+      console.log("Solana data processed:", {
+        honeypotData: !!honeypotData,
+        contractData: !!contractData,
+        pairsCount: pairsData?.length || 0,
+        holdersCount: holdersData?.holders?.length || 0,
+      });
 
       if (honeypotData?.token) {
         tokenInfo = {
@@ -233,42 +256,93 @@ async function fetchComprehensiveTokenAnalysis(
       console.error("Error fetching Solana data:", error);
     }
   } else if (isEvmAddress) {
-    const numericChainId =
-      chainId === "solana-mainnet"
-        ? "1"
-        : chainId.includes("-")
-        ? chainId.split("-")[0] === "eth"
-          ? "1"
-          : chainId.split("-")[0] === "bsc"
-          ? "56"
-          : chainId.split("-")[0] === "matic"
-          ? "137"
-          : chainId.split("-")[0] === "base"
-          ? "8453"
-          : "1"
-        : chainId;
+    const numericChainId = chainId === "solana-mainnet" ? "1" : chainId;
+
+    console.log(`Analyzing EVM token ${address} on chain ${numericChainId}`);
 
     try {
       // Fetch all EVM data in parallel
-      const [honeypot, contract, pairs, holders] = await Promise.allSettled([
+      const [
+        honeypotResponse,
+        contractResponse,
+        pairsResponse,
+        holdersResponse,
+      ] = await Promise.allSettled([
         fetch(
           `https://api.honeypot.is/v2/IsHoneypot?address=${address}&chainID=${numericChainId}`
-        ).then((r) => (r.ok ? r.json() : null)),
+        ),
         fetch(
           `https://api.honeypot.is/v2/GetContractVerification?address=${address}&chainID=${numericChainId}`
-        ).then((r) => (r.ok ? r.json() : null)),
+        ),
         fetch(
           `https://api.honeypot.is/v1/GetPairs?address=${address}&chainID=${numericChainId}`
-        ).then((r) => (r.ok ? r.json() : null)),
+        ),
         fetch(
           `https://api.honeypot.is/v1/TopHolders?address=${address}&chainID=${numericChainId}`
-        ).then((r) => (r.ok ? r.json() : null)),
+        ),
       ]);
 
-      honeypotData = honeypot.status === "fulfilled" ? honeypot.value : null;
-      contractData = contract.status === "fulfilled" ? contract.value : null;
-      pairsData = pairs.status === "fulfilled" ? pairs.value : [];
-      holdersData = holders.status === "fulfilled" ? holders.value : null;
+      console.log("API responses status:", {
+        honeypot: honeypotResponse.status,
+        contract: contractResponse.status,
+        pairs: pairsResponse.status,
+        holders: holdersResponse.status,
+      });
+
+      // Process honeypot data
+      if (
+        honeypotResponse.status === "fulfilled" &&
+        honeypotResponse.value.ok
+      ) {
+        honeypotData = await honeypotResponse.value.json();
+        console.log("Honeypot data received:", honeypotData ? "✓" : "✗");
+      } else {
+        console.log(
+          "Honeypot API failed:",
+          honeypotResponse.status === "fulfilled"
+            ? honeypotResponse.value.status
+            : "Promise rejected"
+        );
+      }
+
+      // Process contract data
+      if (
+        contractResponse.status === "fulfilled" &&
+        contractResponse.value.ok
+      ) {
+        contractData = await contractResponse.value.json();
+        console.log("Contract data received:", contractData ? "✓" : "✗");
+      }
+
+      // Process pairs data
+      if (pairsResponse.status === "fulfilled" && pairsResponse.value.ok) {
+        const pairsJson = await pairsResponse.value.json();
+        pairsData = Array.isArray(pairsJson)
+          ? pairsJson
+          : pairsJson.pairs || [];
+        console.log("Pairs data received:", pairsData?.length || 0, "pairs");
+      }
+
+      // Process holders data
+      if (holdersResponse.status === "fulfilled" && holdersResponse.value.ok) {
+        const holdersJson = await holdersResponse.value.json();
+        holdersData = holdersJson;
+        console.log(
+          "Holders data received:",
+          holdersData?.holders?.length || 0,
+          "holders"
+        );
+
+        // Format holders data for consistency with EVM API
+        if (holdersData && holdersData.holders) {
+          holdersData.holders = holdersData.holders.map(
+            (holder: { percent?: string; percentage?: string }) => ({
+              ...holder,
+              percent: holder.percent || `${holder.percentage}%`,
+            })
+          );
+        }
+      }
 
       if (honeypotData?.token) {
         tokenInfo = {
@@ -295,22 +369,35 @@ async function fetchComprehensiveTokenAnalysis(
 /**
  * Format liquidity information from pairs data
  */
-function formatLiquidityInfo(pairsData: PairData[]): LiquidityInfo {
+function formatLiquidityInfo(
+  pairsData: PairData[],
+  detectedChain: string
+): LiquidityInfo {
   if (!pairsData || pairsData.length === 0) {
+    const baseCurrency = detectedChain === "solana-mainnet" ? "SOL" : "ETH";
     return {
       dex: "Unknown",
       liquidityUsd: 0,
-      liquidityPercent: "0%",
-      pairName: "UNKNOWN-ETH",
+      liquidityPercent: "N/A",
+      pairName: `UNKNOWN-${baseCurrency}`,
     };
   }
 
   const mainPair = pairsData[0];
+  const liquidityUsd = mainPair.liquidity?.usd || mainPair.Liquidity || 0;
+  const dexName =
+    mainPair.dexName ||
+    (detectedChain === "solana-mainnet" ? "Raydium" : "Uniswap V2");
+  const pairName =
+    mainPair.pairName ||
+    mainPair.Pair?.Name ||
+    `UNKNOWN-${detectedChain === "solana-mainnet" ? "SOL" : "ETH"}`;
+
   return {
-    dex: mainPair.dexName || "Uniswap V2",
-    liquidityUsd: mainPair.liquidity?.usd || 0,
-    liquidityPercent: "8.3%", // This would need to be calculated based on total supply
-    pairName: mainPair.pairName || "UNKNOWN-ETH",
+    dex: dexName,
+    liquidityUsd: liquidityUsd,
+    liquidityPercent: "N/A", // Can't calculate without total supply and price data
+    pairName: pairName,
   };
 }
 
@@ -324,21 +411,37 @@ function formatHolderInfo(holdersData: HoldersData | null): HolderInfo {
     holdersData.holders.length === 0
   ) {
     return {
-      topHolder: "3%",
-      secondHolder: "2%",
-      thirdHolder: "2%",
-      fourthHolder: "1%",
-      fifthHolder: "1%",
+      topHolder: "N/A",
+      secondHolder: "N/A",
+      thirdHolder: "N/A",
+      fourthHolder: "N/A",
+      fifthHolder: "N/A",
     };
   }
 
   const holders = holdersData.holders;
+
+  const formatPercentage = (
+    holder: { percent?: string; percentage?: string } | undefined
+  ) => {
+    if (!holder) return "N/A";
+    if (holder.percent)
+      return holder.percent.includes("%")
+        ? holder.percent
+        : `${holder.percent}%`;
+    if (holder.percentage)
+      return holder.percentage.includes("%")
+        ? holder.percentage
+        : `${holder.percentage}%`;
+    return "N/A";
+  };
+
   return {
-    topHolder: holders[0]?.percent || "3%",
-    secondHolder: holders[1]?.percent || "2%",
-    thirdHolder: holders[2]?.percent || "2%",
-    fourthHolder: holders[3]?.percent || "1%",
-    fifthHolder: holders[4]?.percent || "1%",
+    topHolder: formatPercentage(holders[0]),
+    secondHolder: formatPercentage(holders[1]),
+    thirdHolder: formatPercentage(holders[2]),
+    fourthHolder: formatPercentage(holders[3]),
+    fifthHolder: formatPercentage(holders[4]),
   };
 }
 
@@ -349,15 +452,16 @@ function formatContractInfo(
   contractData: ContractData | null,
   holdersData: HoldersData | null
 ): ContractInfo {
-  const canSellCount = holdersData?.recentHolderAnalysis?.canSell || 99;
-  const totalHolders = holdersData?.recentHolderAnalysis?.total || 99;
+  const canSellCount = holdersData?.recentHolderAnalysis?.canSell || 0;
+  const totalHolders = holdersData?.recentHolderAnalysis?.total || 0;
 
   return {
     isOpenSource: contractData?.isOpenSource || false,
     isVerified: contractData?.isVerified || false,
-    canSell: `${canSellCount}/${totalHolders}`,
-    avgGas: holdersData?.recentHolderAnalysis?.avgGas || "132,325",
-    avgTax: holdersData?.recentHolderAnalysis?.avgTax || "0%",
+    canSell:
+      canSellCount && totalHolders ? `${canSellCount}/${totalHolders}` : "N/A",
+    avgGas: holdersData?.recentHolderAnalysis?.avgGas || "N/A",
+    avgTax: holdersData?.recentHolderAnalysis?.avgTax || "N/A",
   };
 }
 
@@ -367,7 +471,7 @@ function formatContractInfo(
 function generateComprehensiveReport(analysis: TokenAnalysisResult): string {
   const { honeypot, contract, pairs, holders, tokenInfo } = analysis;
 
-  const liquidityInfo = formatLiquidityInfo(pairs);
+  const liquidityInfo = formatLiquidityInfo(pairs, analysis.detectedChain);
   const holderInfo = formatHolderInfo(holders);
   const contractInfo = formatContractInfo(contract, holders);
 

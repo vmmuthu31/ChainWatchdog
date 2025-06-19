@@ -4,6 +4,33 @@ const RUGCHECK_API_URL = "https://api.rugcheck.xyz/v1";
 const HELIUS_API_URL = "https://api.helius.xyz/v0";
 const HELIUS_API_KEY = "b477781a-99e7-41be-972e-1942d84d0669";
 
+async function fetchHeliusTokenHolders(
+  tokenAddress: string
+): Promise<any | null> {
+  try {
+    const response = await fetch(
+      `${HELIUS_API_URL}/addresses/${tokenAddress}/balances?api-key=${HELIUS_API_KEY}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.error("Helius holders API error:", response.statusText);
+      return null;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching holders from Helius API:", error);
+    return null;
+  }
+}
+
 async function fetchHeliusTokenMetadata(
   tokenAddress: string
 ): Promise<any | null> {
@@ -382,7 +409,36 @@ export async function getSolanaTokenHolders(tokenAddress: string) {
     const report = await fetchRugCheckTokenReport(tokenAddress);
 
     if (!report) {
-      throw new Error("Failed to fetch RugCheck token report");
+      // Fallback to Helius API for holder data
+      console.log("Falling back to Helius API for holder data");
+      const heliusHolders = await fetchHeliusTokenHolders(tokenAddress);
+
+      if (heliusHolders && heliusHolders.tokens) {
+        return {
+          holders: heliusHolders.tokens.slice(0, 10).map((token: any) => ({
+            address: token.owner,
+            balance: token.amount.toString(),
+            alias: "",
+            percent: `${(
+              (token.amount / heliusHolders.total_supply) *
+              100
+            ).toFixed(1)}%`,
+            percentage: (
+              (token.amount / heliusHolders.total_supply) *
+              100
+            ).toString(),
+            isContract: false,
+            isInsider: false,
+            uiAmount: token.amount,
+            uiAmountString: token.amount.toString(),
+          })),
+          totalSupply: heliusHolders.total_supply?.toString() || "0",
+        };
+      }
+
+      throw new Error(
+        "Failed to fetch RugCheck token report and Helius fallback failed"
+      );
     }
 
     return {
@@ -390,7 +446,8 @@ export async function getSolanaTokenHolders(tokenAddress: string) {
         address: holder.owner,
         balance: holder.amount.toString(),
         alias: report.knownAccounts[holder.owner]?.name || "",
-        percentage: holder.pct.toString(),
+        percent: `${holder.pct.toFixed(1)}%`, // Format as percentage string
+        percentage: holder.pct.toString(), // Keep raw number for compatibility
         isContract: false,
         isInsider: holder.insider,
         uiAmount: holder.uiAmount,
