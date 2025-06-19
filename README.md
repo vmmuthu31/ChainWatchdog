@@ -2,7 +2,7 @@
 
 RugProof is an advanced blockchain security and analytics platform designed to help users identify and protect against crypto scams, spam tokens, and honeypots across multiple blockchains. With a powerful combination of AI and blockchain analytics, it provides real-time scanning and threat detection capabilities.
 
-![RugProof](https://github.com/user-attachments/assets/cd09f5c5-a7c8-4140-b40f-ee4653d4bf68)
+![RugProof](https://github.com/user-attachments/assets/fa83e72e-ad95-4c72-a250-fbf20d5afaeb)
 
 ## Features
 
