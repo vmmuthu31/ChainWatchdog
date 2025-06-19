@@ -32,8 +32,9 @@ Example: \`8R5wXjKyQzZe9ruPi4paXayDzHWmUqMkqwCWayFTpump\`
 • Multi-chain support
 
 *Commands Available:*
-\`/scanwallet <address>\` - Wallet security scan
+\`/scan <address>\` - Wallet security scan
 \`/honeypot <address>\` - Quick honeypot check
+\`/believe <address>\` - Scan a Believe token
 \`/networks\` - List supported networks
 \`/help\` - Detailed help guide
 
