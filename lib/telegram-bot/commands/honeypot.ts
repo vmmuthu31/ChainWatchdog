@@ -195,7 +195,6 @@ async function fetchComprehensiveTokenAnalysis(
   let tokenInfo = { name: "Unknown", symbol: "UNKNOWN", decimals: 18 };
 
   if (isSolanaAddress) {
-    console.log(`Analyzing Solana token: ${address}`);
     try {
       const {
         getSolanaTokenHoneypotAnalysis,
@@ -211,24 +210,10 @@ async function fetchComprehensiveTokenAnalysis(
         getSolanaTokenHolders(address),
       ]);
 
-      console.log("Solana API responses:", {
-        honeypot: honeypot.status,
-        contract: contract.status,
-        pairs: pairs.status,
-        holders: holders.status,
-      });
-
       honeypotData = honeypot.status === "fulfilled" ? honeypot.value : null;
       contractData = contract.status === "fulfilled" ? contract.value : null;
       pairsData = pairs.status === "fulfilled" ? pairs.value : [];
       holdersData = holders.status === "fulfilled" ? holders.value : null;
-
-      console.log("Solana data processed:", {
-        honeypotData: !!honeypotData,
-        contractData: !!contractData,
-        pairsCount: pairsData?.length || 0,
-        holdersCount: holdersData?.holders?.length || 0,
-      });
 
       if (honeypotData?.token) {
         tokenInfo = {
@@ -242,8 +227,6 @@ async function fetchComprehensiveTokenAnalysis(
     }
   } else if (isEvmAddress) {
     const numericChainId = chainId === "solana-mainnet" ? "1" : chainId;
-
-    console.log(`Analyzing EVM token ${address} on chain ${numericChainId}`);
 
     try {
       const [
@@ -266,21 +249,13 @@ async function fetchComprehensiveTokenAnalysis(
         ),
       ]);
 
-      console.log("API responses status:", {
-        honeypot: honeypotResponse.status,
-        contract: contractResponse.status,
-        pairs: pairsResponse.status,
-        holders: holdersResponse.status,
-      });
-
       if (
         honeypotResponse.status === "fulfilled" &&
         honeypotResponse.value.ok
       ) {
         honeypotData = await honeypotResponse.value.json();
-        console.log("Honeypot data received:", honeypotData ? "✓" : "✗");
       } else {
-        console.log(
+        console.info(
           "Honeypot API failed:",
           honeypotResponse.status === "fulfilled"
             ? honeypotResponse.value.status
@@ -293,7 +268,6 @@ async function fetchComprehensiveTokenAnalysis(
         contractResponse.value.ok
       ) {
         contractData = await contractResponse.value.json();
-        console.log("Contract data received:", contractData ? "✓" : "✗");
       }
 
       if (pairsResponse.status === "fulfilled" && pairsResponse.value.ok) {
@@ -301,7 +275,6 @@ async function fetchComprehensiveTokenAnalysis(
         pairsData = Array.isArray(pairsJson)
           ? pairsJson
           : pairsJson.pairs || [];
-        console.log("Pairs data received:", pairsData?.length || 0, "pairs");
       }
 
       if (holdersResponse.status === "fulfilled" && holdersResponse.value.ok) {
@@ -325,24 +298,12 @@ async function fetchComprehensiveTokenAnalysis(
           holdersData = holdersJson;
         }
 
-        console.log(
-          "Holders data received:",
-          holdersData?.holders?.length || 0,
-          "holders"
-        );
-
         const totalSupply =
           honeypotData?.token?.totalSupply ||
           honeypotData?.totalSupply ||
           honeypotData?.token?.supply ||
           honeypotData?.supply ||
           honeypotData?.circulatingSupply;
-
-        console.log(
-          "Total supply found:",
-          totalSupply ? "✓" : "✗",
-          totalSupply
-        );
 
         if (holdersData && holdersData.holders && totalSupply) {
           holdersData.holders = holdersData.holders.map(
@@ -426,7 +387,7 @@ async function fetchComprehensiveTokenAnalysis(
           }
         }
       } else {
-        console.log("Holders API failed or returned empty response");
+        console.info("Holders API failed or returned empty response");
       }
 
       if (honeypotData?.token) {
@@ -522,7 +483,6 @@ function formatContractInfo(
 function generateComprehensiveReport(analysis: TokenAnalysisResult): string {
   const { honeypot, contract, pairs, holders, tokenInfo } = analysis;
 
-  console.log("Holders", holders);
   const liquidityInfo = formatLiquidityInfo(pairs, analysis.detectedChain);
   const contractInfo = formatContractInfo(
     contract,

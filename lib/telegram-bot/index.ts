@@ -99,7 +99,7 @@ bot.on("message", async (message) => {
           );
 
           if (!wasHandled) {
-            console.log(
+            console.info(
               `Ignored non-address message: ${text.substring(0, 20)}...`
             );
           }
