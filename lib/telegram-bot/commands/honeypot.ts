@@ -4,7 +4,6 @@ import { getExplorerButtonForTelegram } from "../utils/getExplorerLinkForTelegra
 import { chainsToCheck } from "../../utils/chainsToCheck";
 import { fetchSolanaTokenInfo } from "../../services/solanaScan";
 
-// Interfaces for comprehensive token analysis
 interface TokenAnalysisResult {
   honeypot: HoneypotData | null;
   contract: ContractData | null;
@@ -50,7 +49,6 @@ interface PairData {
     usd?: number;
   };
   pairName?: string;
-  // Solana specific fields
   Liquidity?: number;
   Pair?: {
     Name?: string;
@@ -63,7 +61,7 @@ interface HoldersData {
   totalHolders?: number;
   holders?: Array<{
     percent?: string;
-    percentage?: string; // For Solana API compatibility
+    percentage?: string;
   }>;
   recentHolderAnalysis?: {
     canSell?: number;
@@ -93,7 +91,6 @@ interface ContractInfo {
  */
 async function detectChain(address: string): Promise<string | null> {
   try {
-    // Check if it's a Solana address
     const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
     if (solanaRegex.test(address)) {
       try {
@@ -105,13 +102,11 @@ async function detectChain(address: string): Promise<string | null> {
       }
     }
 
-    // Check if it's an EVM address
     const evmAddressRegex = /^0x[a-fA-F0-9]{40}$/;
     if (!evmAddressRegex.test(address)) {
       return null;
     }
 
-    // Try to detect EVM chain by checking contract existence
     for (const chainObj of chainsToCheck) {
       try {
         let apiUrl: string;
@@ -154,7 +149,6 @@ async function detectChain(address: string): Promise<string | null> {
       }
     }
 
-    // Fallback to balance check
     for (const chainObj of chainsToCheck) {
       try {
         if (chainObj.id === "43114") continue;
@@ -177,7 +171,7 @@ async function detectChain(address: string): Promise<string | null> {
       }
     }
 
-    return "1"; // Default to Ethereum mainnet
+    return "1";
   } catch (error) {
     console.error("Error in chain detection:", error);
     return null;
@@ -203,7 +197,6 @@ async function fetchComprehensiveTokenAnalysis(
   if (isSolanaAddress) {
     console.log(`Analyzing Solana token: ${address}`);
     try {
-      // Import Solana services
       const {
         getSolanaTokenHoneypotAnalysis,
         getSolanaTokenContractVerification,
@@ -211,7 +204,6 @@ async function fetchComprehensiveTokenAnalysis(
         getSolanaTokenHolders,
       } = await import("../../services/rugCheckService");
 
-      // Fetch all data in parallel for better performance
       const [honeypot, contract, pairs, holders] = await Promise.allSettled([
         getSolanaTokenHoneypotAnalysis(address),
         getSolanaTokenContractVerification(address),
@@ -242,7 +234,7 @@ async function fetchComprehensiveTokenAnalysis(
         tokenInfo = {
           name: honeypotData.token.name || "Unknown",
           symbol: honeypotData.token.symbol || "UNKNOWN",
-          decimals: 9, // Default Solana decimals
+          decimals: 9,
         };
       }
     } catch (error) {
@@ -254,7 +246,6 @@ async function fetchComprehensiveTokenAnalysis(
     console.log(`Analyzing EVM token ${address} on chain ${numericChainId}`);
 
     try {
-      // Fetch all EVM data in parallel
       const [
         honeypotResponse,
         contractResponse,
@@ -282,7 +273,6 @@ async function fetchComprehensiveTokenAnalysis(
         holders: holdersResponse.status,
       });
 
-      // Process honeypot data
       if (
         honeypotResponse.status === "fulfilled" &&
         honeypotResponse.value.ok
@@ -298,7 +288,6 @@ async function fetchComprehensiveTokenAnalysis(
         );
       }
 
-      // Process contract data
       if (
         contractResponse.status === "fulfilled" &&
         contractResponse.value.ok
@@ -307,7 +296,6 @@ async function fetchComprehensiveTokenAnalysis(
         console.log("Contract data received:", contractData ? "✓" : "✗");
       }
 
-      // Process pairs data
       if (pairsResponse.status === "fulfilled" && pairsResponse.value.ok) {
         const pairsJson = await pairsResponse.value.json();
         pairsData = Array.isArray(pairsJson)
@@ -493,7 +481,7 @@ function formatLiquidityInfo(
   return {
     dex: dexName,
     liquidityUsd: liquidityUsd,
-    liquidityPercent: "N/A", // Can't calculate without total supply and price data
+    liquidityPercent: "N/A",
     pairName: pairName,
   };
 }
@@ -635,7 +623,6 @@ export async function handleHoneypotCommand(
 
   const contractAddress = args[0];
 
-  // Validate address format
   const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
   const solanaAddressRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
@@ -662,25 +649,20 @@ export async function handleHoneypotCommand(
   );
 
   try {
-    // Auto-detect chain
     let detectedChain: string;
     if (args.length > 1) {
       detectedChain = args[1];
     } else {
       const detected = await detectChain(contractAddress);
-      detectedChain = detected || "1"; // Default to Ethereum
+      detectedChain = detected || "1";
     }
 
-    // Fetch comprehensive analysis
     const analysis = await fetchComprehensiveTokenAnalysis(
       contractAddress,
       detectedChain
     );
 
-    // Generate report
     const response = generateComprehensiveReport(analysis);
-
-    // Get explorer button
     const explorerButtons = getExplorerButtonForTelegram(
       detectedChain,
       contractAddress,
@@ -741,7 +723,7 @@ _RugProofAI - Keeping your crypto safe_
 
     try {
       const explorerButtons = getExplorerButtonForTelegram(
-        "1", // Default chain for error case
+        "1",
         contractAddress,
         true
       );

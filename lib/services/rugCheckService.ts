@@ -417,8 +417,6 @@ export async function getSolanaTokenHolders(tokenAddress: string) {
     const report = await fetchRugCheckTokenReport(tokenAddress);
 
     if (!report) {
-      // Fallback to Helius API for holder data
-      console.log("Falling back to Helius API for holder data");
       const heliusHolders = await fetchHeliusTokenHolders(tokenAddress);
 
       if (heliusHolders && heliusHolders.tokens) {
@@ -454,8 +452,8 @@ export async function getSolanaTokenHolders(tokenAddress: string) {
         address: holder.owner,
         balance: holder.amount.toString(),
         alias: report.knownAccounts[holder.owner]?.name || "",
-        percent: `${holder.pct.toFixed(1)}%`, // Format as percentage string
-        percentage: holder.pct.toString(), // Keep raw number for compatibility
+        percent: `${holder.pct.toFixed(1)}%`,
+        percentage: holder.pct.toString(),
         isContract: false,
         isInsider: holder.insider,
         uiAmount: holder.uiAmount,
