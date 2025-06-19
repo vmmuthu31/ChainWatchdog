@@ -32,9 +32,9 @@ Example: \`8R5wXjKyQzZe9ruPi4paXayDzHWmUqMkqwCWayFTpump\`
 • Multi-chain support
 
 *Commands Available:*
-\`/scan <address>\` - Full token analysis
-\`/honeypot <address>\` - Quick honeypot check
 \`/scanwallet <address>\` - Wallet security scan
+\`/honeypot <address>\` - Quick honeypot check
+\`/networks\` - List supported networks
 \`/help\` - Detailed help guide
 
 *💡 Pro Tip:* No commands needed! Just paste any token address (EVM or Solana) and I'll auto-analyze it with comprehensive security data from honeypot.is API (EVM) and rugcheck.xyz API (Solana).

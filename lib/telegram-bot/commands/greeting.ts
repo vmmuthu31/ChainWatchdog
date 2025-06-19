@@ -14,7 +14,7 @@ export async function handleGreeting(
 
 I'm here to help you analyze tokens and wallets across multiple blockchains. Here's what you can do:
 
-• Scan a wallet: \`/scan <address> <chain-id>\`
+• Scan a wallet: \`/scanwallet <address> <chain-id>\`
 • Check a token: \`/honeypot <contract> <chain-id>\`
 • See supported networks: \`/networks\`
 • Get help: \`/help\`
