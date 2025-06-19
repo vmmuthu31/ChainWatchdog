@@ -10,6 +10,7 @@ export function detectCommand(command: string): CommandType {
     case "help":
       return CommandType.HELP;
 
+    case "scan":
     case "scanwallet":
     case "wallet":
       return CommandType.SCAN_WALLET;
@@ -19,7 +20,7 @@ export function detectCommand(command: string): CommandType {
     case "checkcontract":
       return CommandType.CHECK_CONTRACT;
 
-    case "scan":
+    case "believe":
     case "honeypot":
     case "hp":
     case "analyze":
