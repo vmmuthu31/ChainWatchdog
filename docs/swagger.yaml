@@ -1,0 +1,789 @@
+openapi: 3.0.3
+info:
+  title: RugProofAI API
+  description: |
+    RugProofAI provides comprehensive blockchain security analysis APIs for detecting honeypots, rug pulls, and other malicious smart contracts across multiple chains.
+
+    ## Authentication
+    All API requests require authentication using API keys in the Authorization header:
+    `Authorization: Bearer YOUR_API_KEY`
+
+    ## Rate Limits
+    - Free Tier: 10 requests/minute
+    - Developer Plan: 100 requests/minute  
+    - Professional Plan: 500 requests/minute
+    - Enterprise Plan: 2000 requests/minute
+
+    ## Credits
+    Each API call consumes credits based on complexity:
+    - Honeypot Analysis: 1 credit
+    - Contract Verification: 1 credit
+    - Wallet Analysis: 2 credits
+    - Batch Analysis: 1 credit per token
+
+  version: 1.0.0
+  contact:
+    name: RugProofAI Support
+    email: api-support@rugproofai.com
+    url: https://rugproofai.com/support
+  license:
+    name: Commercial License
+    url: https://rugproofai.com/terms
+
+servers:
+  - url: https://api.rugproofai.com/v1
+    description: Production API
+  - url: https://api-staging.rugproofai.com/v1
+    description: Staging API
+
+paths:
+  /analyze/honeypot:
+    post:
+      summary: Analyze Token for Honeypot
+      description: |
+        Detect honeypot tokens and analyze selling restrictions across multiple blockchains.
+
+        This endpoint provides comprehensive analysis including:
+        - Honeypot detection with simulation results
+        - Tax analysis (buy/sell/transfer taxes)
+        - Contract verification status
+        - Liquidity analysis
+        - Holder distribution analysis
+        - Risk flags and recommendations
+      operationId: analyzeHoneypot
+      tags:
+        - Token Analysis
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HoneypotAnalysisRequest"
+            examples:
+              ethereum_token:
+                summary: Ethereum Token Analysis
+                value:
+                  address: "0x1234567890123456789012345678901234567890"
+                  chain: "ethereum"
+              solana_token:
+                summary: Solana Token Analysis
+                value:
+                  address: "7PM5cSQH21GiQnP8MtyPCJ5Ckv2pJu3WHe8YkNx5Arbd"
+                  chain: "solana"
+              auto_detect:
+                summary: Auto-detect Chain
+                value:
+                  address: "0x1234567890123456789012345678901234567890"
+      responses:
+        "200":
+          description: Successful analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HoneypotAnalysisResponse"
+              examples:
+                honeypot_detected:
+                  summary: Honeypot Detected
+                  value:
+                    success: true
+                    data:
+                      address: "0x1234567890123456789012345678901234567890"
+                      chain: "ethereum"
+                      token:
+                        name: "Scam Token"
+                        symbol: "SCAM"
+                        decimals: 18
+                        totalHolders: 1234
+                      risk:
+                        level: "HIGH"
+                        score: 95
+                        isHoneypot: true
+                        reason: "Cannot sell tokens - honeypot detected"
+                      taxes:
+                        buyTax: 5.0
+                        sellTax: 99.0
+                        transferTax: 0.0
+                safe_token:
+                  summary: Safe Token
+                  value:
+                    success: true
+                    data:
+                      address: "0x1234567890123456789012345678901234567890"
+                      chain: "ethereum"
+                      risk:
+                        level: "LOW"
+                        score: 15
+                        isHoneypot: false
+                        reason: "Token appears safe"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /analyze/batch:
+    post:
+      summary: Batch Token Analysis
+      description: Analyze multiple tokens in a single request for efficient bulk processing.
+      operationId: analyzeBatch
+      tags:
+        - Token Analysis
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchAnalysisRequest"
+      responses:
+        "200":
+          description: Successful batch analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchAnalysisResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /analyze/contract:
+    post:
+      summary: Contract Verification Analysis
+      description: Analyze smart contract source code and verification status.
+      operationId: analyzeContract
+      tags:
+        - Contract Analysis
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContractAnalysisRequest"
+      responses:
+        "200":
+          description: Successful contract analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContractAnalysisResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /analyze/wallet:
+    post:
+      summary: Wallet Risk Assessment
+      description: Analyze wallet addresses for suspicious activities and risk factors.
+      operationId: analyzeWallet
+      tags:
+        - Wallet Analysis
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WalletAnalysisRequest"
+      responses:
+        "200":
+          description: Successful wallet analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletAnalysisResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /monitor/subscribe:
+    post:
+      summary: Subscribe to Real-time Monitoring
+      description: Subscribe to real-time alerts for token addresses and suspicious activities.
+      operationId: subscribeMonitoring
+      tags:
+        - Monitoring
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MonitoringSubscriptionRequest"
+      responses:
+        "200":
+          description: Subscription created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonitoringSubscriptionResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /monitor/unsubscribe:
+    delete:
+      summary: Unsubscribe from Monitoring
+      description: Cancel an existing monitoring subscription.
+      operationId: unsubscribeMonitoring
+      tags:
+        - Monitoring
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: subscriptionId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The subscription ID to cancel
+      responses:
+        "200":
+          description: Subscription cancelled successfully
+        "404":
+          description: Subscription not found
+
+  /account/usage:
+    get:
+      summary: Get Account Usage
+      description: Get current account usage statistics and remaining credits.
+      operationId: getAccountUsage
+      tags:
+        - Account
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Account usage information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountUsageResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: API key for authentication
+
+  schemas:
+    HoneypotAnalysisRequest:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          type: string
+          description: Token contract address
+          example: "0x1234567890123456789012345678901234567890"
+        chain:
+          type: string
+          description: Blockchain network (optional, auto-detected if not provided)
+          enum: [ethereum, bsc, polygon, base, avalanche, solana]
+          example: "ethereum"
+
+    HoneypotAnalysisResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/HoneypotAnalysisData"
+        credits_used:
+          type: integer
+          example: 1
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+
+    HoneypotAnalysisData:
+      type: object
+      properties:
+        address:
+          type: string
+          example: "0x1234567890123456789012345678901234567890"
+        chain:
+          type: string
+          example: "ethereum"
+        token:
+          $ref: "#/components/schemas/TokenInfo"
+        risk:
+          $ref: "#/components/schemas/RiskAssessment"
+        taxes:
+          $ref: "#/components/schemas/TaxInfo"
+        contract:
+          $ref: "#/components/schemas/ContractInfo"
+        liquidity:
+          $ref: "#/components/schemas/LiquidityInfo"
+        holders:
+          $ref: "#/components/schemas/HoldersInfo"
+        flags:
+          type: array
+          items:
+            type: string
+          example: ["EXTREMELY_HIGH_SELL_TAX", "UNVERIFIED_CONTRACT"]
+
+    TokenInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Example Token"
+        symbol:
+          type: string
+          example: "EXAMPLE"
+        decimals:
+          type: integer
+          example: 18
+        totalHolders:
+          type: integer
+          example: 1234
+
+    RiskAssessment:
+      type: object
+      properties:
+        level:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+          example: "HIGH"
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 85
+        isHoneypot:
+          type: boolean
+          example: true
+        reason:
+          type: string
+          example: "Cannot sell tokens - honeypot detected"
+
+    TaxInfo:
+      type: object
+      properties:
+        buyTax:
+          type: number
+          format: float
+          example: 5.0
+        sellTax:
+          type: number
+          format: float
+          example: 99.0
+        transferTax:
+          type: number
+          format: float
+          example: 0.0
+
+    ContractInfo:
+      type: object
+      properties:
+        isVerified:
+          type: boolean
+          example: false
+        isOpenSource:
+          type: boolean
+          example: false
+        isProxy:
+          type: boolean
+          example: true
+        hasProxyCalls:
+          type: boolean
+          example: true
+        compiler:
+          type: string
+          example: "0.8.19"
+        optimization:
+          type: boolean
+          example: true
+
+    LiquidityInfo:
+      type: object
+      properties:
+        dex:
+          type: string
+          example: "Uniswap V2"
+        pair:
+          type: string
+          example: "EXAMPLE-ETH"
+        liquidityUsd:
+          type: number
+          format: float
+          example: 15000
+        pairAddress:
+          type: string
+          example: "0x..."
+
+    HoldersInfo:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 1234
+        canSell:
+          type: integer
+          example: 10
+        failed:
+          type: integer
+          example: 1224
+        topHolderPercent:
+          type: number
+          format: float
+          example: 45.2
+
+    BatchAnalysisRequest:
+      type: object
+      required:
+        - tokens
+      properties:
+        tokens:
+          type: array
+          items:
+            type: object
+            properties:
+              address:
+                type: string
+              chain:
+                type: string
+          example:
+            - address: "0x1234..."
+              chain: "ethereum"
+            - address: "0x5678..."
+              chain: "bsc"
+
+    BatchAnalysisResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            results:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  status:
+                    type: string
+                    enum: [analyzed, failed, skipped]
+                  risk:
+                    $ref: "#/components/schemas/RiskAssessment"
+            summary:
+              type: object
+              properties:
+                total:
+                  type: integer
+                high_risk:
+                  type: integer
+                medium_risk:
+                  type: integer
+                low_risk:
+                  type: integer
+                failed:
+                  type: integer
+        credits_used:
+          type: integer
+
+    ContractAnalysisRequest:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          type: string
+        chain:
+          type: string
+
+    ContractAnalysisResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            address:
+              type: string
+            isVerified:
+              type: boolean
+            isOpenSource:
+              type: boolean
+            compiler:
+              type: string
+            optimization:
+              type: boolean
+            securityRisks:
+              type: object
+              properties:
+                hasMintFunction:
+                  type: boolean
+                hasBurnFunction:
+                  type: boolean
+                hasOwnerPrivileges:
+                  type: boolean
+                hasPausableFunction:
+                  type: boolean
+                hasUpgradeableProxy:
+                  type: boolean
+            auditScore:
+              type: integer
+            recommendations:
+              type: array
+              items:
+                type: string
+        credits_used:
+          type: integer
+
+    WalletAnalysisRequest:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          type: string
+        chain:
+          type: string
+
+    WalletAnalysisResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            address:
+              type: string
+            riskScore:
+              type: integer
+            riskLevel:
+              type: string
+            activities:
+              type: object
+              properties:
+                totalTransactions:
+                  type: integer
+                suspiciousTransactions:
+                  type: integer
+                interactedWithScams:
+                  type: integer
+                rugPullParticipation:
+                  type: integer
+            tokens:
+              type: object
+              properties:
+                total:
+                  type: integer
+                suspicious:
+                  type: integer
+                verified:
+                  type: integer
+            reputation:
+              type: object
+              properties:
+                isBlacklisted:
+                  type: boolean
+                isWhitelisted:
+                  type: boolean
+                trustScore:
+                  type: integer
+        credits_used:
+          type: integer
+
+    MonitoringSubscriptionRequest:
+      type: object
+      required:
+        - addresses
+        - alertTypes
+        - webhook
+      properties:
+        addresses:
+          type: array
+          items:
+            type: string
+        chains:
+          type: array
+          items:
+            type: string
+        alertTypes:
+          type: array
+          items:
+            type: string
+            enum:
+              [
+                honeypot_detected,
+                rug_pull,
+                high_sell_tax,
+                contract_changed,
+                large_holder_dump,
+              ]
+        webhook:
+          type: string
+          format: uri
+
+    MonitoringSubscriptionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            subscriptionId:
+              type: string
+            status:
+              type: string
+            addresses:
+              type: integer
+            estimatedCreditsPerDay:
+              type: integer
+
+    AccountUsageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            plan:
+              type: string
+              example: "Professional"
+            credits:
+              type: object
+              properties:
+                remaining:
+                  type: integer
+                  example: 15000
+                total:
+                  type: integer
+                  example: 25000
+                used:
+                  type: integer
+                  example: 10000
+                resetDate:
+                  type: string
+                  format: date-time
+            usage:
+              type: object
+              properties:
+                today:
+                  type: integer
+                thisMonth:
+                  type: integer
+                rateLimit:
+                  type: object
+                  properties:
+                    limit:
+                      type: integer
+                      example: 500
+                    remaining:
+                      type: integer
+                      example: 450
+                    resetTime:
+                      type: string
+                      format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: string
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            error:
+              code: "INVALID_ADDRESS"
+              message: "Invalid contract address format"
+              details: "Address must be a valid hex address starting with 0x"
+
+    Unauthorized:
+      description: Unauthorized - invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            error:
+              code: "UNAUTHORIZED"
+              message: "Invalid API key"
+              details: "Please provide a valid API key in the Authorization header"
+
+    RateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            error:
+              code: "RATE_LIMITED"
+              message: "Rate limit exceeded"
+              details: "You have exceeded your rate limit. Please try again later."
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            error:
+              code: "INTERNAL_ERROR"
+              message: "Internal server error"
+              details: "An unexpected error occurred. Please try again later."
+
+tags:
+  - name: Token Analysis
+    description: Analyze tokens for honeypots and security risks
+  - name: Contract Analysis
+    description: Analyze smart contracts for verification and security
+  - name: Wallet Analysis
+    description: Analyze wallet addresses for risk assessment
+  - name: Monitoring
+    description: Real-time monitoring and alerting
+  - name: Account
+    description: Account management and usage statistics
