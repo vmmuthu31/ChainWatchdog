@@ -38,8 +38,6 @@ Example: \`8R5wXjKyQzZe9ruPi4paXayDzHWmUqMkqwCWayFTpump\`
 \`/networks\` - List supported networks
 \`/help\` - Detailed help guide
 
-*💡 Pro Tip:* No commands needed! Just paste any token address (EVM or Solana) and I'll auto-analyze it with comprehensive security data from honeypot.is API (EVM) and rugcheck.xyz API (Solana).
-
 Ready to keep your crypto safe? 🛡️
   `;
 

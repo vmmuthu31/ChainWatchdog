@@ -1,89 +1,36 @@
 import TelegramBot from "node-telegram-bot-api";
-import { BotContext } from "../types";
+import {
+  BotContext,
+  ContractData,
+  ContractInfo,
+  HoldersData,
+  HoneypotData,
+  LiquidityInfo,
+  PairData,
+  TokenAnalysisResult,
+} from "../types";
 import { getExplorerButtonForTelegram } from "../utils/getExplorerLinkForTelegram";
 import { chainsToCheck } from "../../utils/chainsToCheck";
 import { fetchSolanaTokenInfo } from "../../services/solanaScan";
 
-interface TokenAnalysisResult {
-  honeypot: HoneypotData | null;
-  contract: ContractData | null;
-  pairs: PairData[];
-  holders: HoldersData | null;
-  detectedChain: string;
-  tokenInfo: {
-    name: string;
-    symbol: string;
-    decimals?: number;
-  };
+/**
+ * Format percentage with proper rounding
+ */
+function formatPercentage(num: number | string | undefined): string {
+  if (num === undefined || num === null) return "0%";
+  const number = typeof num === "string" ? parseFloat(num) : num;
+  if (isNaN(number)) return "0%";
+  return `${Math.round(number * 100) / 100}%`;
 }
 
-interface HoneypotData {
-  honeypotResult?: {
-    isHoneypot: boolean;
-    honeypotReason?: string;
-  };
-  simulationResult?: {
-    buyTax?: number;
-    sellTax?: number;
-  };
-  summary?: {
-    risk?: string;
-    riskReason?: string;
-  };
-  flags?: string[];
-  token?: {
-    name?: string;
-    symbol?: string;
-    decimals?: number;
-  };
-}
-
-interface ContractData {
-  isOpenSource?: boolean;
-  isVerified?: boolean;
-}
-
-interface PairData {
-  dexName?: string;
-  liquidity?: {
-    usd?: number;
-  };
-  pairName?: string;
-  Liquidity?: number;
-  Pair?: {
-    Name?: string;
-    Address?: string;
-  };
-  ChainID?: number;
-}
-
-interface HoldersData {
-  totalHolders?: number;
-  holders?: Array<{
-    percent?: string;
-    percentage?: string;
-  }>;
-  recentHolderAnalysis?: {
-    canSell?: number;
-    total?: number;
-    avgGas?: string;
-    avgTax?: string;
-  };
-}
-
-interface LiquidityInfo {
-  dex: string;
-  liquidityUsd: number;
-  liquidityPercent: string;
-  pairName: string;
-}
-
-interface ContractInfo {
-  isOpenSource: boolean;
-  isVerified: boolean;
-  canSell: string;
-  avgGas: string;
-  avgTax: string;
+/**
+ * Format large numbers with commas
+ */
+function formatLargeNumber(num: number | string | undefined): string {
+  if (num === undefined || num === null) return "0";
+  const number = typeof num === "string" ? parseFloat(num) : num;
+  if (isNaN(number)) return "0";
+  return number.toLocaleString();
 }
 
 /**
@@ -413,14 +360,40 @@ async function fetchComprehensiveTokenAnalysis(
 }
 
 /**
- * Format liquidity information from pairs data
+ * Format liquidity information from pairs data or honeypot data
  */
 function formatLiquidityInfo(
   pairsData: PairData[],
+  honeypotData: HoneypotData | null,
   detectedChain: string
 ): LiquidityInfo {
+  const baseCurrency =
+    detectedChain === "solana-mainnet"
+      ? "SOL"
+      : detectedChain === "56"
+      ? "BNB"
+      : "ETH";
+
+  if (honeypotData?.pair?.liquidity) {
+    const pairName = honeypotData.pair.pair?.name || `UNKNOWN-${baseCurrency}`;
+    const dexName = pairName.includes("PancakeSwap")
+      ? "PancakeSwap V2"
+      : pairName.includes("Uniswap")
+      ? "Uniswap V2"
+      : detectedChain === "solana-mainnet"
+      ? "Raydium"
+      : "DEX";
+
+    return {
+      dex: dexName,
+      liquidityUsd: honeypotData.pair.liquidity,
+      liquidityPercent: "N/A",
+      pairName: pairName.replace(/^.*?:\s*/, ""),
+      pairAddress: honeypotData.pair.pair?.address || honeypotData.pairAddress,
+    };
+  }
+
   if (!pairsData || pairsData.length === 0) {
-    const baseCurrency = detectedChain === "solana-mainnet" ? "SOL" : "ETH";
     return {
       dex: "Unknown",
       liquidityUsd: 0,
@@ -435,45 +408,81 @@ function formatLiquidityInfo(
     mainPair.dexName ||
     (detectedChain === "solana-mainnet" ? "Raydium" : "Uniswap V2");
   const pairName =
-    mainPair.pairName ||
-    mainPair.Pair?.Name ||
-    `UNKNOWN-${detectedChain === "solana-mainnet" ? "SOL" : "ETH"}`;
+    mainPair.pairName || mainPair.Pair?.Name || `UNKNOWN-${baseCurrency}`;
 
   return {
     dex: dexName,
     liquidityUsd: liquidityUsd,
     liquidityPercent: "N/A",
     pairName: pairName,
+    pairAddress: mainPair.Pair?.Address,
   };
 }
 
 /**
- * Format contract information
+ * Format contract information with enhanced data
  */
 function formatContractInfo(
   contractData: ContractData | null,
+  honeypotData: HoneypotData | null,
   holdersData: HoldersData | null,
   detectedChain: string
 ): ContractInfo {
-  const canSellCount = holdersData?.recentHolderAnalysis?.canSell || 0;
-  const totalHolders = holdersData?.recentHolderAnalysis?.total || 0;
+  const canSellCount =
+    holdersData?.recentHolderAnalysis?.canSell ||
+    honeypotData?.holderAnalysis?.successful ||
+    0;
+  const totalHolders =
+    holdersData?.recentHolderAnalysis?.total ||
+    honeypotData?.holderAnalysis?.holders ||
+    0;
 
-  const actualHolderCount = holdersData?.holders?.length || 0;
+  const actualHolderCount =
+    holdersData?.holders?.length || honeypotData?.token?.totalHolders || 0;
   const isSolana = detectedChain === "solana-mainnet";
 
+  const isOpenSource =
+    contractData?.isOpenSource ||
+    honeypotData?.contractCode?.openSource ||
+    false;
+  const isVerified =
+    contractData?.isVerified ||
+    honeypotData?.contractCode?.rootOpenSource ||
+    false;
+  const isProxy = honeypotData?.contractCode?.isProxy || false;
+  const hasProxyCalls = honeypotData?.contractCode?.hasProxyCalls || false;
+
+  const avgGas =
+    holdersData?.recentHolderAnalysis?.avgGas ||
+    (honeypotData?.holderAnalysis?.averageGas
+      ? formatLargeNumber(honeypotData.holderAnalysis.averageGas)
+      : isSolana
+      ? "~2,000 SOL"
+      : "N/A");
+
+  const avgTax =
+    holdersData?.recentHolderAnalysis?.avgTax ||
+    (honeypotData?.holderAnalysis?.averageTax
+      ? formatPercentage(honeypotData.holderAnalysis.averageTax)
+      : "0%");
+
   return {
-    isOpenSource: contractData?.isOpenSource || false,
-    isVerified: contractData?.isVerified || false,
+    isOpenSource,
+    isVerified,
+    isProxy,
+    hasProxyCalls,
     canSell:
       canSellCount && totalHolders
-        ? `${canSellCount}/${totalHolders}`
+        ? `${formatLargeNumber(canSellCount)}/${formatLargeNumber(
+            totalHolders
+          )}`
         : isSolana && actualHolderCount > 0
-        ? `${actualHolderCount}/${actualHolderCount}`
+        ? `${formatLargeNumber(actualHolderCount)}/${formatLargeNumber(
+            actualHolderCount
+          )}`
         : "N/A",
-    avgGas:
-      holdersData?.recentHolderAnalysis?.avgGas ||
-      (isSolana ? "~2,000 SOL" : "N/A"),
-    avgTax: holdersData?.recentHolderAnalysis?.avgTax || "0%",
+    avgGas: avgGas,
+    avgTax: avgTax,
   };
 }
 
@@ -488,34 +497,94 @@ function escapeMarkdown(text: string): string {
 }
 
 /**
- * Generate comprehensive token analysis report
+ * Generate comprehensive token analysis report with enhanced formatting
  */
 function generateComprehensiveReport(analysis: TokenAnalysisResult): string {
   const { honeypot, contract, pairs, holders, tokenInfo } = analysis;
 
-  const liquidityInfo = formatLiquidityInfo(pairs, analysis.detectedChain);
+  const liquidityInfo = formatLiquidityInfo(
+    pairs,
+    honeypot,
+    analysis.detectedChain
+  );
   const contractInfo = formatContractInfo(
     contract,
+    honeypot,
     holders,
     analysis.detectedChain
   );
 
-  const tokenHolders = holders?.totalHolders
-    ? holders.totalHolders
-    : holders?.holders?.length || 0;
+  const tokenHolders =
+    holders?.totalHolders ||
+    honeypot?.token?.totalHolders ||
+    holders?.holders?.length ||
+    0;
 
   const isHoneypot =
     honeypot?.honeypotResult?.isHoneypot ||
     honeypot?.summary?.risk === "high" ||
+    honeypot?.summary?.risk === "honeypot" ||
     (honeypot?.simulationResult?.sellTax &&
-      honeypot.simulationResult.sellTax > 50);
+      honeypot.simulationResult.sellTax > 50) ||
+    (honeypot?.flags &&
+      Array.isArray(honeypot.flags) &&
+      honeypot.flags.includes("EXTREMELY_HIGH_TAXES"));
 
-  const buyTax = honeypot?.simulationResult?.buyTax || 0;
-  const sellTax = honeypot?.simulationResult?.sellTax || 0;
+  const buyTax = formatPercentage(honeypot?.simulationResult?.buyTax || 0);
+  const sellTax = formatPercentage(honeypot?.simulationResult?.sellTax || 0);
+  const transferTax = formatPercentage(
+    honeypot?.simulationResult?.transferTax || 0
+  );
+
   const honeypotReason =
     honeypot?.honeypotResult?.honeypotReason ||
     honeypot?.summary?.riskReason ||
     "Cannot sell tokens! HONEYPOT DETECTED!";
+
+  let riskFlags: string[] = [];
+  if (honeypot?.flags) {
+    if (Array.isArray(honeypot.flags)) {
+      riskFlags = honeypot.flags;
+    } else if (typeof honeypot.flags === "object") {
+      if (!honeypot.flags.isSellable) riskFlags.push("NOT_SELLABLE");
+      if (!honeypot.flags.isOpen) riskFlags.push("NOT_OPEN_SOURCE");
+      if (honeypot.flags.isAntiWhale) riskFlags.push("ANTI_WHALE");
+      if (honeypot.flags.hasAntiBot) riskFlags.push("ANTI_BOT");
+      if (!honeypot.flags.staysLiquid) riskFlags.push("LIQUIDITY_ISSUES");
+      if (honeypot.flags.hasForeignCalls) riskFlags.push("FOREIGN_CALLS");
+      if (honeypot.flags.hasPermissions) riskFlags.push("HAS_PERMISSIONS");
+    }
+  }
+
+  if (honeypot?.risks && Array.isArray(honeypot.risks)) {
+    honeypot.risks.forEach((risk) => {
+      if (risk.level === "danger" || risk.level === "warning") {
+        riskFlags.push(
+          `${risk.name?.toUpperCase().replace(/\s+/g, "_")}: ${risk.value}`
+        );
+      }
+    });
+  }
+
+  const holderAnalysisText = honeypot?.holderAnalysis
+    ? `📊 *HOLDER ANALYSIS:* ${formatLargeNumber(
+        honeypot.holderAnalysis.holders
+      )} analyzed | ${formatLargeNumber(
+        honeypot.holderAnalysis.successful
+      )} can sell | ${formatLargeNumber(
+        honeypot.holderAnalysis.failed
+      )} failed | Highest tax: ${formatPercentage(
+        honeypot.holderAnalysis.highestTax
+      )}
+`
+    : "";
+
+  const gasInfo = honeypot?.simulationResult
+    ? `⛽ *GAS:* Buy: ${formatLargeNumber(
+        honeypot.simulationResult.buyGas
+      )} | Sell: ${formatLargeNumber(honeypot.simulationResult.sellGas)} units
+`
+    : "";
 
   const safeName = escapeMarkdown(tokenInfo.name);
   const safeSymbol = escapeMarkdown(tokenInfo.symbol);
@@ -524,64 +593,117 @@ function generateComprehensiveReport(analysis: TokenAnalysisResult): string {
   const safeHoneypotReason = escapeMarkdown(honeypotReason);
 
   if (isHoneypot) {
-    return `
-🚨 *HIGH Risk of Honeypot* ❌
+    return `🚨 *CRITICAL WARNING - HONEYPOT DETECTED* 🚨
+⚠️ *DO NOT BUY THIS TOKEN* ⚠️
 ${safeHoneypotReason}
 
-🪙 *Token:* ${safeName} (${safeSymbol})
+🪙 *TOKEN:* ${safeName} (${safeSymbol}) | ${formatLargeNumber(
+      tokenHolders
+    )} holders
+📱 *CHAIN:* ${honeypot?.chain?.name || getChainName(analysis.detectedChain)}
+
+💱 *TRADING:* ${
+      liquidityInfo.dex === "Unknown"
+        ? "❌ No liquidity data"
+        : `${safeDex} | ${safePairName} | $${formatLargeNumber(
+            liquidityInfo.liquidityUsd
+          )}`
+    }
+
+💸 *TAXES:* Buy: ${buyTax} | Sell: ${sellTax}${
+      transferTax !== "0%" ? ` | Transfer: ${transferTax}` : ""
+    }
+
+📄 *CONTRACT:* ${contractInfo.isOpenSource ? "✅ Open" : "❌ Closed"} | ${
+      contractInfo.isVerified ? "✅ Verified" : "❌ Unverified"
+    }${contractInfo.isProxy ? " | ⚠️ Proxy" : ""}${
+      contractInfo.hasProxyCalls ? " | ⚠️ Proxy Calls" : ""
+    }
+
+${holderAnalysisText}${gasInfo}🚩 *RISK FLAGS:*
 ${
-  liquidityInfo.dex === "Unknown"
-    ? "🚨 *Liquidity Information Unavailable* ❌"
-    : `📊 *DEX:* ${safeDex}: ${safePairName}`
-}
-💰 *LQ:* $${liquidityInfo.liquidityUsd.toLocaleString()} (${
-      liquidityInfo.liquidityPercent
-    })
-👥 *Top Holders:* ${tokenHolders}
-
-💸 *TAX:* BUY: ${buyTax}% | SELL: ${sellTax}%
-📄 *CONTRACT:* ${contractInfo.isOpenSource ? "OPEN SOURCE" : "NOT VERIFIED"}
-
-⚠️ *WARNING: DO NOT BUY* - This token is likely a scam designed to steal funds.
-
-🚩 *Risk Flags:*
-${
-  honeypot?.flags && Array.isArray(honeypot.flags)
-    ? honeypot.flags
-        .map((flag: string) => ` • ${escapeMarkdown(flag)}`)
-        .join("\n")
+  riskFlags.length > 0
+    ? riskFlags.map((flag) => ` • ${escapeMarkdown(flag)}`).join("\n")
     : " • High sell tax detected\n • Potential honeypot mechanism"
 }
 
-This is a generated report. Not always accurate.
-`;
+⚠️ *RUGPROOFAI: EXTREMELY HIGH RISK*
+This token shows clear signs of being a honeypot scam.
+
+*Generated by RugProofAI - Not financial advice*`;
   } else {
-    const riskLevel = buyTax > 10 || sellTax > 10 ? "Medium" : "Low";
+    const riskLevel =
+      parseFloat(buyTax) > 10 || parseFloat(sellTax) > 10 ? "Medium" : "Low";
+    const riskEmoji = riskLevel === "Low" ? "✅" : "⚠️";
 
-    return `
-✅ *${riskLevel} Risk of Honeypot* ${riskLevel === "Low" ? "✓" : "⚠️"}
-Didn't detect any risks. Always do your own due diligence!
+    const riskScoreText = honeypot?.score_normalised
+      ? `\n🎯 *Risk Score:* ${honeypot.score_normalised}/100`
+      : "";
 
-🪙 *Token:* ${safeName} (${safeSymbol})
+    return `${riskEmoji} *${riskLevel.toUpperCase()} RISK TOKEN* ${riskEmoji}
+No critical honeypot mechanisms detected. Always DYOR!
+
+🪙 *TOKEN:* ${safeName} (${safeSymbol}) | ${formatLargeNumber(
+      tokenHolders
+    )} holders
+📱 *CHAIN:* ${
+      honeypot?.chain?.name || getChainName(analysis.detectedChain)
+    }${riskScoreText}
+
+💱 *TRADING:* ${
+      liquidityInfo.dex === "Unknown"
+        ? "❌ No liquidity data"
+        : `${safeDex} | ${safePairName} | $${formatLargeNumber(
+            liquidityInfo.liquidityUsd
+          )}`
+    }
+
+💸 *TAXES:* Buy: ${buyTax} | Sell: ${sellTax}${
+      transferTax !== "0%" ? ` | Transfer: ${transferTax}` : ""
+    }
+
+📄 *CONTRACT:* ${contractInfo.isOpenSource ? "✅ Open" : "❌ Closed"} | ${
+      contractInfo.isVerified ? "✅ Verified" : "❌ Unverified"
+    }${contractInfo.isProxy ? " | ℹ️ Proxy" : ""}${
+      contractInfo.hasProxyCalls ? " | ℹ️ Proxy Calls" : ""
+    }
+
+📊 *TRADING:* Can sell: ${contractInfo.canSell} | Gas: ${
+      contractInfo.avgGas
+    } | Tax: ${contractInfo.avgTax}
+
+${holderAnalysisText}${gasInfo}${
+      riskFlags.length > 0
+        ? `🔍 *FLAGS:* ${riskFlags
+            .map((flag) => escapeMarkdown(flag))
+            .join(" | ")}
+
+`
+        : ""
+    }✅ *RUGPROOFAI: ${riskLevel.toUpperCase()} RISK*
 ${
-  liquidityInfo.dex === "Unknown"
-    ? "🚨 *Liquidity Information Unavailable* ❌"
-    : `📊 *DEX:* ${safeDex}: ${safePairName}`
+  riskLevel === "Low"
+    ? "Token appears legitimate, but always DYOR."
+    : "Some risk factors detected. Review before investing."
 }
-💰 *LQ:* $${liquidityInfo.liquidityUsd.toLocaleString()} (${
-      liquidityInfo.liquidityPercent
-    })
-👥 *Top Holders:* ${tokenHolders} 
 
-💸 *TAX:* BUY: ${buyTax}% | SELL: ${sellTax}%
-📄 *CONTRACT:* ${contractInfo.isOpenSource ? "OPEN SOURCE" : "NOT VERIFIED"}
-📊 *Recent Holder Analysis:*
-Can Sell: ${contractInfo.canSell}
-AVG GAS: ${contractInfo.avgGas} | AVG TAX: ${contractInfo.avgTax}
-
-This is a generated report. Not always accurate.
-`;
+*Generated by RugProofAI - Not financial advice*`;
   }
+}
+
+/**
+ * Get chain name for display
+ */
+function getChainName(chainId: string): string {
+  const chainNames: { [key: string]: string } = {
+    "1": "Ethereum",
+    "56": "BSC",
+    "137": "Polygon",
+    "8453": "Base",
+    "43114": "Avalanche",
+    "solana-mainnet": "Solana",
+  };
+  return chainNames[chainId] || `Chain ${chainId}`;
 }
 
 export async function handleHoneypotCommand(

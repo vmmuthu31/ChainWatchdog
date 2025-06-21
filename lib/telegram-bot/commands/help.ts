@@ -60,7 +60,7 @@ Simply paste any token address directly into the chat!
 • Security risk assessment
 
 👤 *WALLET ANALYSIS*
-\`/scanwallet <wallet_address> [chain_id]\`
+\`/scan <wallet_address> [chain_id]\`
 Analyze a wallet for spam tokens, scams, and security risks
 
 🛡️ *CONTRACT AUDIT*
@@ -79,7 +79,7 @@ Audit smart contract security and identify potential risks
 *📋 Examples:*
 • \`0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE\` - Quick SHIB analysis
 • \`/scan 0x1234...\` - Comprehensive token analysis
-• \`/scanwallet 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\` - Scan Vitalik's wallet
+• \`/scan 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\` - Scan Vitalik's wallet
 
 *🔍 What You Get:*
 ✅ Honeypot Detection ✅ Liquidity Analysis
