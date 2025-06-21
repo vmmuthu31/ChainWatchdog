@@ -39,6 +39,44 @@ async function handleDirectAddressInput(
   return true;
 }
 
+/**
+ * Handle irrelevant or unrecognized messages
+ */
+async function handleIrrelevantMessage(
+  bot: TelegramBot,
+  message: TelegramBot.Message
+): Promise<void> {
+  const helpMessage = `
+🔐 *Hey! I'm RugProofAI Telegram Bot* 
+
+I'm here to help you with *crypto security analysis* only! 
+
+*🚀 What I can do:*
+• Analyze tokens for honeypots and scams
+• Check smart contract security
+• Scan wallet addresses for risks
+• Provide liquidity and holder analysis
+
+*📋 How to use me:*
+• Paste any token address directly
+• Use \`/scan <address>\` for full analysis
+• Type \`/help\` for detailed commands
+
+*Example:*
+\`0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE\`
+
+❌ *I can't help with:*
+General questions, news, or non-crypto topics
+
+🔍 *Ready to scan some tokens?* Just paste an address!
+`;
+
+  await bot.sendMessage(message.chat.id, helpMessage, {
+    parse_mode: "Markdown",
+    disable_web_page_preview: true,
+  });
+}
+
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
 
 console.info(`RugProofAI Bot is starting up...`);
@@ -87,21 +125,19 @@ bot.on("message", async (message) => {
 
       default:
         if (text.startsWith("/")) {
-          await bot.sendMessage(
-            message.chat.id,
-            `Unknown command. Type /help to see available commands.`
-          );
+          // Handle unknown commands
+          await handleIrrelevantMessage(bot, message);
         } else if (text.trim() !== "") {
+          // Try to handle direct address input first
           const wasHandled = await handleDirectAddressInput(
             bot,
             text.trim(),
             message
           );
 
+          // If it wasn't a valid address, handle as irrelevant message
           if (!wasHandled) {
-            console.info(
-              `Ignored non-address message: ${text.substring(0, 20)}...`
-            );
+            await handleIrrelevantMessage(bot, message);
           }
         }
         break;
